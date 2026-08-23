@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllProposalSlugs, getProposal } from "@/lib/proposals";
+import { OpeningSequence } from "@/components/proposal/OpeningSequence";
 import { Hero } from "@/components/proposal/Hero";
 import { Situation } from "@/components/proposal/Situation";
 import { Approach } from "@/components/proposal/Approach";
@@ -43,11 +44,12 @@ export default async function ProposalPage({
   return (
     <div className="flex-1">
       {proposal.status === "accepted" && (
-        <div className="bg-surface-raised text-text-primary text-center text-sm font-medium py-2.5">
+        <div className="bg-accent text-accent-ink text-center text-sm font-medium py-2.5">
           This proposal has been marked accepted.
         </div>
       )}
 
+      <OpeningSequence proposal={proposal} />
       <Hero proposal={proposal} />
       <Situation situation={proposal.situation} />
       <Approach approachNotes={proposal.approachNotes} />

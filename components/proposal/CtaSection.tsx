@@ -15,27 +15,24 @@ export function CtaSection({
   );
 
   return (
-    <div
-      id="decision"
-      className="bg-surface border-y border-border-outline"
-    >
-      <div className="max-w-[700px] mx-auto px-6 py-24 text-center">
-        <h2 className="text-2xl font-semibold text-balance mb-4">
+    <div id="decision" className="bg-dark text-dark-ink">
+      <div className="max-w-[720px] mx-auto px-6 py-28 text-center">
+        <h2 className="font-display font-light italic text-4xl text-balance mb-5">
           You&apos;ve Seen What We Do. Now Let&apos;s Do It For You.
         </h2>
-        <p className="text-text-muted max-w-[520px] mx-auto mb-9">
+        <p className="text-dark-ink-muted max-w-[520px] mx-auto mb-10">
           No Pitch, No Pressure. Just An Honest Conversation About Your
           Website And Your Mobile Experience, If That&apos;s Where The Real
           Problem Is.
         </p>
 
-        <div className="flex gap-3 justify-center flex-wrap mb-4">
+        <div className="flex gap-3 justify-center flex-wrap mb-5">
           {paymentLinks?.payoneer && (
             <a
               href={paymentLinks.payoneer}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-7 bg-fill-button text-surface font-medium text-sm px-5 h-11"
+              className="inline-flex items-center justify-center rounded-2 bg-accent text-accent-ink font-medium text-sm px-6 h-12"
             >
               Accept &amp; Pay Via Payoneer
             </a>
@@ -47,8 +44,8 @@ export function CtaSection({
               rel="noopener noreferrer"
               className={
                 hasPayment && paymentLinks?.payoneer
-                  ? "inline-flex items-center justify-center rounded-7 border border-border-outline text-text-primary font-medium text-sm px-5 h-11"
-                  : "inline-flex items-center justify-center rounded-7 bg-fill-button text-surface font-medium text-sm px-5 h-11"
+                  ? "inline-flex items-center justify-center rounded-2 border border-dark-ink-muted text-dark-ink font-medium text-sm px-6 h-12"
+                  : "inline-flex items-center justify-center rounded-2 bg-accent text-accent-ink font-medium text-sm px-6 h-12"
               }
             >
               Accept &amp; Pay Via Wise
@@ -59,20 +56,20 @@ export function CtaSection({
               href={CAL_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-7 bg-fill-button text-surface font-medium text-sm px-5 h-11"
+              className="inline-flex items-center justify-center rounded-2 bg-accent text-accent-ink font-medium text-sm px-6 h-12"
             >
               Accept &amp; Book A 15-Min Call
             </a>
           )}
         </div>
 
-        <div className="text-sm text-text-muted">
+        <div className="text-sm text-dark-ink-muted">
           Prefer email?{" "}
           <a
             href={`mailto:hello@biflux.design?subject=${encodeURIComponent(
               "Accepting the proposal"
             )}&body=${mailBody}`}
-            className="text-text-primary underline underline-offset-2"
+            className="text-dark-ink underline underline-offset-2"
           >
             hello@biflux.design
           </a>
