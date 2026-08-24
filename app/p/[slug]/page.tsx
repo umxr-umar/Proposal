@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getAllProposalSlugs, getProposal } from "@/lib/proposals";
 import { SlideDeck } from "@/components/proposal/slides/SlideDeck";
 import { CoverSlide } from "@/components/proposal/slides/CoverSlide";
+import { CoverSlideV2 } from "@/components/proposal/slides/CoverSlideV2";
 
 export async function generateStaticParams() {
   const slugs = await getAllProposalSlugs();
@@ -32,5 +33,12 @@ export default async function ProposalPage({
 
   if (!proposal) notFound();
 
-  return <SlideDeck slides={[<CoverSlide key="cover" proposal={proposal} />]} />;
+  return (
+    <SlideDeck
+      slides={[
+        <CoverSlide key="cover-v1" proposal={proposal} />,
+        <CoverSlideV2 key="cover-v2" proposal={proposal} />,
+      ]}
+    />
+  );
 }
