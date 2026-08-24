@@ -8,10 +8,8 @@ import { Approach } from "@/components/proposal/Approach";
 import { CaseStudies } from "@/components/proposal/CaseStudies";
 import { Plan } from "@/components/proposal/Plan";
 import { Timeline } from "@/components/proposal/Timeline";
-import { Faq } from "@/components/proposal/Faq";
 import { CtaSection } from "@/components/proposal/CtaSection";
 import { Questions } from "@/components/proposal/Questions";
-import { Footer } from "@/components/proposal/Footer";
 
 export async function generateStaticParams() {
   const slugs = await getAllProposalSlugs();
@@ -56,10 +54,8 @@ export default async function ProposalPage({
       <CaseStudies slugs={proposal.caseStudySlugs} />
       <Plan packages={proposal.packages} />
       <Timeline timeline={proposal.timeline} />
-      <Faq />
       <CtaSection clientName={proposal.clientName} paymentLinks={proposal.paymentLinks} />
       <Questions clientName={proposal.clientName} />
-      <Footer />
     </div>
   );
 }

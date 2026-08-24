@@ -32,6 +32,7 @@ export type PaymentLinks = {
 export type Proposal = {
   slug: string;
   clientName: string;
+  clientEmail?: string;
   projectType: ProjectType;
   heroHeadline?: string;
   heroLede?: string;

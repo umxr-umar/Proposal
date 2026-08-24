@@ -3,6 +3,7 @@ import type { Proposal } from "@/lib/types";
 export const proposal: Proposal = {
   slug: "acme-roofing",
   clientName: "Acme Roofing Co",
+  clientEmail: "hello@acmeroofing.com",
   projectType: "Website Design",
   heroHeadline: "We Build Websites That Turn Cold Traffic Into Customers.",
   heroLede: "Acme Roofing Co, built to convert.",

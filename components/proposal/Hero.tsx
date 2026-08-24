@@ -1,50 +1,33 @@
 import type { Proposal } from "@/lib/types";
 
-const CAL_URL = "https://cal.com/umar-d1uf39/15min";
-
 export function Hero({ proposal }: { proposal: Proposal }) {
   return (
     <div className="max-w-[900px] mx-auto px-6 pt-32 pb-24">
-      <div className="text-xs tracking-wide uppercase text-ink-muted mb-7">
-        Prepared For {proposal.clientName}
-      </div>
-
-      <h1 className="font-display font-light italic text-6xl leading-[1.05] text-balance mb-7 max-w-[820px]">
-        {proposal.heroHeadline ||
-          "We Build Websites That Turn Cold Traffic Into Customers."}
+      <h1 className="font-display font-normal text-6xl leading-[1.05] text-balance mb-7 uppercase">
+        Project Proposal
       </h1>
 
-      {proposal.heroLede && (
-        <p className="text-lg text-ink-muted max-w-[560px] mb-10">
-          {proposal.heroLede}
-        </p>
-      )}
+      <p className="text-lg text-ink-muted max-w-[640px] mb-16">
+        Web design and web development contract proposal for{" "}
+        {proposal.clientName}.
+      </p>
 
-      <div className="flex gap-3 flex-wrap mb-14">
-        <a
-          href="#decision"
-          className="inline-flex items-center justify-center rounded-2 bg-accent text-accent-ink font-medium text-sm px-6 h-12"
-        >
-          Accept This Proposal
-        </a>
-        <a
-          href={CAL_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center rounded-2 border border-border text-ink font-medium text-sm px-6 h-12"
-        >
-          Book A 15-Min Call
-        </a>
-      </div>
-
-      <div className="flex gap-x-6 gap-y-2 flex-wrap text-sm text-ink-muted">
-        {[
-          "100+ Websites Rebuilt From Scratch",
-          "60+ Mobile Flows Rebuilt From Scratch",
-          "15+ Industries Served",
-        ].map((badge) => (
-          <span key={badge}>{badge}</span>
-        ))}
+      <div className="flex gap-x-16 gap-y-6 flex-wrap">
+        <div>
+          <div className="text-xs tracking-wide uppercase text-ink-muted mb-3">
+            Freelancer
+          </div>
+          <div className="text-ink">hello@biflux.design</div>
+        </div>
+        <div>
+          <div className="text-xs tracking-wide uppercase text-ink-muted mb-3">
+            Client
+          </div>
+          <div className="text-ink">{proposal.clientName}</div>
+          {proposal.clientEmail && (
+            <div className="text-ink-muted">{proposal.clientEmail}</div>
+          )}
+        </div>
       </div>
 
       {proposal.personalMessageVideoUrl && (
