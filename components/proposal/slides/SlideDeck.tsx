@@ -1,9 +1,42 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 const SLIDE_WIDTH = 1920;
 const SLIDE_HEIGHT = 1080;
+
+/**
+ * Shared deck state exposed to every slide — current position, slide count,
+ * and a jump-to-slide function. Lets any slide render its own page number
+ * or link to another slide (e.g. a table of contents) without SlideDeck
+ * needing to know anything about what's inside each slide.
+ */
+type SlideDeckState = {
+  index: number;
+  total: number;
+  goToSlide: (i: number) => void;
+};
+
+const SlideDeckContext = createContext<SlideDeckState>({
+  index: 0,
+  total: 1,
+  goToSlide: () => {},
+});
+
+export function useSlideDeck() {
+  return useContext(SlideDeckContext);
+}
+
+export function pad(n: number) {
+  return String(n + 1).padStart(2, "0");
+}
 
 function Chevron({ dir }: { dir: "left" | "right" }) {
   return (
@@ -17,10 +50,6 @@ function Chevron({ dir }: { dir: "left" | "right" }) {
       />
     </svg>
   );
-}
-
-function pad(n: number) {
-  return String(n + 1).padStart(2, "0");
 }
 
 /**
@@ -87,6 +116,10 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
   const canPrev = index > 0;
   const canNext = index < slides.length - 1;
 
+  function goToSlide(i: number) {
+    setIndex(Math.min(Math.max(i, 0), slides.length - 1));
+  }
+
   return (
     <div className="relative h-screen w-full overflow-hidden bg-black">
       <div
@@ -95,7 +128,13 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
       >
         {slides.map((slide, i) => (
           <div key={i} className="h-full w-screen shrink-0">
-            <SlideCanvas>{slide}</SlideCanvas>
+            <SlideCanvas>
+              <SlideDeckContext.Provider
+                value={{ index, total: slides.length, goToSlide }}
+              >
+                {slide}
+              </SlideDeckContext.Provider>
+            </SlideCanvas>
           </div>
         ))}
       </div>
@@ -116,7 +155,7 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
             <button
               key={i}
               type="button"
-              onClick={() => setIndex(i)}
+              onClick={() => goToSlide(i)}
               aria-label={`Go to slide ${i + 1}`}
               className={`h-1.5 rounded-full transition-all ${
                 i === index ? "w-6 bg-[#C0FFD2]" : "w-1.5 bg-white/30 hover:bg-white/50"
