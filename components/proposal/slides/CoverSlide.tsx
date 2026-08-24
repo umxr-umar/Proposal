@@ -1,4 +1,5 @@
 import type { Proposal } from "@/lib/types";
+import { BifluxLogo } from "./BifluxLogo";
 
 /**
  * Version 1 of the Cover slide. Values pulled from Paper's "Cover" frame at
@@ -61,18 +62,7 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
 
         <div className="flex items-start" style={{ marginTop: 71, gap: 105 }}>
           <div className="flex flex-col" style={{ gap: 27 }}>
-            <div
-              className="uppercase"
-              style={{
-                fontFamily: inter,
-                fontWeight: 500,
-                fontSize: 21,
-                lineHeight: "109%",
-                letterSpacing: "0.2em",
-              }}
-            >
-              Freelancer
-            </div>
+            <BifluxLogo />
             <div
               className="flex flex-col"
               style={{
