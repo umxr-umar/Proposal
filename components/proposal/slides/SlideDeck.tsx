@@ -54,19 +54,18 @@ function Chevron({ dir }: { dir: "left" | "right" }) {
 
 /**
  * Glossy circular arrow button — layered gradient + inset highlight/shadow
- * + outer drop shadow, tuned to look pressed/3D rather than flat. `filled`
- * swaps the dark gradient for the mint accent gradient (used on Next).
+ * + outer drop shadow, tuned to look pressed/3D rather than flat. Both
+ * directions share the same neutral dark glossy treatment — no accent
+ * color, matching the monochrome gray/white nav reference.
  */
 function NavArrowButton({
   dir,
   onClick,
   disabled,
-  filled,
 }: {
   dir: "left" | "right";
   onClick: () => void;
   disabled: boolean;
-  filled?: boolean;
 }) {
   return (
     <button
@@ -75,25 +74,14 @@ function NavArrowButton({
       disabled={disabled}
       aria-label={dir === "left" ? "Previous slide" : "Next slide"}
       className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-[filter,transform] duration-150 hover:brightness-110 active:scale-90 disabled:pointer-events-none disabled:opacity-30"
-      style={
-        filled
-          ? {
-              background:
-                "linear-gradient(180deg, #dcffe6 0%, #a3edbb 55%, #79db9c 100%)",
-              border: "1px solid rgba(255,255,255,0.4)",
-              color: "#06210f",
-              boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.8), inset 0 -2px 3px rgba(10,60,30,0.3), 0 6px 18px rgba(140,255,180,0.35), 0 2px 6px rgba(0,0,0,0.35)",
-            }
-          : {
-              background:
-                "linear-gradient(180deg, #3c3e42 0%, #202124 60%, #131315 100%)",
-              border: "1px solid rgba(255,255,255,0.14)",
-              color: "rgba(255,255,255,0.85)",
-              boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 3px rgba(0,0,0,0.4), 0 3px 8px rgba(0,0,0,0.45)",
-            }
-      }
+      style={{
+        background:
+          "linear-gradient(180deg, #3c3e42 0%, #202124 60%, #131315 100%)",
+        border: "1px solid rgba(255,255,255,0.14)",
+        color: "rgba(255,255,255,0.85)",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 3px rgba(0,0,0,0.4), 0 3px 8px rgba(0,0,0,0.45)",
+      }}
     >
       <Chevron dir={dir} />
     </button>
@@ -210,18 +198,19 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
               type="button"
               onClick={() => goToSlide(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold tabular-nums transition-all duration-150 hover:bg-white/[0.06]"
-              style={
-                i === index
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[14px] tabular-nums transition-all duration-150 hover:bg-white/[0.06]"
+              style={{
+                fontFamily: "var(--font-neue-haas), system-ui, sans-serif",
+                ...(i === index
                   ? {
-                      color: "#06210f",
+                      color: "#0a0a0a",
                       background:
-                        "linear-gradient(180deg, #dcffe6 0%, #a3edbb 55%, #79db9c 100%)",
+                        "linear-gradient(180deg, #ffffff 0%, #e2e2e2 100%)",
                       boxShadow:
-                        "inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -2px 2px rgba(10,60,30,0.25), 0 4px 12px rgba(140,255,180,0.3)",
+                        "inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -2px 2px rgba(0,0,0,0.12), 0 4px 12px rgba(255,255,255,0.15)",
                     }
-                  : { color: "rgba(255,255,255,0.42)" }
-              }
+                  : { color: "rgba(255,255,255,0.42)" }),
+              }}
             >
               {pad(i)}
             </button>
@@ -232,7 +221,6 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
           dir="right"
           onClick={() => canNext && setIndex((i) => i + 1)}
           disabled={!canNext}
-          filled
         />
       </div>
     </div>

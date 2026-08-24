@@ -1,6 +1,17 @@
 import type { Metadata } from "next";
 import { Inter, Fraunces, Instrument_Serif } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+
+// The studio's actual brand font — Umar has the licensed desktop family,
+// but only the Roman (regular) weight has a redistributable file on hand,
+// so this is self-hosted at 400 only rather than the full weight range.
+const neueHaas = localFont({
+  src: "./fonts/NeueHaasDisplayRoman.ttf",
+  variable: "--font-neue-haas",
+  weight: "400",
+  style: "normal",
+});
 
 const inter = Inter({
   variable: "--font-inter",
@@ -35,7 +46,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${fraunces.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${inter.variable} ${fraunces.variable} ${instrumentSerif.variable} ${neueHaas.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-ink">
         {children}
