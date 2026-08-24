@@ -26,6 +26,12 @@ import { BifluxLogo } from "./BifluxLogo";
  */
 export function CoverSlide({ proposal }: { proposal: Proposal }) {
   const inter = "var(--font-inter), system-ui, sans-serif";
+  // Real system font reference (not a bundled file — no license needed to
+  // point at an OS-installed copy, same category as "-apple-system"/
+  // "system-ui"); falls back to Arial where Helvetica Neue isn't installed.
+  const helveticaNeue = '"Helvetica Neue", Helvetica, Arial, sans-serif';
+  // The studio's actual brand font, self-hosted (Roman/400 weight only).
+  const neueHaas = "var(--font-neue-haas), system-ui, sans-serif";
 
   return (
     <div
@@ -56,7 +62,7 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
           style={{
             marginLeft: 8,
             width: 727,
-            fontFamily: inter,
+            fontFamily: helveticaNeue,
             fontWeight: 600,
             fontSize: 72,
             lineHeight: "111%",
@@ -75,7 +81,7 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
               className="flex flex-col"
               style={{
                 gap: 4,
-                fontFamily: inter,
+                fontFamily: neueHaas,
                 fontWeight: 400,
                 fontSize: 27,
                 lineHeight: "135%",
@@ -90,7 +96,7 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
             <div
               className="uppercase"
               style={{
-                fontFamily: inter,
+                fontFamily: neueHaas,
                 fontWeight: 500,
                 fontSize: 21,
                 lineHeight: "109%",
@@ -103,7 +109,7 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
               className="flex flex-col"
               style={{
                 gap: 4,
-                fontFamily: inter,
+                fontFamily: neueHaas,
                 fontWeight: 400,
                 fontSize: 27,
                 lineHeight: "135%",

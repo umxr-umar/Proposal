@@ -32,8 +32,8 @@ const SECTIONS = [
  */
 export function TableOfContentsSlide() {
   const { index, goToSlide } = useSlideDeck();
-  const inter = "var(--font-inter), system-ui, sans-serif";
   const instrumentSerif = "var(--font-instrument-serif), serif";
+  const neueHaas = "var(--font-neue-haas), system-ui, sans-serif";
   const year = new Date().getFullYear();
 
   return (
@@ -46,7 +46,7 @@ export function TableOfContentsSlide() {
           <BifluxLogo width={87.03} height={20.6} />
           <div
             style={{
-              fontFamily: inter,
+              fontFamily: neueHaas,
               fontSize: 27,
               color: "#938F8A",
               letterSpacing: "-0.03em",
@@ -58,7 +58,7 @@ export function TableOfContentsSlide() {
         </div>
         <div
           style={{
-            fontFamily: inter,
+            fontFamily: neueHaas,
             fontSize: 27,
             color: "#938F8A",
             letterSpacing: "-0.03em",
@@ -94,7 +94,7 @@ export function TableOfContentsSlide() {
             </span>
             <span
               style={{
-                fontFamily: inter,
+                fontFamily: neueHaas,
                 fontWeight: 600,
                 fontSize: 72,
                 letterSpacing: "-0.06em",
@@ -112,7 +112,7 @@ export function TableOfContentsSlide() {
         style={{
           left: 1855,
           top: 998,
-          fontFamily: inter,
+          fontFamily: neueHaas,
           fontSize: 27,
           color: "#938F8A",
           letterSpacing: "-0.03em",
