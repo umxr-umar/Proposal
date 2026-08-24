@@ -54,11 +54,12 @@
   .stage {
     position: relative;
     width: 100%;
-    max-width: 1280px;
+    max-width: var(--stage-width, 1280px);
     aspect-ratio: 1920 / 1080;
     background: #000000;
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    transition: max-width 0.05s linear;
   }
   .frame {
     position: absolute;
@@ -127,6 +128,30 @@
     border-left: 1px solid #2a2c2f;
     padding: 20px;
     overflow-y: auto;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #666;
+    margin: 0 0 14px;
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid #2a2c2f;
+    margin: 22px 0;
+  }
+  .presets {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .presets button {
+    flex: 1;
+    margin: 0;
+    padding: 7px 4px;
+    font-size: 11px;
   }
   .slider-group { margin-bottom: 22px; }
   .slider-group label {
@@ -211,26 +236,41 @@
   </div>
 
   <div class="panel">
-    <div class="slider-group">
-      <label>Padding Top <span class="val" id="valTop">48px</span></label>
-      <input type="range" id="padTop" min="0" max="150" value="48" />
+    <p class="section-label">Preview size</p>
+    <div class="presets">
+      <button type="button" data-width="1280">13&Prime;</button>
+      <button type="button" data-width="1512">14&Prime;</button>
+      <button type="button" data-width="1728">16&Prime;</button>
+      <button type="button" data-width="1920">27&Prime;</button>
     </div>
     <div class="slider-group">
-      <label>Padding Bottom <span class="val" id="valBottom">48px</span></label>
-      <input type="range" id="padBottom" min="0" max="150" value="48" />
+      <label>Stage Width <span class="val" id="valStageWidth">1280px</span></label>
+      <input type="range" id="stageWidth" min="480" max="1920" value="1280" />
+    </div>
+
+    <hr class="divider" />
+
+    <p class="section-label">Padding</p>
+    <div class="slider-group">
+      <label>Padding Top <span class="val" id="valTop">18px</span></label>
+      <input type="range" id="padTop" min="0" max="150" value="18" />
     </div>
     <div class="slider-group">
-      <label>Padding Left <span class="val" id="valLeft">48px</span></label>
-      <input type="range" id="padLeft" min="0" max="150" value="48" />
+      <label>Padding Bottom <span class="val" id="valBottom">22px</span></label>
+      <input type="range" id="padBottom" min="0" max="150" value="22" />
     </div>
     <div class="slider-group">
-      <label>Padding Right <span class="val" id="valRight">48px</span></label>
-      <input type="range" id="padRight" min="0" max="150" value="48" />
+      <label>Padding Left <span class="val" id="valLeft">42px</span></label>
+      <input type="range" id="padLeft" min="0" max="150" value="42" />
+    </div>
+    <div class="slider-group">
+      <label>Padding Right <span class="val" id="valRight">56px</span></label>
+      <input type="range" id="padRight" min="0" max="150" value="56" />
     </div>
 
     <div class="output" id="output"></div>
     <button id="copyBtn">Copy values</button>
-    <button id="resetBtn" class="reset">Reset to 48px all sides</button>
+    <button id="resetBtn" class="reset">Reset to current values</button>
   </div>
 </div>
 
@@ -251,14 +291,36 @@
   };
   const output = document.getElementById('output');
 
+  const stageWidthSlider = document.getElementById('stageWidth');
+  const valStageWidth = document.getElementById('valStageWidth');
+
+  function updateStageWidth() {
+    const w = stageWidthSlider.value;
+    valStageWidth.textContent = w + 'px';
+    stage.style.setProperty('--stage-width', w + 'px');
+  }
+
   function updateScale() {
-    // The stage renders at whatever width fits the viewport; --scale maps
-    // the fixed 1920px reference canvas down to the stage's real width, so
-    // every padding value below is expressed in real 1920x1080-canvas px,
-    // same numbers as CoverSlide.tsx.
+    // The stage renders at whatever width fits the viewport (capped by the
+    // Stage Width slider); --scale maps the fixed 1920px reference canvas
+    // down to the stage's real rendered width, so every padding value below
+    // stays expressed in real 1920x1080-canvas px, same numbers as
+    // CoverSlide.tsx. Driven by ResizeObserver so it tracks live drag-resize
+    // of the browser window too, not just the slider.
     const scale = stage.getBoundingClientRect().width / 1920;
     frame.style.setProperty('--scale', scale);
   }
+
+  new ResizeObserver(updateScale).observe(stage);
+
+  stageWidthSlider.addEventListener('input', updateStageWidth);
+
+  document.querySelectorAll('.presets button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      stageWidthSlider.value = btn.dataset.width;
+      updateStageWidth();
+    });
+  });
 
   function update() {
     const values = {};
@@ -276,7 +338,6 @@
   }
 
   Object.values(sliders).forEach((el) => el.addEventListener('input', update));
-  window.addEventListener('resize', updateScale);
 
   document.getElementById('copyBtn').addEventListener('click', () => {
     navigator.clipboard.writeText(output.textContent).then(() => {
@@ -287,11 +348,13 @@
     });
   });
 
+  const CURRENT_VALUES = { top: 18, bottom: 22, left: 42, right: 56 };
   document.getElementById('resetBtn').addEventListener('click', () => {
-    Object.values(sliders).forEach((el) => (el.value = 48));
+    for (const key in sliders) sliders[key].value = CURRENT_VALUES[key];
     update();
   });
 
+  updateStageWidth();
   updateScale();
   update();
 </script>
