@@ -16,7 +16,8 @@ import { BifluxLogo } from "./BifluxLogo";
  * desktop font with no web-license file available here, so Inter
  * substitutes for it. Inter renders wider than the real font at the same
  * point size (measured: 1975px vs Paper's real 1729px at 212.18px), so
- * the title size below is corrected to 185.8px to match that real width.
+ * the title size below is corrected (187.5px, tuned via padding-tool.html)
+ * to match that real width.
  *
  * The subtitle wraps to a different number of lines depending on the
  * client name's length (Paper's placeholder wraps to 3; a longer real
@@ -41,7 +42,7 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
         style={{
           fontFamily: inter,
           fontWeight: 500,
-          fontSize: 185.8,
+          fontSize: 187.5,
           lineHeight: "100%",
           letterSpacing: "-0.06em",
           whiteSpace: "nowrap",
@@ -58,7 +59,7 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
             fontFamily: inter,
             fontWeight: 600,
             fontSize: 72,
-            lineHeight: "100%",
+            lineHeight: "111%",
             letterSpacing: "-0.06em",
             textTransform: "capitalize",
           }}
@@ -69,7 +70,7 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
 
         <div className="flex items-start" style={{ marginTop: 71, gap: 105 }}>
           <div className="flex flex-col" style={{ gap: 27 }}>
-            <BifluxLogo />
+            <BifluxLogo width={87.03} height={20.6} />
             <div
               className="flex flex-col"
               style={{
