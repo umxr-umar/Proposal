@@ -60,6 +60,7 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
             fontSize: 72,
             lineHeight: "100%",
             letterSpacing: "-0.06em",
+            textTransform: "capitalize",
           }}
         >
           Web design and web development contract proposal for{" "}

@@ -90,8 +90,9 @@
     width: calc(727px * var(--scale));
     font-weight: 600;
     font-size: calc(var(--fs-subtitle) * var(--scale));
-    line-height: 1;
+    line-height: var(--lh-subtitle, 1);
     letter-spacing: -0.06em;
+    text-transform: capitalize;
   }
   .fields-row {
     display: flex;
@@ -289,6 +290,10 @@
       <input type="range" id="fsSubtitle" min="20" max="120" step="0.1" value="72" />
     </div>
     <div class="slider-group">
+      <label>Subtitle Line Height <span class="val" id="valLhSubtitle">1.0</span></label>
+      <input type="range" id="lhSubtitle" min="0.8" max="2" step="0.01" value="1" />
+    </div>
+    <div class="slider-group">
       <label>Field Label (CLIENT) <span class="val" id="valFsLabel">21px</span></label>
       <input type="range" id="fsLabel" min="10" max="48" step="0.1" value="21" />
     </div>
@@ -404,6 +409,8 @@
   const fontOutput = document.getElementById('fontOutput');
   const logoHSlider = document.getElementById('logoH');
   const valLogoH = document.getElementById('valLogoH');
+  const lhSubtitleSlider = document.getElementById('lhSubtitle');
+  const valLhSubtitle = document.getElementById('valLhSubtitle');
 
   function updateFonts() {
     const values = {};
@@ -416,9 +423,13 @@
     const logoH = logoHSlider.value;
     valLogoH.textContent = logoH + 'px';
     frame.style.setProperty('--logo-h', logoH + 'px');
+    const lhSubtitle = lhSubtitleSlider.value;
+    valLhSubtitle.textContent = lhSubtitle;
+    frame.style.setProperty('--lh-subtitle', lhSubtitle);
     fontOutput.textContent =
       'title: ' + values.title + ',\n' +
       'subtitle: ' + values.subtitle + ',\n' +
+      'subtitleLineHeight: ' + lhSubtitle + ',\n' +
       'fieldLabel: ' + values.label + ',\n' +
       'fieldValue: ' + values.value + ',\n' +
       'logoHeight: ' + logoH + ',';
@@ -426,6 +437,7 @@
 
   Object.values(fontSliders).forEach((el) => el.addEventListener('input', updateFonts));
   logoHSlider.addEventListener('input', updateFonts);
+  lhSubtitleSlider.addEventListener('input', updateFonts);
 
   document.getElementById('copyFontBtn').addEventListener('click', () => {
     navigator.clipboard.writeText(fontOutput.textContent).then(() => {
@@ -440,6 +452,7 @@
   document.getElementById('resetFontBtn').addEventListener('click', () => {
     for (const key in fontSliders) fontSliders[key].value = CURRENT_FONT_SIZES[key];
     logoHSlider.value = 20.57;
+    lhSubtitleSlider.value = 1;
     updateFonts();
   });
 
