@@ -89,7 +89,7 @@ export function TableOfContentsSlide() {
                 lineHeight: "100%",
               }}
             >
-              {String(i + 1).padStart(2, "0")}.{" "}
+              /{String(i + 1).padStart(2, "0")}.{" "}
             </span>
             <span
               style={{
