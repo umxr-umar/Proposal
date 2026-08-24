@@ -7,8 +7,9 @@ import { BifluxLogo } from "./BifluxLogo";
  * the whole 1920x1080 box as one rigid unit to fit any screen.
  *
  * Layout: title pinned to the top, the subtitle+fields group pinned to the
- * bottom, equal 48px padding on both — no fixed gap between them, so the
- * space between naturally fills whatever room is left instead of a
+ * bottom — padding is 19px top, 41px bottom, 42px left, 42px right (tuned
+ * via public/padding-tool.html) — no fixed gap between title and fields,
+ * so the space between naturally fills whatever room is left instead of a
  * hardcoded value that would overflow on a longer subtitle.
  *
  * Title font is "Neue Haas Grotesk Display Pro" in Paper, a licensed
@@ -28,7 +29,12 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
   return (
     <div
       className="flex h-full w-full flex-col justify-between bg-[#000000] text-[#DDDDD5]"
-      style={{ paddingBlock: 48, paddingInline: 48 }}
+      style={{
+        paddingTop: 19,
+        paddingBottom: 41,
+        paddingLeft: 42,
+        paddingRight: 42,
+      }}
     >
       <h1
         className="uppercase"

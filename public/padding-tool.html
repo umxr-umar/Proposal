@@ -252,20 +252,20 @@
 
     <p class="section-label">Padding</p>
     <div class="slider-group">
-      <label>Padding Top <span class="val" id="valTop">18px</span></label>
-      <input type="range" id="padTop" min="0" max="150" value="18" />
+      <label>Padding Top <span class="val" id="valTop">19px</span></label>
+      <input type="range" id="padTop" min="0" max="150" value="19" />
     </div>
     <div class="slider-group">
-      <label>Padding Bottom <span class="val" id="valBottom">22px</span></label>
-      <input type="range" id="padBottom" min="0" max="150" value="22" />
+      <label>Padding Bottom <span class="val" id="valBottom">41px</span></label>
+      <input type="range" id="padBottom" min="0" max="150" value="41" />
     </div>
     <div class="slider-group">
       <label>Padding Left <span class="val" id="valLeft">42px</span></label>
       <input type="range" id="padLeft" min="0" max="150" value="42" />
     </div>
     <div class="slider-group">
-      <label>Padding Right <span class="val" id="valRight">56px</span></label>
-      <input type="range" id="padRight" min="0" max="150" value="56" />
+      <label>Padding Right <span class="val" id="valRight">42px</span></label>
+      <input type="range" id="padRight" min="0" max="150" value="42" />
     </div>
 
     <div class="output" id="output"></div>
@@ -348,7 +348,7 @@
     });
   });
 
-  const CURRENT_VALUES = { top: 18, bottom: 22, left: 42, right: 56 };
+  const CURRENT_VALUES = { top: 19, bottom: 41, left: 42, right: 42 };
   document.getElementById('resetBtn').addEventListener('click', () => {
     for (const key in sliders) sliders[key].value = CURRENT_VALUES[key];
     update();
