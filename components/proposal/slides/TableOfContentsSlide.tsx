@@ -33,6 +33,7 @@ const SECTIONS = [
 export function TableOfContentsSlide() {
   const { index, goToSlide } = useSlideDeck();
   const inter = "var(--font-inter), system-ui, sans-serif";
+  const instrumentSerif = "var(--font-instrument-serif), serif";
   const year = new Date().getFullYear();
 
   return (
@@ -82,8 +83,8 @@ export function TableOfContentsSlide() {
           >
             <span
               style={{
-                fontFamily: inter,
-                fontWeight: 600,
+                fontFamily: instrumentSerif,
+                fontWeight: 400,
                 fontSize: 72,
                 letterSpacing: "-0.06em",
                 lineHeight: "100%",
