@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Slide Nav — Refined Options</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+/>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: #0a0a0b;
+    color: #eee;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  header {
+    padding: 28px 32px 8px;
+  }
+  header h1 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  header p {
+    font-size: 13px;
+    color: #999;
+    margin: 0;
+    max-width: 640px;
+    line-height: 1.5;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px 32px 72px;
+  }
+  .option {
+    border: 1px solid #232427;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #141517;
+  }
+  .option-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px;
+    border-bottom: 1px solid #232427;
+    gap: 16px;
+  }
+  .option-label .name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f2f2f2;
+    white-space: nowrap;
+  }
+  .option-label .desc {
+    font-size: 12px;
+    color: #888;
+    text-align: right;
+  }
+  .stage {
+    position: relative;
+    height: 240px;
+    background: radial-gradient(130% 110% at 50% 130%, #202124 0%, #000000 62%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 32px;
+  }
+
+  /* glossy pill container — layered gradient + inset highlight/shadow + outer drop shadow */
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-radius: 999px;
+    padding: 11px 16px;
+    background: linear-gradient(180deg, #303236 0%, #18191b 55%, #0b0b0c 100%);
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 -1px 1px rgba(0,0,0,0.5),
+      0 14px 32px rgba(0,0,0,0.55),
+      0 2px 6px rgba(0,0,0,0.4);
+    color: #fff;
+  }
+
+  .arrow-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.12s ease, filter 0.15s ease;
+    background: linear-gradient(180deg, #3c3e42 0%, #202124 60%, #131315 100%);
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.18),
+      inset 0 -2px 3px rgba(0,0,0,0.4),
+      0 3px 8px rgba(0,0,0,0.45);
+    color: rgba(255,255,255,0.85);
+  }
+  .arrow-btn:hover { filter: brightness(1.15); }
+  .arrow-btn:active { transform: scale(0.92); }
+  .arrow-btn svg { width: 15px; height: 15px; }
+  .arrow-btn.filled {
+    background: linear-gradient(180deg, #dcffe6 0%, #a3edbb 55%, #79db9c 100%);
+    border-color: rgba(255,255,255,0.4);
+    color: #06210f;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.8),
+      inset 0 -2px 3px rgba(10,60,30,0.3),
+      0 6px 18px rgba(140,255,180,0.35),
+      0 2px 6px rgba(0,0,0,0.35);
+  }
+
+  .divider {
+    width: 1px;
+    height: 18px;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,0.18), transparent);
+  }
+  .counter {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: rgba(255,255,255,0.55);
+    white-space: nowrap;
+  }
+
+  /* refined B — segmented glossy pill, zero-padded, rounded-square glossy active */
+  .b-numbers { display: flex; align-items: center; gap: 3px; }
+  .b-num {
+    display: flex; align-items: center; justify-content: center;
+    min-width: 34px; height: 30px; padding: 0 7px; border-radius: 9px;
+    font-variant-numeric: tabular-nums;
+    font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.42);
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .b-num:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.06); }
+  .b-num.active {
+    color: #06210f;
+    background: linear-gradient(180deg, #dcffe6 0%, #a3edbb 55%, #79db9c 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -2px 2px rgba(10,60,30,0.25),
+      0 4px 12px rgba(140,255,180,0.3);
+    font-weight: 700;
+  }
+
+  /* refined D — pill + badge + counter, same glossy badge language, deeper container */
+  .d-numbers { display: flex; align-items: center; gap: 3px; }
+  .d-num {
+    display: flex; align-items: center; justify-content: center;
+    min-width: 32px; height: 28px; padding: 0 6px; border-radius: 8px;
+    font-variant-numeric: tabular-nums;
+    font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4);
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .d-num:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.06); }
+  .d-num.active {
+    color: #06210f;
+    background: linear-gradient(180deg, #ffffff 0%, #e4e4e4 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.9),
+      inset 0 -2px 2px rgba(0,0,0,0.12),
+      0 4px 12px rgba(255,255,255,0.18);
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Slide Deck Navigation — Refined</h1>
+  <p>Rebuilt with real depth instead of flat fills — layered gradients, inset highlights, and soft outer glow on the active state, closer to the glossy/premium feel of your references. Inter throughout (tabular figures for alignment), no monospace. Simulated on an 8-slide deck. Click numbers or arrows.</p>
+</header>
+
+<div class="options" id="options"></div>
+
+<script>
+  const TOTAL = 8;
+
+  function chevronLeft() {
+    return '<svg viewBox="0 0 24 24" fill="none"><path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  function chevronRight() {
+    return '<svg viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  const state = { b: 2, d: 0 };
+
+  function renderB() {
+    const active = state.b;
+    let items = '';
+    for (let i = 0; i < TOTAL; i++) {
+      items += `<div class="b-num${i === active ? ' active' : ''}" data-i="${i}">${pad(i + 1)}</div>`;
+    }
+    document.getElementById('b-numbers').innerHTML = items;
+  }
+
+  function renderD() {
+    const active = state.d;
+    let items = '';
+    for (let i = 0; i < TOTAL; i++) {
+      items += `<div class="d-num${i === active ? ' active' : ''}" data-i="${i}">${pad(i + 1)}</div>`;
+    }
+    document.getElementById('d-numbers').innerHTML = items;
+    document.getElementById('d-counter').textContent = `${pad(active + 1)} / ${pad(TOTAL)}`;
+  }
+
+  const renderers = { b: renderB, d: renderD };
+
+  function step(key, delta) {
+    state[key] = Math.min(Math.max(state[key] + delta, 0), TOTAL - 1);
+    renderers[key]();
+  }
+
+  document.getElementById('options').innerHTML = `
+    <div class="option">
+      <div class="option-label">
+        <span class="name">Option B — Segmented Pill (Refined)</span>
+        <span class="desc">Zero-padded glossy pill, mint-gradient active badge with inner highlight + soft glow</span>
+      </div>
+      <div class="stage">
+        <div class="pill">
+          <button class="arrow-btn" onclick="step('b',-1)">${chevronLeft()}</button>
+          <div class="b-numbers" id="b-numbers"></div>
+          <button class="arrow-btn filled" onclick="step('b',1)">${chevronRight()}</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="option">
+      <div class="option-label">
+        <span class="name">Option D — Pill + Badge + Counter (Refined)</span>
+        <span class="desc">Same glossy language, white-gradient badge, counter text, circular glossy end arrows</span>
+      </div>
+      <div class="stage">
+        <div class="pill">
+          <button class="arrow-btn" onclick="step('d',-1)">${chevronLeft()}</button>
+          <div class="d-numbers" id="d-numbers"></div>
+          <div class="divider"></div>
+          <span class="counter" id="d-counter"></span>
+          <button class="arrow-btn filled" onclick="step('d',1)">${chevronRight()}</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  renderB(); renderD();
+
+  document.getElementById('options').addEventListener('click', (e) => {
+    const el = e.target.closest('[data-i]');
+    if (!el) return;
+    const container = el.closest('.stage');
+    const key = container.querySelector('.b-numbers') ? 'b' : 'd';
+    state[key] = Number(el.dataset.i);
+    renderers[key]();
+  });
+</script>
+
+</body>
+</html>
