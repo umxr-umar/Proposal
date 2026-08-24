@@ -80,7 +80,7 @@
     margin: 0;
     text-transform: uppercase;
     font-weight: 500;
-    font-size: calc(185.8px * var(--scale));
+    font-size: calc(var(--fs-title) * var(--scale));
     line-height: 1;
     letter-spacing: -0.06em;
     white-space: nowrap;
@@ -89,7 +89,7 @@
     margin: 0 0 0 calc(8px * var(--scale));
     width: calc(727px * var(--scale));
     font-weight: 600;
-    font-size: calc(72px * var(--scale));
+    font-size: calc(var(--fs-subtitle) * var(--scale));
     line-height: 1;
     letter-spacing: -0.06em;
   }
@@ -107,7 +107,7 @@
   .field-label {
     text-transform: uppercase;
     font-weight: 500;
-    font-size: calc(21px * var(--scale));
+    font-size: calc(var(--fs-label) * var(--scale));
     line-height: 1.09;
     letter-spacing: 0.2em;
   }
@@ -116,7 +116,7 @@
     flex-direction: column;
     gap: calc(4px * var(--scale));
     font-weight: 400;
-    font-size: calc(27px * var(--scale));
+    font-size: calc(var(--fs-value) * var(--scale));
     line-height: 1.35;
     letter-spacing: -0.03em;
   }
@@ -271,6 +271,30 @@
     <div class="output" id="output"></div>
     <button id="copyBtn">Copy values</button>
     <button id="resetBtn" class="reset">Reset to current values</button>
+
+    <hr class="divider" />
+
+    <p class="section-label">Typography</p>
+    <div class="slider-group">
+      <label>Title <span class="val" id="valFsTitle">185.8px</span></label>
+      <input type="range" id="fsTitle" min="40" max="260" step="0.1" value="185.8" />
+    </div>
+    <div class="slider-group">
+      <label>Subtitle <span class="val" id="valFsSubtitle">72px</span></label>
+      <input type="range" id="fsSubtitle" min="20" max="120" step="0.1" value="72" />
+    </div>
+    <div class="slider-group">
+      <label>Field Label (CLIENT) <span class="val" id="valFsLabel">21px</span></label>
+      <input type="range" id="fsLabel" min="10" max="48" step="0.1" value="21" />
+    </div>
+    <div class="slider-group">
+      <label>Field Value (names/emails) <span class="val" id="valFsValue">27px</span></label>
+      <input type="range" id="fsValue" min="10" max="60" step="0.1" value="27" />
+    </div>
+
+    <div class="output" id="fontOutput"></div>
+    <button id="copyFontBtn">Copy font sizes</button>
+    <button id="resetFontBtn" class="reset">Reset to current sizes</button>
   </div>
 </div>
 
@@ -354,9 +378,58 @@
     update();
   });
 
+  // Typography — each text element's font size is independently adjustable,
+  // same real-canvas-px convention as the padding sliders above.
+  const fontSliders = {
+    title: document.getElementById('fsTitle'),
+    subtitle: document.getElementById('fsSubtitle'),
+    label: document.getElementById('fsLabel'),
+    value: document.getElementById('fsValue'),
+  };
+  const fontLabels = {
+    title: document.getElementById('valFsTitle'),
+    subtitle: document.getElementById('valFsSubtitle'),
+    label: document.getElementById('valFsLabel'),
+    value: document.getElementById('valFsValue'),
+  };
+  const fontOutput = document.getElementById('fontOutput');
+
+  function updateFonts() {
+    const values = {};
+    for (const key in fontSliders) {
+      const v = fontSliders[key].value;
+      values[key] = v;
+      fontLabels[key].textContent = v + 'px';
+      frame.style.setProperty('--fs-' + key, v + 'px');
+    }
+    fontOutput.textContent =
+      'title: ' + values.title + ',\n' +
+      'subtitle: ' + values.subtitle + ',\n' +
+      'fieldLabel: ' + values.label + ',\n' +
+      'fieldValue: ' + values.value + ',';
+  }
+
+  Object.values(fontSliders).forEach((el) => el.addEventListener('input', updateFonts));
+
+  document.getElementById('copyFontBtn').addEventListener('click', () => {
+    navigator.clipboard.writeText(fontOutput.textContent).then(() => {
+      const btn = document.getElementById('copyFontBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => (btn.textContent = original), 1200);
+    });
+  });
+
+  const CURRENT_FONT_SIZES = { title: 185.8, subtitle: 72, label: 21, value: 27 };
+  document.getElementById('resetFontBtn').addEventListener('click', () => {
+    for (const key in fontSliders) fontSliders[key].value = CURRENT_FONT_SIZES[key];
+    updateFonts();
+  });
+
   updateStageWidth();
   updateScale();
   update();
+  updateFonts();
 </script>
 
 </body>
