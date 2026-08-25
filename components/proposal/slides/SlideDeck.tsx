@@ -12,22 +12,35 @@ import {
 const SLIDE_WIDTH = 1920;
 const SLIDE_HEIGHT = 1080;
 
+// Real screen pixels the nav pill actually occupies from the viewport's
+// bottom edge (pill height ~54px + its bottom-8 margin), plus a ~24px
+// breathing-room buffer on top of that.
+const NAV_GUTTER_PX = 110;
+
 /**
  * Shared deck state exposed to every slide — current position, slide count,
- * and a jump-to-slide function. Lets any slide render its own page number
- * or link to another slide (e.g. a table of contents) without SlideDeck
- * needing to know anything about what's inside each slide.
+ * a jump-to-slide function, and the live scale factor + the nav-safe bottom
+ * offset derived from it. `navSafeBottom` is in CANVAS units (1920x1080
+ * space) but is recomputed from the real scale every time the viewport
+ * resizes, so `bottom: navSafeBottom` on a slide's lowest content always
+ * clears the nav pill by exactly NAV_GUTTER_PX real screen pixels —
+ * regardless of screen size, unlike a fixed canvas position (which only
+ * happens to work at whatever scale it was eyeballed against).
  */
 type SlideDeckState = {
   index: number;
   total: number;
   goToSlide: (i: number) => void;
+  scale: number;
+  navSafeBottom: number;
 };
 
 const SlideDeckContext = createContext<SlideDeckState>({
   index: 0,
   total: 1,
   goToSlide: () => {},
+  scale: 1,
+  navSafeBottom: NAV_GUTTER_PX,
 });
 
 export function useSlideDeck() {
@@ -95,43 +108,19 @@ function NavArrowButton({
  * a "cover" fit: it always fills the entire viewport edge to edge, cropping
  * whatever overflows rather than letterboxing. Anchored to the top (not
  * centered), so any crop only ever eats into the BOTTOM of the design —
- * the header/title area is always fully visible, and the bottom margin is
- * exactly where the nav pill already lives, backed by its own scrim (see
- * SlideDeck below).
+ * the header/title area is always fully visible. `scale` is measured once
+ * by SlideDeck (all slides share the same viewport) and passed down, rather
+ * than each slide re-measuring the same thing independently.
  */
-function SlideCanvas({ children }: { children: ReactNode }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    function updateScale(width: number, height: number) {
-      setScale(Math.max(width / SLIDE_WIDTH, height / SLIDE_HEIGHT));
-    }
-
-    // Initial measurement (ResizeObserver's first callback covers this too,
-    // but doing it synchronously avoids a one-frame flash at scale 1).
-    const rect = container.getBoundingClientRect();
-    updateScale(rect.width, rect.height);
-
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      const box = entry.contentBoxSize?.[0];
-      if (box) {
-        updateScale(box.inlineSize, box.blockSize);
-      } else {
-        const r = entry.target.getBoundingClientRect();
-        updateScale(r.width, r.height);
-      }
-    });
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
-
+function SlideCanvas({
+  scale,
+  children,
+}: {
+  scale: number;
+  children: ReactNode;
+}) {
   return (
-    <div ref={containerRef} className="h-full w-full overflow-hidden">
+    <div className="h-full w-full overflow-hidden">
       <div className="flex h-full w-full items-start justify-center">
         <div
           style={{
@@ -151,6 +140,8 @@ function SlideCanvas({ children }: { children: ReactNode }) {
 
 export function SlideDeck({ slides }: { slides: ReactNode[] }) {
   const [index, setIndex] = useState(0);
+  const [scale, setScale] = useState(1);
+  const deckRef = useRef<HTMLDivElement>(null);
   const canPrev = index > 0;
   const canNext = index < slides.length - 1;
 
@@ -158,17 +149,49 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
     setIndex(Math.min(Math.max(i, 0), slides.length - 1));
   }
 
+  useEffect(() => {
+    const el = deckRef.current;
+    if (!el) return;
+
+    function updateScale(width: number, height: number) {
+      setScale(Math.max(width / SLIDE_WIDTH, height / SLIDE_HEIGHT));
+    }
+
+    // Initial measurement (ResizeObserver's first callback covers this too,
+    // but doing it synchronously avoids a one-frame flash at scale 1).
+    const rect = el.getBoundingClientRect();
+    updateScale(rect.width, rect.height);
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      const box = entry.contentBoxSize?.[0];
+      if (box) {
+        updateScale(box.inlineSize, box.blockSize);
+      } else {
+        const r = entry.target.getBoundingClientRect();
+        updateScale(r.width, r.height);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const navSafeBottom = NAV_GUTTER_PX / scale;
+
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-black">
+    <div
+      ref={deckRef}
+      className="relative h-screen w-full overflow-hidden bg-black"
+    >
       <div
         className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)]"
         style={{ transform: `translateX(-${index * 100}vw)` }}
       >
         {slides.map((slide, i) => (
           <div key={i} className="h-full w-screen shrink-0">
-            <SlideCanvas>
+            <SlideCanvas scale={scale}>
               <SlideDeckContext.Provider
-                value={{ index, total: slides.length, goToSlide }}
+                value={{ index, total: slides.length, goToSlide, scale, navSafeBottom }}
               >
                 {slide}
               </SlideDeckContext.Provider>
@@ -176,18 +199,6 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
           </div>
         ))}
       </div>
-
-      {/* Scrim behind the nav pill — since the frame now covers the full
-          viewport edge to edge (no letterbox to tuck the nav into), this
-          guarantees the pill reads cleanly regardless of what's under it,
-          whether that's Cover/TOC's black or Problem's light background. */}
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-44"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0))",
-        }}
-      />
 
       <div
         className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3.5 rounded-full p-2.5 text-white"

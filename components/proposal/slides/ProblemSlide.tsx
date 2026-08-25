@@ -17,9 +17,15 @@ import { pad, useSlideDeck } from "./SlideDeck";
  * Light-themed (cream #E8E8E3 background, black text) — a real, confirmed
  * departure from Cover/TOC's black theme, taken directly from the Figma
  * source rather than assumed.
+ *
+ * The body block and the page number are anchored with
+ * `bottom: navSafeBottom` (from SlideDeck's context) rather than a fixed
+ * `top` — navSafeBottom is recomputed from the live scale factor, so it
+ * always clears the fixed nav pill by the same real screen pixels
+ * regardless of viewport size.
  */
 export function ProblemSlide({ proposal }: { proposal: Proposal }) {
-  const { index } = useSlideDeck();
+  const { index, navSafeBottom } = useSlideDeck();
   const inter = "var(--font-inter), system-ui, sans-serif";
   const year = new Date().getFullYear();
 
@@ -62,7 +68,7 @@ export function ProblemSlide({ proposal }: { proposal: Proposal }) {
 
       <div
         className="absolute flex items-start"
-        style={{ left: 48, top: 500, gap: 174 }}
+        style={{ left: 48, bottom: navSafeBottom, gap: 174 }}
       >
         <div
           style={{
@@ -111,7 +117,7 @@ export function ProblemSlide({ proposal }: { proposal: Proposal }) {
         className="absolute"
         style={{
           left: 1855,
-          top: 998,
+          bottom: navSafeBottom,
           fontFamily: inter,
           fontWeight: 400,
           fontSize: 27,

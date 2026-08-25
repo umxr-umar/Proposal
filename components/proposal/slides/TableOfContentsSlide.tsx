@@ -29,9 +29,16 @@ const SECTIONS = [
  * section that doesn't exist yet just clamps to the last built slide
  * instead of erroring, so this doesn't need to change as later slides
  * get built.
+ *
+ * The list and the page number are anchored with `bottom: navSafeBottom`
+ * (from SlideDeck's context) rather than a fixed `top` — navSafeBottom is
+ * recomputed from the live scale factor, so it always clears the fixed nav
+ * pill by the same real screen pixels regardless of viewport size, instead
+ * of a canvas position that only happens to work at whatever size it was
+ * checked against.
  */
 export function TableOfContentsSlide() {
-  const { index, goToSlide } = useSlideDeck();
+  const { index, goToSlide, navSafeBottom } = useSlideDeck();
   const instrumentSerif = "var(--font-instrument-serif), serif";
   const neueHaas = "var(--font-neue-haas), system-ui, sans-serif";
   const year = new Date().getFullYear();
@@ -71,7 +78,7 @@ export function TableOfContentsSlide() {
 
       <div
         className="absolute flex flex-col items-start"
-        style={{ left: 56, top: 420, gap: 12 }}
+        style={{ left: 56, bottom: navSafeBottom, gap: 12 }}
       >
         {SECTIONS.map((title, i) => (
           <button
@@ -111,7 +118,7 @@ export function TableOfContentsSlide() {
         className="absolute"
         style={{
           left: 1855,
-          top: 998,
+          bottom: navSafeBottom,
           fontFamily: neueHaas,
           fontSize: 30.3,
           color: "#938F8A",
