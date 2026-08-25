@@ -154,7 +154,16 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
     if (!el) return;
 
     function updateScale(width: number, height: number) {
-      setScale(Math.max(width / SLIDE_WIDTH, height / SLIDE_HEIGHT));
+      const coverScale = Math.max(width / SLIDE_WIDTH, height / SLIDE_HEIGHT);
+      const containScale = Math.min(width / SLIDE_WIDTH, height / SLIDE_HEIGHT);
+      // Pure cover-fit crops more aggressively the further the viewport's
+      // aspect ratio drifts from 16:9 — fine for realistic browser windows
+      // (even resized ones, down to roughly 4:3), but on an unusually
+      // square or narrow window it starts eating whole words. Cap how far
+      // cover can zoom in past contain-fit, so extreme shapes fall back to
+      // a small margin instead of unlimited cropping.
+      const ASPECT_TOLERANCE = 1.4;
+      setScale(Math.min(coverScale, containScale * ASPECT_TOLERANCE));
     }
 
     // Initial measurement (ResizeObserver's first callback covers this too,
