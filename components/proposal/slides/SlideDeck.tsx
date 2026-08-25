@@ -12,6 +12,13 @@ import {
 const SLIDE_WIDTH = 1920;
 const SLIDE_HEIGHT = 1080;
 
+// Fixed screen-space (not scaled) always left clear at the bottom for the
+// nav pill, so it never overlaps slide content — some slides put content
+// close to the bottom edge (TOC's last row, Problem's last paragraph line),
+// and the nav pill sits at a fixed viewport position, not scaled with the
+// frame, so without this the two can collide regardless of which slide.
+const NAV_RESERVED_HEIGHT = 110;
+
 /**
  * Shared deck state exposed to every slide — current position, slide count,
  * and a jump-to-slide function. Lets any slide render its own page number
@@ -105,7 +112,8 @@ function SlideCanvas({ children }: { children: ReactNode }) {
     if (!container) return;
 
     function updateScale(width: number, height: number) {
-      setScale(Math.min(width / SLIDE_WIDTH, height / SLIDE_HEIGHT));
+      const availableHeight = Math.max(height - NAV_RESERVED_HEIGHT, 0);
+      setScale(Math.min(width / SLIDE_WIDTH, availableHeight / SLIDE_HEIGHT));
     }
 
     // Initial measurement (ResizeObserver's first callback covers this too,
@@ -128,20 +136,22 @@ function SlideCanvas({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      className="flex h-full w-full items-center justify-center"
-    >
+    <div ref={containerRef} className="h-full w-full">
       <div
-        style={{
-          width: SLIDE_WIDTH,
-          height: SLIDE_HEIGHT,
-          transform: `scale(${scale})`,
-          transformOrigin: "center center",
-          flexShrink: 0,
-        }}
+        className="flex h-full w-full items-center justify-center"
+        style={{ paddingBottom: NAV_RESERVED_HEIGHT }}
       >
-        {children}
+        <div
+          style={{
+            width: SLIDE_WIDTH,
+            height: SLIDE_HEIGHT,
+            transform: `scale(${scale})`,
+            transformOrigin: "center center",
+            flexShrink: 0,
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
