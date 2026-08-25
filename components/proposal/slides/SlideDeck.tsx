@@ -154,6 +154,10 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
     if (!el) return;
 
     function updateScale(width: number, height: number) {
+      // Guard against a 0×0 measurement (possible for one frame during
+      // initial layout) — dividing NAV_GUTTER_PX by a 0 scale later would
+      // produce `bottom: Infinity`, an invalid CSS value.
+      if (width === 0 || height === 0) return;
       const coverScale = Math.max(width / SLIDE_WIDTH, height / SLIDE_HEIGHT);
       const containScale = Math.min(width / SLIDE_WIDTH, height / SLIDE_HEIGHT);
       // Pure cover-fit crops more aggressively the further the viewport's

@@ -5,6 +5,8 @@ import { SlideDeck } from "@/components/proposal/slides/SlideDeck";
 import { CoverSlide } from "@/components/proposal/slides/CoverSlide";
 import { TableOfContentsSlide } from "@/components/proposal/slides/TableOfContentsSlide";
 import { ProblemSlide } from "@/components/proposal/slides/ProblemSlide";
+import { SolutionSlide } from "@/components/proposal/slides/SolutionSlide";
+import { ImpactSlide } from "@/components/proposal/slides/ImpactSlide";
 
 export async function generateStaticParams() {
   const slugs = await getAllProposalSlugs();
@@ -40,6 +42,8 @@ export default async function ProposalPage({
         <CoverSlide key="cover" proposal={proposal} />,
         <TableOfContentsSlide key="toc" />,
         <ProblemSlide key="problem" proposal={proposal} />,
+        <SolutionSlide key="solution" proposal={proposal} />,
+        <ImpactSlide key="impact" proposal={proposal} />,
       ]}
     />
   );

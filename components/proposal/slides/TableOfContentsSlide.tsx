@@ -12,6 +12,15 @@ const SECTIONS = [
   "Contract Agreement",
 ];
 
+// Each TOC entry jumps to the FIRST slide of that section — not a simple
+// `i + 2`, since "Project Overview" alone now spans three real slides
+// (Problem/Solution/Impact at indices 2-4), so every later section's
+// target shifts accordingly. Clicking a section that doesn't exist yet
+// just clamps to the last built slide (SlideDeck's goToSlide already
+// clamps), so these can stay accurate ahead of the slides actually
+// existing.
+const SECTION_TARGETS = [2, 5, 6, 7, 8, 9];
+
 /**
  * Table of Contents slide, values pulled 1:1 from Paper's "Table of
  * contents" frame (1920x1080 reference canvas, same <SlideCanvas> rigid
@@ -23,12 +32,11 @@ const SECTIONS = [
  * shared index via `pad`, not typed in by hand, so it stays correct
  * automatically if slide order ever changes.
  *
- * Each row is clickable and jumps straight to that section via
- * SlideDeck's goToSlide. Target indices assume the eventual full deck
- * order (Cover, TOC, then these six sections in order) — clicking a
- * section that doesn't exist yet just clamps to the last built slide
- * instead of erroring, so this doesn't need to change as later slides
- * get built.
+ * Each row is clickable and jumps straight to that section's first slide
+ * via SlideDeck's goToSlide — see SECTION_TARGETS below, since sections
+ * don't map 1:1 to slide indices (Project Overview alone is three real
+ * slides). Clicking a section that doesn't exist yet just clamps to the
+ * last built slide instead of erroring.
  *
  * The list and the page number are anchored with `bottom: navSafeBottom`
  * (from SlideDeck's context) rather than a fixed `top` — navSafeBottom is
@@ -84,7 +92,7 @@ export function TableOfContentsSlide() {
           <button
             key={title}
             type="button"
-            onClick={() => goToSlide(i + 2)}
+            onClick={() => goToSlide(SECTION_TARGETS[i])}
             className="flex cursor-pointer items-center border-0 bg-transparent p-0 text-left transition-opacity hover:opacity-70"
             style={{ gap: 199 }}
           >
