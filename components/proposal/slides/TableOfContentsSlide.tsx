@@ -47,10 +47,10 @@ export function TableOfContentsSlide() {
           <div
             style={{
               fontFamily: neueHaas,
-              fontSize: 27,
+              fontSize: 30.3,
               color: "#938F8A",
-              letterSpacing: "-0.03em",
-              lineHeight: "135%",
+              letterSpacing: "-0.006em",
+              lineHeight: "131%",
             }}
           >
             Table of contents
@@ -59,10 +59,10 @@ export function TableOfContentsSlide() {
         <div
           style={{
             fontFamily: neueHaas,
-            fontSize: 27,
+            fontSize: 30.3,
             color: "#938F8A",
-            letterSpacing: "-0.03em",
-            lineHeight: "135%",
+            letterSpacing: "-0.006em",
+            lineHeight: "131%",
           }}
         >
           {year}
@@ -86,8 +86,8 @@ export function TableOfContentsSlide() {
                 fontFamily: instrumentSerif,
                 fontWeight: 400,
                 fontSize: 72,
-                letterSpacing: "-0.06em",
-                lineHeight: "100%",
+                letterSpacing: "-0.025em",
+                lineHeight: "97%",
               }}
             >
               /{String(i + 1).padStart(2, "0")}.{" "}
@@ -95,10 +95,10 @@ export function TableOfContentsSlide() {
             <span
               style={{
                 fontFamily: neueHaas,
-                fontWeight: 600,
-                fontSize: 72,
-                letterSpacing: "-0.06em",
-                lineHeight: "100%",
+                fontWeight: 400,
+                fontSize: 75.8,
+                letterSpacing: "0.003em",
+                lineHeight: "104%",
               }}
             >
               {title}
@@ -113,10 +113,10 @@ export function TableOfContentsSlide() {
           left: 1855,
           top: 998,
           fontFamily: neueHaas,
-          fontSize: 27,
+          fontSize: 30.3,
           color: "#938F8A",
-          letterSpacing: "-0.03em",
-          lineHeight: "135%",
+          letterSpacing: "-0.006em",
+          lineHeight: "131%",
         }}
       >
         {pad(index)}
