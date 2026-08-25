@@ -2,15 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Cover Padding Tool</title>
+<title>Cover Slide Tuning Tool</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
 />
 <style>
+  @font-face {
+    font-family: 'Neue Haas Grotesk Roman';
+    src: url('/fonts/NeueHaasDisplayRoman.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
   * { box-sizing: border-box; }
   html, body {
     margin: 0;
@@ -19,187 +26,106 @@
     color: #eee;
     font-family: -apple-system, system-ui, sans-serif;
   }
-  body {
-    display: flex;
-    flex-direction: column;
-  }
-  header {
-    padding: 16px 24px;
-    border-bottom: 1px solid #2a2c2f;
-    flex-shrink: 0;
-  }
-  header h1 {
-    font-size: 15px;
-    font-weight: 600;
-    margin: 0 0 2px;
-  }
-  header p {
-    font-size: 12px;
-    color: #999;
-    margin: 0;
-  }
-  .layout {
-    flex: 1;
-    display: flex;
-    min-height: 0;
-  }
+  body { display: flex; flex-direction: column; }
+  header { padding: 16px 24px; border-bottom: 1px solid #2a2c2f; flex-shrink: 0; }
+  header h1 { font-size: 15px; font-weight: 600; margin: 0 0 2px; }
+  header p { font-size: 12px; color: #999; margin: 0; max-width: 720px; line-height: 1.5; }
+
+  .layout { flex: 1; display: flex; min-height: 0; overflow: hidden; }
   .preview-wrap {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 32px;
-    min-width: 0;
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 32px; min-width: 0;
   }
   .stage {
-    position: relative;
-    width: 100%;
-    max-width: var(--stage-width, 1280px);
-    aspect-ratio: 1920 / 1080;
-    background: #000000;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    transition: max-width 0.05s linear;
+    position: relative; width: 100%; max-width: var(--stage-width, 1280px);
+    aspect-ratio: 1920 / 1080; background: #000000; overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5); transition: max-width 0.05s linear;
   }
   .frame {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    color: #DDDDD5;
-    font-family: 'Inter', system-ui, sans-serif;
-    /* padding is set via CSS vars driven by the sliders, scaled to the
-       stage's rendered size vs the 1920x1080 reference canvas */
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    justify-content: space-between; color: #DDDDD5;
     padding-top: calc(var(--pad-top) * var(--scale));
     padding-bottom: calc(var(--pad-bottom) * var(--scale));
     padding-left: calc(var(--pad-left) * var(--scale));
     padding-right: calc(var(--pad-right) * var(--scale));
   }
-  .frame h1 {
-    margin: 0;
-    text-transform: uppercase;
-    font-weight: 500;
-    font-size: calc(var(--fs-title) * var(--scale));
-    line-height: 1;
-    letter-spacing: -0.06em;
+  .el-title {
+    margin: 0; text-transform: uppercase; font-family: 'Inter', system-ui, sans-serif;
     white-space: nowrap;
+    font-size: calc(var(--fs-title) * var(--scale));
+    font-weight: var(--fw-title);
+    letter-spacing: calc(var(--ls-title) * 1em);
+    line-height: var(--lh-title);
   }
-  .frame .subtitle {
-    margin: 0 0 0 calc(8px * var(--scale));
-    width: calc(727px * var(--scale));
-    font-weight: 600;
-    font-size: calc(var(--fs-subtitle) * var(--scale));
-    line-height: var(--lh-subtitle, 1);
-    letter-spacing: -0.06em;
+  .el-subtitle {
+    margin: 0 0 0 calc(8px * var(--scale)); width: calc(727px * var(--scale));
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-transform: capitalize;
+    font-size: calc(var(--fs-subtitle) * var(--scale));
+    font-weight: var(--fw-subtitle);
+    letter-spacing: calc(var(--ls-subtitle) * 1em);
+    line-height: var(--lh-subtitle);
   }
   .fields-row {
-    display: flex;
-    align-items: flex-start;
-    margin-top: calc(71px * var(--scale));
-    gap: calc(105px * var(--scale));
+    display: flex; align-items: flex-start;
+    margin-top: calc(71px * var(--scale)); gap: calc(105px * var(--scale));
   }
-  .field-col {
-    display: flex;
-    flex-direction: column;
-    gap: calc(27px * var(--scale));
-  }
-  .field-label {
-    text-transform: uppercase;
-    font-weight: 500;
+  .field-col { display: flex; flex-direction: column; gap: calc(27px * var(--scale)); }
+  .el-label {
+    text-transform: uppercase; font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
     font-size: calc(var(--fs-label) * var(--scale));
-    line-height: 1.09;
-    letter-spacing: 0.2em;
+    font-weight: var(--fw-label);
+    letter-spacing: calc(var(--ls-label) * 1em);
+    line-height: var(--lh-label);
   }
-  .field-value {
-    display: flex;
-    flex-direction: column;
-    gap: calc(4px * var(--scale));
-    font-weight: 400;
+  .el-value {
+    display: flex; flex-direction: column; gap: calc(4px * var(--scale));
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
     font-size: calc(var(--fs-value) * var(--scale));
-    line-height: 1.35;
-    letter-spacing: -0.03em;
+    font-weight: var(--fw-value);
+    letter-spacing: calc(var(--ls-value) * 1em);
+    line-height: var(--lh-value);
   }
   .logo svg {
-    display: block;
+    display: block; width: auto; aspect-ratio: 87 / 20.594;
     height: calc(var(--logo-h) * var(--scale));
-    width: auto;
-    aspect-ratio: 87 / 20.594;
   }
 
-  .panel {
-    width: 300px;
-    flex-shrink: 0;
-    border-left: 1px solid #2a2c2f;
-    padding: 20px;
-    overflow-y: auto;
+  .panel { width: 340px; flex-shrink: 0; border-left: 1px solid #2a2c2f; padding: 20px; overflow-y: auto; }
+  .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #666; margin: 0 0 14px; }
+  .divider { border: none; border-top: 1px solid #2a2c2f; margin: 22px 0; }
+  .presets { display: flex; gap: 6px; margin-bottom: 18px; }
+  .presets button { flex: 1; margin: 0; padding: 7px 4px; font-size: 11px; }
+
+  .slider-group { margin-bottom: 16px; }
+  .slider-group label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 500; margin-bottom: 6px; color: #ccc; }
+  .slider-group label span.val { font-family: ui-monospace, monospace; color: #7fffb0; }
+  input[type="range"] { width: 100%; accent-color: #7fffb0; }
+
+  .element-panel {
+    border: 1px solid #26282c; border-radius: 12px; padding: 14px 16px 18px;
+    margin-bottom: 16px; background: #0e0f10;
   }
-  .section-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #666;
-    margin: 0 0 14px;
+  .element-panel .el-name { font-size: 13px; font-weight: 600; color: #f0f0f0; margin: 0 0 2px; }
+  .element-panel .el-font { font-size: 11px; color: #777; margin: 0 0 14px; }
+
+  .weight-picker { display: flex; gap: 6px; margin-bottom: 16px; }
+  .weight-picker button {
+    flex: 1; margin: 0; padding: 6px 4px; font-size: 11px;
+    background: #1f2124; border: 1px solid #2a2c2f; border-radius: 6px; color: #eee; cursor: pointer;
   }
-  .divider {
-    border: none;
-    border-top: 1px solid #2a2c2f;
-    margin: 22px 0;
+  .weight-picker button.active { background: #7fffb0; color: #06210f; border-color: #7fffb0; font-weight: 600; }
+  .weight-fixed {
+    font-size: 11px; color: #888; background: #1a1b1d; border: 1px solid #26282c;
+    border-radius: 6px; padding: 6px 10px; margin-bottom: 16px;
   }
-  .presets {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 18px;
-  }
-  .presets button {
-    flex: 1;
-    margin: 0;
-    padding: 7px 4px;
-    font-size: 11px;
-  }
-  .slider-group { margin-bottom: 22px; }
-  .slider-group label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: #ccc;
-  }
-  .slider-group label span.val {
-    font-family: ui-monospace, monospace;
-    color: #7fffb0;
-  }
-  input[type="range"] {
-    width: 100%;
-    accent-color: #7fffb0;
-  }
+
   .output {
-    margin-top: 8px;
-    background: #0e0f10;
-    border: 1px solid #2a2c2f;
-    border-radius: 8px;
-    padding: 12px;
-    font-family: ui-monospace, monospace;
-    font-size: 12px;
-    color: #ccc;
-    white-space: pre;
-    line-height: 1.6;
+    margin-top: 8px; background: #0e0f10; border: 1px solid #2a2c2f; border-radius: 8px;
+    padding: 12px; font-family: ui-monospace, monospace; font-size: 11px; color: #ccc;
+    white-space: pre; line-height: 1.6; overflow-x: auto;
   }
-  button {
-    width: 100%;
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #2a2c2f;
-    background: #1f2124;
-    color: #eee;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-  }
+  button { width: 100%; margin-top: 10px; padding: 10px; border-radius: 8px; border: 1px solid #2a2c2f; background: #1f2124; color: #eee; font-size: 13px; font-weight: 500; cursor: pointer; }
   button:hover { background: #26282c; }
   button:active { transform: scale(0.98); }
   .reset { background: transparent; color: #999; margin-top: 6px; }
@@ -208,17 +134,17 @@
 <body>
 
 <header>
-  <h1>Cover Slide — Padding Tool</h1>
-  <p>Drag the sliders to tune top/bottom/left/right padding. Values are in real px on the 1920×1080 reference canvas — the same numbers used in CoverSlide.tsx.</p>
+  <h1>Cover Slide — Full Tuning Tool</h1>
+  <p>Every distinct text role on the slide, each with its own font size, line height, letter spacing, and (where more than one weight is actually loaded) a weight picker. Real fonts — Inter, Helvetica Neue, and the self-hosted Neue Haas Grotesk Roman — same as the live component. Values are in real px/em on the 1920×1080 reference canvas.</p>
 </header>
 
 <div class="layout">
   <div class="preview-wrap">
     <div class="stage" id="stage">
       <div class="frame" id="frame">
-        <h1>Project Proposal</h1>
+        <h1 class="el-title">Project Proposal</h1>
         <div>
-          <p class="subtitle">Web design and web development contract proposal for Acme Roofing Co.</p>
+          <p class="el-subtitle">Web design and web development contract proposal for Acme Roofing Co.</p>
           <div class="fields-row">
             <div class="field-col">
               <div class="logo">
@@ -226,11 +152,11 @@
                   <path d="M1455.014 172.061H1463.503C1465.605 172.061 1467.202 172.657 1468.323 173.821 1468.715 174.276 1469.051 174.787 1469.275 175.354 1469.5 175.922 1469.612 176.575 1469.612 177.284 1469.612 178.42 1469.303 179.357 1468.743 180.038 1468.183 180.72 1467.398 181.23 1466.389 181.543V181.628C1466.95 181.769 1467.455 181.969 1467.959 182.252 1468.463 182.537 1468.883 182.878 1469.248 183.274 1469.612 183.672 1469.892 184.155 1470.116 184.694 1470.313 185.262 1470.425 185.858 1470.425 186.539 1470.425 187.335 1470.284 188.072 1470.032 188.725 1469.78 189.378 1469.415 189.945 1468.968 190.428 1468.407 191.053 1467.679 191.507 1466.838 191.848 1465.997 192.188 1465.016 192.358 1463.952 192.358H1455.014V172.061ZM1463.84 190.059C1465.213 190.059 1466.249 189.719 1466.978 189.038 1467.258 188.753 1467.455 188.412 1467.622 188.016 1467.791 187.618 1467.874 187.192 1467.874 186.681 1467.874 185.432 1467.455 184.468 1466.669 183.842 1465.885 183.218 1464.876 182.906 1463.672 182.906H1457.535V190.059H1463.84ZM1463.195 180.749C1464.429 180.749 1465.38 180.464 1466.054 179.896 1466.726 179.329 1467.09 178.506 1467.09 177.427 1467.09 176.462 1466.754 175.694 1466.137 175.128 1465.52 174.559 1464.652 174.276 1463.532 174.276H1457.535V180.749H1463.195ZM1471.14 172.061H1473.662V192.358H1471.14V172.061ZM1474.686 183.474H1482.195V185.574H1474.686V183.474ZM1499.482 171.88L1498.092 176.668H1497.36C1497.992 174.03 1497.79 173.032 1495.996 173.032H1491.574C1490.993 173.032 1490.613 173.314 1490.436 173.877L1488.111 181.581H1491.649C1493.115 181.581 1493.721 181.069 1494.277 179.457H1494.884L1493.165 185.549H1492.508C1492.963 183.475 1492.762 182.606 1491.372 182.606H1487.809L1485.635 189.824C1485.181 191.334 1485.282 191.744 1487.96 191.744L1487.758 192.358H1479.647L1479.825 191.744C1481.744 191.744 1482.377 191.334 1482.831 189.824L1487.481 174.415C1487.935 172.903 1487.91 172.494 1485.662 172.494L1485.838 171.88H1499.482ZM1506.253 171.88L1506.076 172.494C1504.156 172.494 1503.524 172.903 1503.07 174.415L1498.522 189.542C1498.091 190.977 1498.345 191.207 1499.482 191.207H1502.488C1504.409 191.207 1505.344 190.438 1507.138 187.111L1507.871 187.341 1505.293 192.358H1492.382L1492.559 191.744C1494.504 191.744 1495.136 191.334 1495.591 189.824L1500.24 174.415C1500.695 172.903 1500.643 172.494 1498.395 172.494L1498.573 171.88H1506.253ZM1512.432 192.743C1507.807 192.743 1506.419 189.747 1507.757 185.344L1511.067 174.415C1511.523 172.903 1511.497 172.494 1509.324 172.494L1509.501 171.88H1517.031L1516.854 172.494C1514.958 172.494 1514.327 172.903 1513.872 174.415L1510.462 185.626C1509.4 189.133 1510.133 191.539 1513.089 191.539 1515.994 191.539 1518.091 189.465 1519.431 185.038L1522.666 174.415C1523.094 172.903 1523.044 172.494 1520.644 172.494L1520.821 171.88H1526.557L1526.404 172.494C1524.838 172.494 1524.283 172.903 1523.827 174.415L1520.594 185.14C1519.356 189.338 1517.385 192.743 1512.432 192.743ZM1535.974 172.494L1536.127 171.88H1541.913L1541.761 172.468C1540.523 172.468 1539.791 172.827 1538.274 174.491L1531.982 181.428 1534.08 189.799C1534.484 191.412 1535.117 191.744 1536.784 191.744L1536.582 192.358H1529.027L1529.228 191.744C1531.426 191.744 1531.553 191.309 1531.174 189.799L1529.556 183.322 1523.973 189.927C1522.811 191.257 1523.088 191.744 1525.033 191.744L1524.882 192.358H1518.819L1518.995 191.77C1520.41 191.77 1521.295 191.283 1522.987 189.363L1529.254 182.171 1527.333 174.44C1526.93 172.827 1526.373 172.494 1525.033 172.494L1525.211 171.88H1532.133L1531.932 172.494C1529.936 172.494 1529.86 172.929 1530.24 174.44L1531.705 180.276 1536.884 174.363C1538.148 172.929 1537.82 172.494 1535.974 172.494ZM1540.105 192.682C1539.358 192.682 1538.825 192.17 1538.825 191.468 1538.825 190.496 1539.705 189.497 1540.744 189.497 1541.517 189.497 1541.996 190.01 1541.996 190.711 1541.996 191.656 1541.144 192.682 1540.105 192.682Z" fill="#DDDDD5"/>
                 </svg>
               </div>
-              <div class="field-value"><div>hello@biflux.design</div></div>
+              <div class="el-value"><div>hello@biflux.design</div></div>
             </div>
             <div class="field-col">
-              <div class="field-label">Client</div>
-              <div class="field-value">
+              <div class="el-label">Client</div>
+              <div class="el-value">
                 <div>Acme Roofing Co</div>
                 <div>hello@acmeroofing.com</div>
               </div>
@@ -258,76 +184,59 @@
 
     <p class="section-label">Padding</p>
     <div class="slider-group">
-      <label>Padding Top <span class="val" id="valTop">19px</span></label>
+      <label>Top <span class="val" id="valPadTop">19px</span></label>
       <input type="range" id="padTop" min="0" max="150" value="19" />
     </div>
     <div class="slider-group">
-      <label>Padding Bottom <span class="val" id="valBottom">41px</span></label>
+      <label>Bottom <span class="val" id="valPadBottom">41px</span></label>
       <input type="range" id="padBottom" min="0" max="150" value="41" />
     </div>
     <div class="slider-group">
-      <label>Padding Left <span class="val" id="valLeft">42px</span></label>
+      <label>Left <span class="val" id="valPadLeft">42px</span></label>
       <input type="range" id="padLeft" min="0" max="150" value="42" />
     </div>
     <div class="slider-group">
-      <label>Padding Right <span class="val" id="valRight">42px</span></label>
+      <label>Right <span class="val" id="valPadRight">42px</span></label>
       <input type="range" id="padRight" min="0" max="150" value="42" />
     </div>
-
-    <div class="output" id="output"></div>
-    <button id="copyBtn">Copy values</button>
-    <button id="resetBtn" class="reset">Reset to current values</button>
+    <div class="slider-group">
+      <label>BI-FLUX Logo Height <span class="val" id="valLogoH">20.6px</span></label>
+      <input type="range" id="logoH" min="6" max="60" step="0.1" value="20.6" />
+    </div>
+    <button id="resetLayoutBtn" class="reset">Reset padding + logo</button>
 
     <hr class="divider" />
 
-    <p class="section-label">Typography</p>
-    <div class="slider-group">
-      <label>Title <span class="val" id="valFsTitle">185.8px</span></label>
-      <input type="range" id="fsTitle" min="40" max="260" step="0.1" value="185.8" />
-    </div>
-    <div class="slider-group">
-      <label>Subtitle <span class="val" id="valFsSubtitle">72px</span></label>
-      <input type="range" id="fsSubtitle" min="20" max="120" step="0.1" value="72" />
-    </div>
-    <div class="slider-group">
-      <label>Subtitle Line Height <span class="val" id="valLhSubtitle">1.0</span></label>
-      <input type="range" id="lhSubtitle" min="0.8" max="2" step="0.01" value="1" />
-    </div>
-    <div class="slider-group">
-      <label>Field Label (CLIENT) <span class="val" id="valFsLabel">21px</span></label>
-      <input type="range" id="fsLabel" min="10" max="48" step="0.1" value="21" />
-    </div>
-    <div class="slider-group">
-      <label>Field Value (names/emails) <span class="val" id="valFsValue">27px</span></label>
-      <input type="range" id="fsValue" min="10" max="60" step="0.1" value="27" />
-    </div>
-    <div class="slider-group">
-      <label>BI-FLUX Logo Height <span class="val" id="valLogoH">20.57px</span></label>
-      <input type="range" id="logoH" min="6" max="60" step="0.1" value="20.57" />
-    </div>
+    <p class="section-label">Typography — per element</p>
+    <div id="elementPanels"></div>
 
-    <div class="output" id="fontOutput"></div>
-    <button id="copyFontBtn">Copy font sizes</button>
-    <button id="resetFontBtn" class="reset">Reset to current sizes</button>
+    <div class="output" id="output"></div>
+    <button id="copyBtn">Copy all values</button>
+    <button id="resetTypeBtn" class="reset">Reset typography</button>
   </div>
 </div>
 
 <script>
   const stage = document.getElementById('stage');
   const frame = document.getElementById('frame');
-  const sliders = {
+
+  // ---- Preview size + padding + logo (unchanged mechanics from before) ----
+  const padSliders = {
     top: document.getElementById('padTop'),
     bottom: document.getElementById('padBottom'),
     left: document.getElementById('padLeft'),
     right: document.getElementById('padRight'),
   };
-  const labels = {
-    top: document.getElementById('valTop'),
-    bottom: document.getElementById('valBottom'),
-    left: document.getElementById('valLeft'),
-    right: document.getElementById('valRight'),
+  const padLabels = {
+    top: document.getElementById('valPadTop'),
+    bottom: document.getElementById('valPadBottom'),
+    left: document.getElementById('valPadLeft'),
+    right: document.getElementById('valPadRight'),
   };
-  const output = document.getElementById('output');
+  const PAD_DEFAULTS = { top: 19, bottom: 41, left: 42, right: 42 };
+  const LOGO_DEFAULT = 20.6;
+  const logoHSlider = document.getElementById('logoH');
+  const valLogoH = document.getElementById('valLogoH');
 
   const stageWidthSlider = document.getElementById('stageWidth');
   const valStageWidth = document.getElementById('valStageWidth');
@@ -337,22 +246,12 @@
     valStageWidth.textContent = w + 'px';
     stage.style.setProperty('--stage-width', w + 'px');
   }
-
   function updateScale() {
-    // The stage renders at whatever width fits the viewport (capped by the
-    // Stage Width slider); --scale maps the fixed 1920px reference canvas
-    // down to the stage's real rendered width, so every padding value below
-    // stays expressed in real 1920x1080-canvas px, same numbers as
-    // CoverSlide.tsx. Driven by ResizeObserver so it tracks live drag-resize
-    // of the browser window too, not just the slider.
     const scale = stage.getBoundingClientRect().width / 1920;
     frame.style.setProperty('--scale', scale);
   }
-
   new ResizeObserver(updateScale).observe(stage);
-
   stageWidthSlider.addEventListener('input', updateStageWidth);
-
   document.querySelectorAll('.presets button').forEach((btn) => {
     btn.addEventListener('click', () => {
       stageWidthSlider.value = btn.dataset.width;
@@ -360,22 +259,140 @@
     });
   });
 
-  function update() {
-    const values = {};
-    for (const key in sliders) {
-      const v = sliders[key].value;
-      values[key] = v;
-      labels[key].textContent = v + 'px';
+  function updateLayout() {
+    for (const key in padSliders) {
+      const v = padSliders[key].value;
+      padLabels[key].textContent = v + 'px';
       frame.style.setProperty('--pad-' + key, v + 'px');
     }
-    output.textContent =
-      'paddingTop: ' + values.top + ',\n' +
-      'paddingBottom: ' + values.bottom + ',\n' +
-      'paddingLeft: ' + values.left + ',\n' +
-      'paddingRight: ' + values.right + ',';
+    const logoH = logoHSlider.value;
+    valLogoH.textContent = logoH + 'px';
+    frame.style.setProperty('--logo-h', logoH + 'px');
+  }
+  Object.values(padSliders).forEach((el) => el.addEventListener('input', updateLayout));
+  logoHSlider.addEventListener('input', updateLayout);
+  document.getElementById('resetLayoutBtn').addEventListener('click', () => {
+    for (const key in padSliders) padSliders[key].value = PAD_DEFAULTS[key];
+    logoHSlider.value = LOGO_DEFAULT;
+    updateLayout();
+  });
+
+  // ---- Per-element typography config ----
+  // Each entry describes one distinct text role on the slide: its real
+  // font, its current real values (from CoverSlide.tsx), sane slider
+  // ranges, and which weights actually exist as loaded font files/faces.
+  // Elements with only one real weight get a fixed note instead of a
+  // picker — there's nothing to switch to, so a picker would be a lie.
+  const ELEMENTS = [
+    {
+      key: 'title', name: 'Title', font: 'Inter',
+      defaults: { fs: 187.5, lh: 1.0, ls: -0.06, fw: 500 },
+      fsRange: [100, 260, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001],
+      weights: [400, 500, 600],
+    },
+    {
+      key: 'subtitle', name: 'Subtitle', font: 'Helvetica Neue (system)',
+      defaults: { fs: 72, lh: 1.11, ls: -0.06, fw: 600 },
+      fsRange: [30, 120, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001],
+      weights: [400, 500, 600, 700],
+    },
+    {
+      key: 'label', name: 'Client Label ("CLIENT")', font: 'Neue Haas Grotesk Roman',
+      defaults: { fs: 21, lh: 1.09, ls: 0.2, fw: 400 },
+      fsRange: [10, 40, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.05, 0.35, 0.001],
+      weights: null,
+    },
+    {
+      key: 'value', name: 'Value Text (names, emails)', font: 'Neue Haas Grotesk Roman',
+      defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 400 },
+      fsRange: [14, 48, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.08, 0.1, 0.001],
+      weights: null,
+    },
+  ];
+
+  const state = {};
+  ELEMENTS.forEach((el) => { state[el.key] = { ...el.defaults }; });
+
+  const panelsContainer = document.getElementById('elementPanels');
+
+  function fmtLs(v) { return (v >= 0 ? '+' : '') + v.toFixed(3) + 'em'; }
+
+  ELEMENTS.forEach((el) => {
+    const panel = document.createElement('div');
+    panel.className = 'element-panel';
+
+    const weightControl = el.weights
+      ? `<div class="weight-picker" id="wp-${el.key}"></div>`
+      : `<div class="weight-fixed">Only ${el.defaults.fw} (Roman) is loaded — nothing else to pick.</div>`;
+
+    panel.innerHTML = `
+      <p class="el-name">${el.name}</p>
+      <p class="el-font">${el.font}</p>
+      <div class="slider-group">
+        <label>Font Size <span class="val" id="val-${el.key}-fs">${el.defaults.fs}px</span></label>
+        <input type="range" id="in-${el.key}-fs" min="${el.fsRange[0]}" max="${el.fsRange[1]}" step="${el.fsRange[2]}" value="${el.defaults.fs}" />
+      </div>
+      <div class="slider-group">
+        <label>Line Height <span class="val" id="val-${el.key}-lh">${el.defaults.lh}</span></label>
+        <input type="range" id="in-${el.key}-lh" min="${el.lhRange[0]}" max="${el.lhRange[1]}" step="${el.lhRange[2]}" value="${el.defaults.lh}" />
+      </div>
+      <div class="slider-group">
+        <label>Letter Spacing <span class="val" id="val-${el.key}-ls">${fmtLs(el.defaults.ls)}</span></label>
+        <input type="range" id="in-${el.key}-ls" min="${el.lsRange[0]}" max="${el.lsRange[1]}" step="${el.lsRange[2]}" value="${el.defaults.ls}" />
+      </div>
+      ${weightControl}
+    `;
+    panelsContainer.appendChild(panel);
+
+    if (el.weights) {
+      const wp = panel.querySelector(`#wp-${el.key}`);
+      el.weights.forEach((w) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = w;
+        if (w === el.defaults.fw) btn.classList.add('active');
+        btn.addEventListener('click', () => {
+          state[el.key].fw = w;
+          wp.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          applyElement(el.key);
+          updateOutput();
+        });
+        wp.appendChild(btn);
+      });
+    }
+
+    ['fs', 'lh', 'ls'].forEach((prop) => {
+      const input = panel.querySelector(`#in-${el.key}-${prop}`);
+      input.addEventListener('input', () => {
+        state[el.key][prop] = Number(input.value);
+        const label = panel.querySelector(`#val-${el.key}-${prop}`);
+        label.textContent = prop === 'ls'
+          ? fmtLs(state[el.key][prop])
+          : prop === 'fs' ? state[el.key][prop] + 'px' : state[el.key][prop];
+        applyElement(el.key);
+        updateOutput();
+      });
+    });
+  });
+
+  function applyElement(key) {
+    const s = state[key];
+    frame.style.setProperty(`--fs-${key}`, s.fs + 'px');
+    frame.style.setProperty(`--lh-${key}`, s.lh);
+    frame.style.setProperty(`--ls-${key}`, s.ls);
+    frame.style.setProperty(`--fw-${key}`, s.fw);
   }
 
-  Object.values(sliders).forEach((el) => el.addEventListener('input', update));
+  const output = document.getElementById('output');
+  function updateOutput() {
+    let lines = [];
+    ELEMENTS.forEach((el) => {
+      const s = state[el.key];
+      lines.push(`${el.key}: { fontSize: ${s.fs}, lineHeight: "${Math.round(s.lh * 100)}%", letterSpacing: "${s.ls >= 0 ? s.ls.toFixed(3) : s.ls.toFixed(3)}em", fontWeight: ${s.fw} },`);
+    });
+    output.textContent = lines.join('\n');
+  }
 
   document.getElementById('copyBtn').addEventListener('click', () => {
     navigator.clipboard.writeText(output.textContent).then(() => {
@@ -386,80 +403,32 @@
     });
   });
 
-  const CURRENT_VALUES = { top: 19, bottom: 41, left: 42, right: 42 };
-  document.getElementById('resetBtn').addEventListener('click', () => {
-    for (const key in sliders) sliders[key].value = CURRENT_VALUES[key];
-    update();
-  });
-
-  // Typography — each text element's font size is independently adjustable,
-  // same real-canvas-px convention as the padding sliders above.
-  const fontSliders = {
-    title: document.getElementById('fsTitle'),
-    subtitle: document.getElementById('fsSubtitle'),
-    label: document.getElementById('fsLabel'),
-    value: document.getElementById('fsValue'),
-  };
-  const fontLabels = {
-    title: document.getElementById('valFsTitle'),
-    subtitle: document.getElementById('valFsSubtitle'),
-    label: document.getElementById('valFsLabel'),
-    value: document.getElementById('valFsValue'),
-  };
-  const fontOutput = document.getElementById('fontOutput');
-  const logoHSlider = document.getElementById('logoH');
-  const valLogoH = document.getElementById('valLogoH');
-  const lhSubtitleSlider = document.getElementById('lhSubtitle');
-  const valLhSubtitle = document.getElementById('valLhSubtitle');
-
-  function updateFonts() {
-    const values = {};
-    for (const key in fontSliders) {
-      const v = fontSliders[key].value;
-      values[key] = v;
-      fontLabels[key].textContent = v + 'px';
-      frame.style.setProperty('--fs-' + key, v + 'px');
-    }
-    const logoH = logoHSlider.value;
-    valLogoH.textContent = logoH + 'px';
-    frame.style.setProperty('--logo-h', logoH + 'px');
-    const lhSubtitle = lhSubtitleSlider.value;
-    valLhSubtitle.textContent = lhSubtitle;
-    frame.style.setProperty('--lh-subtitle', lhSubtitle);
-    fontOutput.textContent =
-      'title: ' + values.title + ',\n' +
-      'subtitle: ' + values.subtitle + ',\n' +
-      'subtitleLineHeight: ' + lhSubtitle + ',\n' +
-      'fieldLabel: ' + values.label + ',\n' +
-      'fieldValue: ' + values.value + ',\n' +
-      'logoHeight: ' + logoH + ',';
-  }
-
-  Object.values(fontSliders).forEach((el) => el.addEventListener('input', updateFonts));
-  logoHSlider.addEventListener('input', updateFonts);
-  lhSubtitleSlider.addEventListener('input', updateFonts);
-
-  document.getElementById('copyFontBtn').addEventListener('click', () => {
-    navigator.clipboard.writeText(fontOutput.textContent).then(() => {
-      const btn = document.getElementById('copyFontBtn');
-      const original = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(() => (btn.textContent = original), 1200);
+  document.getElementById('resetTypeBtn').addEventListener('click', () => {
+    ELEMENTS.forEach((el) => {
+      state[el.key] = { ...el.defaults };
+      panelsContainer.querySelector(`#in-${el.key}-fs`).value = el.defaults.fs;
+      panelsContainer.querySelector(`#in-${el.key}-lh`).value = el.defaults.lh;
+      panelsContainer.querySelector(`#in-${el.key}-ls`).value = el.defaults.ls;
+      panelsContainer.querySelector(`#val-${el.key}-fs`).textContent = el.defaults.fs + 'px';
+      panelsContainer.querySelector(`#val-${el.key}-lh`).textContent = el.defaults.lh;
+      panelsContainer.querySelector(`#val-${el.key}-ls`).textContent = fmtLs(el.defaults.ls);
+      if (el.weights) {
+        const wp = panelsContainer.querySelector(`#wp-${el.key}`);
+        wp.querySelectorAll('button').forEach((b) => {
+          b.classList.toggle('active', Number(b.textContent) === el.defaults.fw);
+        });
+      }
+      applyElement(el.key);
     });
+    updateOutput();
   });
 
-  const CURRENT_FONT_SIZES = { title: 185.8, subtitle: 72, label: 21, value: 27 };
-  document.getElementById('resetFontBtn').addEventListener('click', () => {
-    for (const key in fontSliders) fontSliders[key].value = CURRENT_FONT_SIZES[key];
-    logoHSlider.value = 20.57;
-    lhSubtitleSlider.value = 1;
-    updateFonts();
-  });
-
+  // ---- init ----
   updateStageWidth();
   updateScale();
-  update();
-  updateFonts();
+  updateLayout();
+  ELEMENTS.forEach((el) => applyElement(el.key));
+  updateOutput();
 </script>
 
 </body>

@@ -6,8 +6,12 @@ import "./globals.css";
 // The studio's actual brand font — Umar has the licensed desktop family,
 // but only the Roman (regular) weight has a redistributable file on hand,
 // so this is self-hosted at 400 only rather than the full weight range.
+// Lives in public/fonts/ (not app/fonts/) so the same file is also directly
+// fetchable as a static asset — the standalone tuning tools (padding-tool.html
+// etc.) load it via a plain @font-face, since they're outside Next's font
+// pipeline and have no access to next/font's generated CSS variable.
 const neueHaas = localFont({
-  src: "./fonts/NeueHaasDisplayRoman.ttf",
+  src: "../public/fonts/NeueHaasDisplayRoman.ttf",
   variable: "--font-neue-haas",
   weight: "400",
   style: "normal",
