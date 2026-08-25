@@ -12,13 +12,6 @@ import {
 const SLIDE_WIDTH = 1920;
 const SLIDE_HEIGHT = 1080;
 
-// Fixed screen-space (not scaled) always left clear at the bottom for the
-// nav pill, so it never overlaps slide content — some slides put content
-// close to the bottom edge (TOC's last row, Problem's last paragraph line),
-// and the nav pill sits at a fixed viewport position, not scaled with the
-// frame, so without this the two can collide regardless of which slide.
-const NAV_RESERVED_HEIGHT = 110;
-
 /**
  * Shared deck state exposed to every slide — current position, slide count,
  * and a jump-to-slide function. Lets any slide render its own page number
@@ -98,10 +91,13 @@ function NavArrowButton({
 /**
  * Every slide is authored at Paper's exact 1920x1080 reference size, using
  * Paper's exact pixel values (no vw/vh, no clamp). This wrapper scales that
- * fixed frame as ONE rigid unit to fit whatever viewport it's shown on —
- * like a presentation "fit to screen" — so every gap, font size, and
- * proportion stays exactly as designed at any screen size, from a 13" to
- * a 27" monitor, phones included.
+ * fixed frame as ONE rigid unit — never stretched, never distorted — using
+ * a "cover" fit: it always fills the entire viewport edge to edge, cropping
+ * whatever overflows rather than letterboxing. Anchored to the top (not
+ * centered), so any crop only ever eats into the BOTTOM of the design —
+ * the header/title area is always fully visible, and the bottom margin is
+ * exactly where the nav pill already lives, backed by its own scrim (see
+ * SlideDeck below).
  */
 function SlideCanvas({ children }: { children: ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -112,8 +108,7 @@ function SlideCanvas({ children }: { children: ReactNode }) {
     if (!container) return;
 
     function updateScale(width: number, height: number) {
-      const availableHeight = Math.max(height - NAV_RESERVED_HEIGHT, 0);
-      setScale(Math.min(width / SLIDE_WIDTH, availableHeight / SLIDE_HEIGHT));
+      setScale(Math.max(width / SLIDE_WIDTH, height / SLIDE_HEIGHT));
     }
 
     // Initial measurement (ResizeObserver's first callback covers this too,
@@ -136,17 +131,14 @@ function SlideCanvas({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div ref={containerRef} className="h-full w-full">
-      <div
-        className="flex h-full w-full items-center justify-center"
-        style={{ paddingBottom: NAV_RESERVED_HEIGHT }}
-      >
+    <div ref={containerRef} className="h-full w-full overflow-hidden">
+      <div className="flex h-full w-full items-start justify-center">
         <div
           style={{
             width: SLIDE_WIDTH,
             height: SLIDE_HEIGHT,
             transform: `scale(${scale})`,
-            transformOrigin: "center center",
+            transformOrigin: "top center",
             flexShrink: 0,
           }}
         >
@@ -184,6 +176,18 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
           </div>
         ))}
       </div>
+
+      {/* Scrim behind the nav pill — since the frame now covers the full
+          viewport edge to edge (no letterbox to tuck the nav into), this
+          guarantees the pill reads cleanly regardless of what's under it,
+          whether that's Cover/TOC's black or Problem's light background. */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-44"
+        style={{
+          background:
+            "linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0))",
+        }}
+      />
 
       <div
         className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 items-center gap-3.5 rounded-full p-2.5 text-white"
