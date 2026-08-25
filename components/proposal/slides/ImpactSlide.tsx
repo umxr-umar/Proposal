@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import type { Proposal } from "@/lib/types";
 import { OverviewTextSlide } from "./OverviewTextSlide";
 import { pad, useSlideDeck } from "./SlideDeck";
+import { fx, ffont } from "@/lib/fluid";
 
 /**
  * "Impact" — third and last of three sub-slides under "01. Project
@@ -51,11 +52,11 @@ export function ImpactSlide({ proposal }: { proposal: Proposal }) {
           onClick={() => goToSlide(5)}
           className="absolute cursor-pointer border-0 bg-transparent p-0 text-left transition-opacity hover:opacity-70"
           style={{
-            left: 1413,
+            left: fx(1413),
             bottom: navSafeBottom,
             fontFamily: inter,
             fontWeight: 400,
-            fontSize: 27,
+            fontSize: ffont(27),
             lineHeight: "135%",
             letterSpacing: "-0.03em",
           }}

@@ -1,37 +1,25 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-
-const SLIDE_WIDTH = 1920;
-const SLIDE_HEIGHT = 1080;
+import { createContext, useContext, useState, type ReactNode } from "react";
 
 // Real screen pixels the nav pill actually occupies from the viewport's
 // bottom edge (pill height ~54px + its bottom-8 margin), plus a ~24px
-// breathing-room buffer on top of that.
+// breathing-room buffer on top of that. A plain constant now — not scale-
+// dependent, since slides are true fluid CSS (%, vw, clamp()) rather than
+// a fixed canvas scaled as one block, so nothing here needs recomputing
+// off a measured scale factor.
 const NAV_GUTTER_PX = 110;
 
 /**
  * Shared deck state exposed to every slide — current position, slide count,
- * a jump-to-slide function, and the live scale factor + the nav-safe bottom
- * offset derived from it. `navSafeBottom` is in CANVAS units (1920x1080
- * space) but is recomputed from the real scale every time the viewport
- * resizes, so `bottom: navSafeBottom` on a slide's lowest content always
- * clears the nav pill by exactly NAV_GUTTER_PX real screen pixels —
- * regardless of screen size, unlike a fixed canvas position (which only
- * happens to work at whatever scale it was eyeballed against).
+ * a jump-to-slide function, and navSafeBottom (the constant bottom offset
+ * every slide's lowest content should sit above, so it clears the fixed
+ * nav pill on any screen size).
  */
 type SlideDeckState = {
   index: number;
   total: number;
   goToSlide: (i: number) => void;
-  scale: number;
   navSafeBottom: number;
 };
 
@@ -39,7 +27,6 @@ const SlideDeckContext = createContext<SlideDeckState>({
   index: 0,
   total: 1,
   goToSlide: () => {},
-  scale: 1,
   navSafeBottom: NAV_GUTTER_PX,
 });
 
@@ -101,47 +88,8 @@ function NavArrowButton({
   );
 }
 
-/**
- * Every slide is authored at Paper's exact 1920x1080 reference size, using
- * Paper's exact pixel values (no vw/vh, no clamp). This wrapper scales that
- * fixed frame as ONE rigid unit — never stretched, never distorted — using
- * a "cover" fit: it always fills the entire viewport edge to edge, cropping
- * whatever overflows rather than letterboxing. Anchored to the top (not
- * centered), so any crop only ever eats into the BOTTOM of the design —
- * the header/title area is always fully visible. `scale` is measured once
- * by SlideDeck (all slides share the same viewport) and passed down, rather
- * than each slide re-measuring the same thing independently.
- */
-function SlideCanvas({
-  scale,
-  children,
-}: {
-  scale: number;
-  children: ReactNode;
-}) {
-  return (
-    <div className="h-full w-full overflow-hidden">
-      <div className="flex h-full w-full items-start justify-center">
-        <div
-          style={{
-            width: SLIDE_WIDTH,
-            height: SLIDE_HEIGHT,
-            transform: `scale(${scale})`,
-            transformOrigin: "top center",
-            flexShrink: 0,
-          }}
-        >
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function SlideDeck({ slides }: { slides: ReactNode[] }) {
   const [index, setIndex] = useState(0);
-  const [scale, setScale] = useState(1);
-  const deckRef = useRef<HTMLDivElement>(null);
   const canPrev = index > 0;
   const canNext = index < slides.length - 1;
 
@@ -149,66 +97,24 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
     setIndex(Math.min(Math.max(i, 0), slides.length - 1));
   }
 
-  useEffect(() => {
-    const el = deckRef.current;
-    if (!el) return;
-
-    function updateScale(width: number, height: number) {
-      // Guard against a 0×0 measurement (possible for one frame during
-      // initial layout) — dividing NAV_GUTTER_PX by a 0 scale later would
-      // produce `bottom: Infinity`, an invalid CSS value.
-      if (width === 0 || height === 0) return;
-      const coverScale = Math.max(width / SLIDE_WIDTH, height / SLIDE_HEIGHT);
-      const containScale = Math.min(width / SLIDE_WIDTH, height / SLIDE_HEIGHT);
-      // Pure cover-fit crops more aggressively the further the viewport's
-      // aspect ratio drifts from 16:9 — fine for realistic browser windows
-      // (even resized ones, down to roughly 4:3), but on an unusually
-      // square or narrow window it starts eating whole words. Cap how far
-      // cover can zoom in past contain-fit, so extreme shapes fall back to
-      // a small margin instead of unlimited cropping.
-      const ASPECT_TOLERANCE = 1.4;
-      setScale(Math.min(coverScale, containScale * ASPECT_TOLERANCE));
-    }
-
-    // Initial measurement (ResizeObserver's first callback covers this too,
-    // but doing it synchronously avoids a one-frame flash at scale 1).
-    const rect = el.getBoundingClientRect();
-    updateScale(rect.width, rect.height);
-
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      const box = entry.contentBoxSize?.[0];
-      if (box) {
-        updateScale(box.inlineSize, box.blockSize);
-      } else {
-        const r = entry.target.getBoundingClientRect();
-        updateScale(r.width, r.height);
-      }
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const navSafeBottom = NAV_GUTTER_PX / scale;
-
   return (
-    <div
-      ref={deckRef}
-      className="relative h-screen w-full overflow-hidden bg-black"
-    >
+    <div className="relative h-screen w-full overflow-hidden bg-black">
       <div
         className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)]"
         style={{ transform: `translateX(-${index * 100}vw)` }}
       >
         {slides.map((slide, i) => (
-          <div key={i} className="h-full w-screen shrink-0">
-            <SlideCanvas scale={scale}>
-              <SlideDeckContext.Provider
-                value={{ index, total: slides.length, goToSlide, scale, navSafeBottom }}
-              >
-                {slide}
-              </SlideDeckContext.Provider>
-            </SlideCanvas>
+          <div key={i} className="relative h-full w-screen shrink-0">
+            <SlideDeckContext.Provider
+              value={{
+                index,
+                total: slides.length,
+                goToSlide,
+                navSafeBottom: NAV_GUTTER_PX,
+              }}
+            >
+              {slide}
+            </SlideDeckContext.Provider>
           </div>
         ))}
       </div>

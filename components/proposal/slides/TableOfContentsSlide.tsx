@@ -2,6 +2,7 @@
 
 import { BifluxLogo } from "./BifluxLogo";
 import { pad, useSlideDeck } from "./SlideDeck";
+import { fx, fy, ffont } from "@/lib/fluid";
 
 const SECTIONS = [
   "Project Overview",
@@ -23,8 +24,10 @@ const SECTION_TARGETS = [2, 5, 6, 7, 8, 9];
 
 /**
  * Table of Contents slide, values pulled 1:1 from Paper's "Table of
- * contents" frame (1920x1080 reference canvas, same <SlideCanvas> rigid
- * scale-to-fit as every other slide).
+ * contents" frame (1920x1080 reference canvas) — every dimension below is
+ * a `clamp()` (via lib/fluid.ts) that reproduces the reference px value
+ * exactly at 1920x1080 and reflows fluidly at any other size, rather than
+ * scaling a fixed canvas as one rigid block.
  *
  * "Your Name" in Paper's placeholder becomes the BI-FLUX logo (same swap
  * as the Cover slide); the year is the real current year, not a hardcoded
@@ -39,11 +42,8 @@ const SECTION_TARGETS = [2, 5, 6, 7, 8, 9];
  * last built slide instead of erroring.
  *
  * The list and the page number are anchored with `bottom: navSafeBottom`
- * (from SlideDeck's context) rather than a fixed `top` — navSafeBottom is
- * recomputed from the live scale factor, so it always clears the fixed nav
- * pill by the same real screen pixels regardless of viewport size, instead
- * of a canvas position that only happens to work at whatever size it was
- * checked against.
+ * (from SlideDeck's context, a constant real px) so they always clear the
+ * fixed nav pill regardless of viewport size.
  */
 export function TableOfContentsSlide() {
   const { index, goToSlide, navSafeBottom } = useSlideDeck();
@@ -55,14 +55,14 @@ export function TableOfContentsSlide() {
     <div className="relative h-full w-full bg-[#000000] text-[#DDDDD5]">
       <div
         className="absolute flex items-center justify-between"
-        style={{ left: 48, top: 48, width: 1824 }}
+        style={{ left: fx(48), top: fy(48), width: fx(1824) }}
       >
-        <div className="flex items-center" style={{ gap: 174 }}>
-          <BifluxLogo width={87.03} height={20.6} />
+        <div className="flex items-center" style={{ gap: fx(174) }}>
+          <BifluxLogo height={ffont(20.6)} />
           <div
             style={{
               fontFamily: neueHaas,
-              fontSize: 30.3,
+              fontSize: ffont(30.3),
               color: "#938F8A",
               letterSpacing: "-0.006em",
               lineHeight: "131%",
@@ -74,7 +74,7 @@ export function TableOfContentsSlide() {
         <div
           style={{
             fontFamily: neueHaas,
-            fontSize: 30.3,
+            fontSize: ffont(30.3),
             color: "#938F8A",
             letterSpacing: "-0.006em",
             lineHeight: "131%",
@@ -86,7 +86,7 @@ export function TableOfContentsSlide() {
 
       <div
         className="absolute flex flex-col items-start"
-        style={{ left: 56, bottom: navSafeBottom, gap: 12 }}
+        style={{ left: fx(56), bottom: navSafeBottom, gap: fy(12) }}
       >
         {SECTIONS.map((title, i) => (
           <button
@@ -94,13 +94,13 @@ export function TableOfContentsSlide() {
             type="button"
             onClick={() => goToSlide(SECTION_TARGETS[i])}
             className="flex cursor-pointer items-center border-0 bg-transparent p-0 text-left transition-opacity hover:opacity-70"
-            style={{ gap: 199 }}
+            style={{ gap: fx(199) }}
           >
             <span
               style={{
                 fontFamily: instrumentSerif,
                 fontWeight: 400,
-                fontSize: 72,
+                fontSize: ffont(72),
                 letterSpacing: "-0.025em",
                 lineHeight: "97%",
               }}
@@ -111,7 +111,7 @@ export function TableOfContentsSlide() {
               style={{
                 fontFamily: neueHaas,
                 fontWeight: 400,
-                fontSize: 75.8,
+                fontSize: ffont(75.8),
                 letterSpacing: "0.003em",
                 lineHeight: "104%",
               }}
@@ -125,10 +125,10 @@ export function TableOfContentsSlide() {
       <div
         className="absolute"
         style={{
-          left: 1855,
+          left: fx(1855),
           bottom: navSafeBottom,
           fontFamily: neueHaas,
-          fontSize: 30.3,
+          fontSize: ffont(30.3),
           color: "#938F8A",
           letterSpacing: "-0.006em",
           lineHeight: "131%",

@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { BifluxLogo } from "./BifluxLogo";
 import { pad, useSlideDeck } from "./SlideDeck";
+import { fx, fy, ffont } from "@/lib/fluid";
 
 /**
  * Shared layout for the "01. Project Overview" sub-slides (Problem,
@@ -12,9 +13,14 @@ import { pad, useSlideDeck } from "./SlideDeck";
  * numbers. Real Inter throughout — Figma's own tokens specify Inter here,
  * not a substitute for Neue Haas Grotesk like Cover/TOC.
  *
+ * Every dimension below is a `clamp()` (via lib/fluid.ts) reproducing the
+ * reference px value exactly at 1920x1080 and reflowing fluidly at any
+ * other size, rather than scaling a fixed canvas as one rigid block — no
+ * cropping, no letterbox bars, ever.
+ *
  * Body and footer anchor with `bottom: navSafeBottom` (from SlideDeck's
- * context) rather than a fixed `top`, so they always clear the nav pill
- * by the same real screen pixels regardless of viewport size.
+ * context, a constant real px) so they always clear the fixed nav pill
+ * regardless of viewport size.
  */
 export function OverviewTextSlide({
   label,
@@ -40,15 +46,18 @@ export function OverviewTextSlide({
     >
       <div
         className="absolute flex items-center justify-between"
-        style={{ left: 48, top: 48, width: 1824 }}
+        style={{ left: fx(48), top: fy(48), width: fx(1824) }}
       >
-        <div className="flex items-end justify-between" style={{ width: 545 }}>
-          <BifluxLogo width={87.03} height={20.6} color="#000000" />
+        <div
+          className="flex items-end justify-between"
+          style={{ width: fx(545) }}
+        >
+          <BifluxLogo height={ffont(20.6)} color="#000000" />
           <div
             style={{
               fontFamily: inter,
               fontWeight: 500,
-              fontSize: 27,
+              fontSize: ffont(27),
               lineHeight: "135%",
               letterSpacing: "-0.03em",
             }}
@@ -60,7 +69,7 @@ export function OverviewTextSlide({
           style={{
             fontFamily: inter,
             fontWeight: 400,
-            fontSize: 27,
+            fontSize: ffont(27),
             lineHeight: "135%",
             letterSpacing: "-0.03em",
             color: "#938F8A",
@@ -72,13 +81,13 @@ export function OverviewTextSlide({
 
       <div
         className="absolute flex items-start"
-        style={{ left: 48, bottom: navSafeBottom, gap: bodyGap }}
+        style={{ left: fx(48), bottom: navSafeBottom, gap: fx(bodyGap) }}
       >
         <div
           style={{
             fontFamily: inter,
             fontWeight: 700,
-            fontSize: 27,
+            fontSize: ffont(27),
             lineHeight: "180%",
             letterSpacing: "-0.03em",
             whiteSpace: "nowrap",
@@ -88,10 +97,10 @@ export function OverviewTextSlide({
         </div>
         <div
           style={{
-            width: bodyWidth,
+            width: fx(bodyWidth),
             fontFamily: inter,
             fontWeight: 500,
-            fontSize: 27,
+            fontSize: ffont(27),
             lineHeight: "135%",
             letterSpacing: "-0.03em",
           }}
@@ -99,7 +108,9 @@ export function OverviewTextSlide({
           {paragraphs.map((p, i) => (
             <p
               key={i}
-              style={i < paragraphs.length - 1 ? { marginBottom: 36 } : undefined}
+              style={
+                i < paragraphs.length - 1 ? { marginBottom: fy(36) } : undefined
+              }
             >
               {p}
             </p>
@@ -111,11 +122,11 @@ export function OverviewTextSlide({
         <div
           className="absolute"
           style={{
-            left: 1855,
+            left: fx(1855),
             bottom: navSafeBottom,
             fontFamily: inter,
             fontWeight: 400,
-            fontSize: 27,
+            fontSize: ffont(27),
             lineHeight: "135%",
             letterSpacing: "-0.03em",
             color: "#938F8A",

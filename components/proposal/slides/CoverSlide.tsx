@@ -1,16 +1,26 @@
+"use client";
+
 import type { Proposal } from "@/lib/types";
 import { BifluxLogo } from "./BifluxLogo";
+import { useSlideDeck } from "./SlideDeck";
+import { fx, fy, ffont } from "@/lib/fluid";
 
 /**
  * Version 1 of the Cover slide. Values pulled from Paper's "Cover" frame at
- * its native 1920x1080 canvas, rendered inside <SlideCanvas>, which scales
- * the whole 1920x1080 box as one rigid unit to fit any screen.
+ * its native 1920x1080 canvas — every dimension below is a `clamp()` (via
+ * lib/fluid.ts) that reproduces the reference px value exactly at 1920x1080
+ * and reflows fluidly at any other window size, rather than scaling a
+ * fixed canvas as one rigid block. No cropping, no letterbox bars, ever —
+ * the trade-off is that proportions can drift slightly between very
+ * differently-shaped windows instead of staying pixel-identical.
  *
  * Layout: title pinned to the top, the subtitle+fields group pinned to the
  * bottom — padding is 19px top, 41px bottom, 42px left, 42px right (tuned
  * via public/padding-tool.html) — no fixed gap between title and fields,
  * so the space between naturally fills whatever room is left instead of a
- * hardcoded value that would overflow on a longer subtitle.
+ * hardcoded value that would overflow on a longer subtitle. navSafeBottom
+ * is added on top of the real bottom padding so nothing ever sits under
+ * the fixed nav pill.
  *
  * Title font is "Neue Haas Grotesk Display Pro" in Paper, a licensed
  * desktop font with no web-license file available here, so Inter
@@ -25,6 +35,7 @@ import { BifluxLogo } from "./BifluxLogo";
  * margin rather than an independent fixed position, so it never collides.
  */
 export function CoverSlide({ proposal }: { proposal: Proposal }) {
+  const { navSafeBottom } = useSlideDeck();
   const inter = "var(--font-inter), system-ui, sans-serif";
   // Real system font reference (not a bundled file — no license needed to
   // point at an OS-installed copy, same category as "-apple-system"/
@@ -37,10 +48,10 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
     <div
       className="flex h-full w-full flex-col justify-between bg-[#000000] text-[#DDDDD5]"
       style={{
-        paddingTop: 19,
-        paddingBottom: 41,
-        paddingLeft: 42,
-        paddingRight: 42,
+        paddingTop: fy(19),
+        paddingBottom: `calc(${fy(41)} + ${navSafeBottom}px)`,
+        paddingLeft: fx(42),
+        paddingRight: fx(42),
       }}
     >
       <h1
@@ -48,10 +59,9 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
         style={{
           fontFamily: inter,
           fontWeight: 500,
-          fontSize: 187.5,
+          fontSize: ffont(187.5, { min: 56 }),
           lineHeight: "100%",
           letterSpacing: "-0.06em",
-          whiteSpace: "nowrap",
         }}
       >
         Project Proposal
@@ -60,11 +70,11 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
       <div>
         <p
           style={{
-            marginLeft: 8,
-            width: 727,
+            marginLeft: fx(8),
+            width: fx(727),
             fontFamily: helveticaNeue,
             fontWeight: 600,
-            fontSize: 72,
+            fontSize: ffont(72),
             lineHeight: "111%",
             letterSpacing: "-0.06em",
             textTransform: "capitalize",
@@ -74,16 +84,19 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
           {proposal.clientName}.
         </p>
 
-        <div className="flex items-start" style={{ marginTop: 71, gap: 105 }}>
-          <div className="flex flex-col" style={{ gap: 27 }}>
-            <BifluxLogo width={87.03} height={20.6} />
+        <div
+          className="flex items-start"
+          style={{ marginTop: fy(71), gap: fx(105) }}
+        >
+          <div className="flex flex-col" style={{ gap: fy(27) }}>
+            <BifluxLogo height={ffont(20.6)} />
             <div
               className="flex flex-col"
               style={{
-                gap: 4,
+                gap: fy(4),
                 fontFamily: neueHaas,
                 fontWeight: 400,
-                fontSize: 27,
+                fontSize: ffont(27),
                 lineHeight: "135%",
                 letterSpacing: "-0.03em",
               }}
@@ -92,13 +105,13 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
             </div>
           </div>
 
-          <div className="flex flex-col" style={{ gap: 27 }}>
+          <div className="flex flex-col" style={{ gap: fy(27) }}>
             <div
               className="uppercase"
               style={{
                 fontFamily: neueHaas,
                 fontWeight: 500,
-                fontSize: 21,
+                fontSize: ffont(21),
                 lineHeight: "109%",
                 letterSpacing: "0.2em",
               }}
@@ -108,10 +121,10 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
             <div
               className="flex flex-col"
               style={{
-                gap: 4,
+                gap: fy(4),
                 fontFamily: neueHaas,
                 fontWeight: 400,
-                fontSize: 27,
+                fontSize: ffont(27),
                 lineHeight: "135%",
                 letterSpacing: "-0.03em",
               }}
