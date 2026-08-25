@@ -16,35 +16,43 @@
  * top/bottom, so vertical spacing uses vh here rather than a % trick.
  * `ffont` — font sizes specifically scale with whichever of width/height
  * is more constrained (like `vmin`, but weighted to the 16:9 reference),
- * so text never overflows or balloons on an unusual aspect ratio.
+ * so text never overflows or balloons on an unusual aspect ratio — but on
+ * a proportionally BIGGER 16:9-ish screen, both dimensions grow together,
+ * so text (and everything else) keeps scaling up to genuinely fill the
+ * screen rather than plateauing.
  *
- * Default min/max bounds are 55%–150% of the reference value; pass
- * `{ min, max }` to override for a specific element that needs tighter or
- * looser bounds.
+ * No max bound by default — the design should keep growing to fill any
+ * screen, including large ones, not just avoid cropping on small ones.
+ * Only a min bound (55% for fx/fy, 45% for ffont) keeps things from
+ * shrinking into illegibility on a small window. Pass `{ min, max }` to
+ * override either for a specific element that needs its own bounds.
  */
 const REF_WIDTH = 1920;
 const REF_HEIGHT = 1080;
 
 type Bounds = { min?: number; max?: number };
 
+function clampStr(minPx: number, mid: string, maxPx?: number) {
+  return maxPx === undefined
+    ? `max(${minPx}px, ${mid})`
+    : `clamp(${minPx}px, ${mid}, ${maxPx}px)`;
+}
+
 export function fx(px: number, { min, max }: Bounds = {}) {
   const vw = (px / REF_WIDTH) * 100;
   const minPx = min ?? px * 0.55;
-  const maxPx = max ?? px * 1.5;
-  return `clamp(${minPx}px, ${vw}vw, ${maxPx}px)`;
+  return clampStr(minPx, `${vw}vw`, max);
 }
 
 export function fy(px: number, { min, max }: Bounds = {}) {
   const vh = (px / REF_HEIGHT) * 100;
   const minPx = min ?? px * 0.55;
-  const maxPx = max ?? px * 1.5;
-  return `clamp(${minPx}px, ${vh}vh, ${maxPx}px)`;
+  return clampStr(minPx, `${vh}vh`, max);
 }
 
 export function ffont(px: number, { min, max }: Bounds = {}) {
   const vw = (px / REF_WIDTH) * 100;
   const vh = (px / REF_HEIGHT) * 100;
   const minPx = min ?? px * 0.45;
-  const maxPx = max ?? px * 1.35;
-  return `clamp(${minPx}px, min(${vw}vw, ${vh}vh), ${maxPx}px)`;
+  return clampStr(minPx, `min(${vw}vw, ${vh}vh)`, max);
 }

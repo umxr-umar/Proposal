@@ -20,6 +20,7 @@ export function BifluxLogo({
       xmlns="http://www.w3.org/2000/svg"
       style={{
         flexShrink: 0,
+        alignSelf: "flex-start",
         height,
         width: "auto",
         aspectRatio: "87 / 20.594",
