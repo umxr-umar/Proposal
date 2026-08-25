@@ -62,7 +62,7 @@ export function ProblemSlide({ proposal }: { proposal: Proposal }) {
 
       <div
         className="absolute flex items-start"
-        style={{ left: 48, top: 545, gap: 174 }}
+        style={{ left: 48, top: 500, gap: 174 }}
       >
         <div
           style={{

@@ -71,7 +71,7 @@ export function TableOfContentsSlide() {
 
       <div
         className="absolute flex flex-col items-start"
-        style={{ left: 56, top: 520, gap: 12 }}
+        style={{ left: 56, top: 420, gap: 12 }}
       >
         {SECTIONS.map((title, i) => (
           <button
