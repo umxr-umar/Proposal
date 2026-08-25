@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import type { Proposal } from "@/lib/types";
 import { OverviewTextSlide } from "./OverviewTextSlide";
 import { pad, useSlideDeck } from "./SlideDeck";
@@ -27,22 +28,22 @@ export function ImpactSlide({ proposal }: { proposal: Proposal }) {
       bodyWidth={740}
       bodyGap={199}
       paragraphs={[
-        <>
+        <Fragment key="p1">
           A refined website will position {proposal.clientName}&rsquo;s as
           a forward-thinking creative leader, attracting high-profile
           clients and top-tier creative talents.
-        </>,
-        <>
+        </Fragment>,
+        <Fragment key="p2">
           The platform will engage visitors through a balance of
           curiosity-driven interactivity and clear content presentation,
           increasing dwell time and exploration.
-        </>,
-        <>
+        </Fragment>,
+        <Fragment key="p3">
           With a 24/7 digital showcase, the site will streamline client
           acquisition by reinforcing trust and credibility. This strategic
           upgrade will ensure {proposal.clientName}&rsquo;s brand remains
           as impactful and memorable as the work they create.
-        </>,
+        </Fragment>,
       ]}
       footer={
         <button

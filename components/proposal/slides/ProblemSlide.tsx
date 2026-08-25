@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import type { Proposal } from "@/lib/types";
 import { OverviewTextSlide } from "./OverviewTextSlide";
 
@@ -16,24 +17,24 @@ export function ProblemSlide({ proposal }: { proposal: Proposal }) {
       bodyWidth={710}
       bodyGap={174}
       paragraphs={[
-        <>
+        <Fragment key="p1">
           {proposal.clientName}&rsquo;s current website is a minimal holding
           page that, while intriguing, does not effectively showcase their
           portfolio or communicate their capabilities.
-        </>,
-        <>
+        </Fragment>,
+        <Fragment key="p2">
           Initially designed to drive curiosity and mystery, the site has
           served its purpose but now needs to evolve. As the agency
           matures and builds a strong body of work, it requires a digital
           presence that not only captivates but also validates their
           credibility in the industry.
-        </>,
-        <>
+        </Fragment>,
+        <Fragment key="p3">
           The challenge is to create a site that remains true to{" "}
           {proposal.clientName}&rsquo;s unique branding while ensuring
           usability, clarity, and a compelling user experience for both
           prospective clients and creative professionals.
-        </>,
+        </Fragment>,
       ]}
     />
   );
