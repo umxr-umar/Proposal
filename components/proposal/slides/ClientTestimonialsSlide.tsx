@@ -91,12 +91,15 @@ function TestimonialCard({
 
   return (
     <div
-      className="flex flex-col"
+      className="flex h-full flex-col"
       style={{
         width: fx(width),
         backgroundColor: "#FFFFFF",
         borderRadius: fx(19),
-        padding: fx(9),
+        paddingLeft: fx(9),
+        paddingRight: fx(9),
+        paddingTop: fy(9),
+        paddingBottom: fy(9),
         gap: fy(9),
       }}
     >
@@ -105,6 +108,8 @@ function TestimonialCard({
         style={{
           width: "100%",
           aspectRatio: "1 / 1",
+          flexShrink: 1,
+          minHeight: 0,
           borderRadius: fx(19),
           overflow: "hidden",
           background: "linear-gradient(180deg, #E8E8E3 0%, #4FA8A8 100%)",
@@ -152,7 +157,13 @@ function TestimonialCard({
         style={{
           backgroundColor: "#000000",
           borderRadius: fx(19),
-          padding: fx(35),
+          paddingLeft: fx(35),
+          paddingRight: fx(35),
+          paddingTop: fy(35),
+          paddingBottom: fy(35),
+          flex: "1 1 auto",
+          minHeight: 0,
+          overflow: "hidden",
         }}
       >
         <p
