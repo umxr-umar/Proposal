@@ -7,6 +7,11 @@ import { TableOfContentsSlide } from "@/components/proposal/slides/TableOfConten
 import { ProblemSlide } from "@/components/proposal/slides/ProblemSlide";
 import { SolutionSlide } from "@/components/proposal/slides/SolutionSlide";
 import { ImpactSlide } from "@/components/proposal/slides/ImpactSlide";
+import { ScopeDeliverablesSlide } from "@/components/proposal/slides/ScopeDeliverablesSlide";
+import { ProjectTimelineSlide } from "@/components/proposal/slides/ProjectTimelineSlide";
+import { ExecutiveSummarySlide } from "@/components/proposal/slides/ExecutiveSummarySlide";
+import { ClientTestimonialsSlide } from "@/components/proposal/slides/ClientTestimonialsSlide";
+import { TermsAndConditionsSlide } from "@/components/proposal/slides/TermsAndConditionsSlide";
 
 export async function generateStaticParams() {
   const slugs = await getAllProposalSlugs();
@@ -44,6 +49,11 @@ export default async function ProposalPage({
         <ProblemSlide key="problem" proposal={proposal} />,
         <SolutionSlide key="solution" proposal={proposal} />,
         <ImpactSlide key="impact" proposal={proposal} />,
+        <ScopeDeliverablesSlide key="scope-deliverables" proposal={proposal} />,
+        <ProjectTimelineSlide key="project-timeline" proposal={proposal} />,
+        <ExecutiveSummarySlide key="executive-summary" proposal={proposal} />,
+        <ClientTestimonialsSlide key="client-testimonials" proposal={proposal} />,
+        <TermsAndConditionsSlide key="terms-and-conditions" proposal={proposal} />,
       ]}
     />
   );

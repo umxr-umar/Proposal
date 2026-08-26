@@ -32,7 +32,7 @@
   header p { font-size: 12px; color: #999; margin: 0; max-width: 760px; line-height: 1.5; }
 
   .slide-tabs {
-    display: flex; gap: 6px; padding: 12px 24px; border-bottom: 1px solid #2a2c2f; flex-shrink: 0;
+    display: flex; gap: 6px; padding: 12px 24px; border-bottom: 1px solid #2a2c2f; flex-shrink: 0; flex-wrap: wrap;
   }
   .slide-tabs button {
     padding: 8px 16px; font-size: 13px; font-weight: 500; border-radius: 8px;
@@ -211,6 +211,473 @@
   #stage-problem .p-page {
     position: absolute; left: calc(var(--p-page-x) * var(--scale)); top: calc(var(--p-page-y) * var(--scale));
   }
+
+  /* ---- Solution slide stage (same shared layout as Problem, own vars) ---- */
+  #stage-solution { background: #E8E8E3; color: #000000; }
+  #stage-solution .so-header {
+    position: absolute; display: flex; align-items: center; justify-content: space-between;
+    left: calc(var(--so-header-x) * var(--scale)); top: calc(var(--so-header-y) * var(--scale));
+    width: calc(var(--so-header-w) * var(--scale));
+  }
+  #stage-solution .so-header-left {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    width: calc(var(--so-header-lw) * var(--scale));
+  }
+  #stage-solution .so-logo svg {
+    display: block; width: auto; aspect-ratio: 87 / 20.594;
+    height: calc(var(--so-logo-h) * var(--scale));
+  }
+  #stage-solution .so-breadcrumb, #stage-solution .so-year, #stage-solution .so-page {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: calc(var(--so-fs-label) * var(--scale)); font-weight: var(--so-fw-label);
+    letter-spacing: calc(var(--so-ls-label) * 1em); line-height: var(--so-lh-label);
+  }
+  #stage-solution .so-year, #stage-solution .so-page { color: #938F8A; }
+  #stage-solution .so-body {
+    position: absolute; display: flex; align-items: flex-start;
+    left: calc(var(--so-body-x) * var(--scale)); top: calc(var(--so-body-y) * var(--scale));
+    gap: calc(var(--so-body-gap) * var(--scale));
+  }
+  #stage-solution .so-heading {
+    font-family: 'Inter', system-ui, sans-serif; white-space: nowrap;
+    font-size: calc(var(--so-fs-heading) * var(--scale)); font-weight: var(--so-fw-heading);
+    letter-spacing: calc(var(--so-ls-heading) * 1em); line-height: var(--so-lh-heading);
+  }
+  #stage-solution .so-text {
+    width: calc(var(--so-text-w) * var(--scale));
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: calc(var(--so-fs-body) * var(--scale)); font-weight: var(--so-fw-body);
+    letter-spacing: calc(var(--so-ls-body) * 1em); line-height: var(--so-lh-body);
+  }
+  #stage-solution .so-text p { margin: 0 0 calc(var(--so-para-gap) * var(--scale)); }
+  #stage-solution .so-text p:last-child { margin-bottom: 0; }
+  #stage-solution .so-page {
+    position: absolute; left: calc(var(--so-page-x) * var(--scale)); top: calc(var(--so-page-y) * var(--scale));
+  }
+
+  /* ---- Impact slide stage (same shared layout, plus a two-tone footer link) ---- */
+  #stage-impact { background: #E8E8E3; color: #000000; }
+  #stage-impact .im-header {
+    position: absolute; display: flex; align-items: center; justify-content: space-between;
+    left: calc(var(--im-header-x) * var(--scale)); top: calc(var(--im-header-y) * var(--scale));
+    width: calc(var(--im-header-w) * var(--scale));
+  }
+  #stage-impact .im-header-left {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    width: calc(var(--im-header-lw) * var(--scale));
+  }
+  #stage-impact .im-logo svg {
+    display: block; width: auto; aspect-ratio: 87 / 20.594;
+    height: calc(var(--im-logo-h) * var(--scale));
+  }
+  #stage-impact .im-breadcrumb, #stage-impact .im-year {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: calc(var(--im-fs-label) * var(--scale)); font-weight: var(--im-fw-label);
+    letter-spacing: calc(var(--im-ls-label) * 1em); line-height: var(--im-lh-label);
+  }
+  #stage-impact .im-year { color: #938F8A; }
+  #stage-impact .im-body {
+    position: absolute; display: flex; align-items: flex-start;
+    left: calc(var(--im-body-x) * var(--scale)); top: calc(var(--im-body-y) * var(--scale));
+    gap: calc(var(--im-body-gap) * var(--scale));
+  }
+  #stage-impact .im-heading {
+    font-family: 'Inter', system-ui, sans-serif; white-space: nowrap;
+    font-size: calc(var(--im-fs-heading) * var(--scale)); font-weight: var(--im-fw-heading);
+    letter-spacing: calc(var(--im-ls-heading) * 1em); line-height: var(--im-lh-heading);
+  }
+  #stage-impact .im-text {
+    width: calc(var(--im-text-w) * var(--scale));
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: calc(var(--im-fs-body) * var(--scale)); font-weight: var(--im-fw-body);
+    letter-spacing: calc(var(--im-ls-body) * 1em); line-height: var(--im-lh-body);
+  }
+  #stage-impact .im-text p { margin: 0 0 calc(var(--im-para-gap) * var(--scale)); }
+  #stage-impact .im-text p:last-child { margin-bottom: 0; }
+  #stage-impact .im-footer {
+    position: absolute; left: calc(var(--im-footer-x) * var(--scale)); top: calc(var(--im-page-y) * var(--scale));
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: calc(var(--im-fs-label) * var(--scale)); font-weight: var(--im-fw-label);
+    letter-spacing: calc(var(--im-ls-label) * 1em); line-height: var(--im-lh-label);
+  }
+  #stage-impact .im-footer .muted { color: #938F8A; }
+
+  /* ---- Scope and Deliverables slide stage (numbered list + bullets) ---- */
+  #stage-scope { background: #E8E8E3; color: #000000; }
+  #stage-scope .sd-header {
+    position: absolute; display: flex; align-items: center; justify-content: space-between;
+    left: calc(var(--sd-header-x) * var(--scale)); top: calc(var(--sd-header-y) * var(--scale));
+    width: calc(var(--sd-header-w) * var(--scale));
+  }
+  #stage-scope .sd-header-left {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    width: calc(var(--sd-header-lw) * var(--scale));
+  }
+  #stage-scope .sd-logo svg {
+    display: block; width: auto; aspect-ratio: 87 / 20.594;
+    height: calc(var(--sd-logo-h) * var(--scale));
+  }
+  #stage-scope .sd-breadcrumb, #stage-scope .sd-year, #stage-scope .sd-page {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: calc(var(--sd-fs-label) * var(--scale)); font-weight: var(--sd-fw-label);
+    letter-spacing: calc(var(--sd-ls-label) * 1em); line-height: var(--sd-lh-label);
+  }
+  #stage-scope .sd-year, #stage-scope .sd-page { color: #938F8A; }
+  #stage-scope .sd-cols {
+    position: absolute; display: flex; align-items: flex-start;
+    left: calc(var(--sd-cols-x) * var(--scale)); bottom: calc(var(--sd-cols-bottom) * var(--scale));
+    gap: calc(var(--sd-cols-gap) * var(--scale));
+  }
+  #stage-scope .sd-col-design { width: calc(var(--sd-col-w1) * var(--scale)); }
+  #stage-scope .sd-col-dev { width: calc(var(--sd-col-w2) * var(--scale)); }
+  #stage-scope .sd-divider { align-self: stretch; width: 1px; background: rgba(0,0,0,0.15); }
+  #stage-scope .sd-col-heading {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: calc(var(--sd-fs-colheading) * var(--scale)); font-weight: var(--sd-fw-colheading);
+    letter-spacing: calc(var(--sd-ls-colheading) * 1em); line-height: var(--sd-lh-colheading);
+    margin-bottom: calc(var(--sd-heading-gap) * var(--scale));
+  }
+  #stage-scope .sd-section { margin-bottom: calc(var(--sd-section-gap) * var(--scale)); }
+  #stage-scope .sd-section:last-child { margin-bottom: 0; }
+  #stage-scope .sd-num-row {
+    display: flex;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: calc(var(--sd-fs-numheading) * var(--scale)); font-weight: var(--sd-fw-numheading);
+    letter-spacing: calc(var(--sd-ls-numheading) * 1em); line-height: var(--sd-lh-numheading);
+    gap: calc(8px * var(--scale));
+  }
+  #stage-scope .sd-bullets {
+    display: flex; flex-direction: column;
+    margin-top: calc(4px * var(--scale));
+    padding-left: calc(28px * var(--scale));
+    gap: calc(4px * var(--scale));
+  }
+  #stage-scope .sd-bullet {
+    display: flex;
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--sd-fs-body) * var(--scale)); font-weight: var(--sd-fw-body);
+    letter-spacing: calc(var(--sd-ls-body) * 1em); line-height: var(--sd-lh-body);
+    gap: calc(10px * var(--scale));
+  }
+  #stage-scope .sd-bullet .bold { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 700; }
+  #stage-scope .sd-page {
+    position: absolute; left: calc(var(--sd-page-x) * var(--scale)); top: calc(var(--sd-page-y) * var(--scale));
+  }
+
+  /* ---- Project Timeline slide stage (paragraph + stage/duration table) ---- */
+  #stage-timeline { background: #E8E8E3; color: #000000; }
+  #stage-timeline .pt-header {
+    position: absolute; display: flex; align-items: center; justify-content: space-between;
+    left: calc(var(--pt-header-x) * var(--scale)); top: calc(var(--pt-header-y) * var(--scale));
+    width: calc(var(--pt-header-w) * var(--scale));
+  }
+  #stage-timeline .pt-header-left {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    width: calc(var(--pt-header-lw) * var(--scale));
+  }
+  #stage-timeline .pt-logo svg {
+    display: block; width: auto; aspect-ratio: 87 / 20.594;
+    height: calc(var(--pt-logo-h) * var(--scale));
+  }
+  #stage-timeline .pt-breadcrumb, #stage-timeline .pt-year, #stage-timeline .pt-footer-link {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: calc(var(--pt-fs-label) * var(--scale)); font-weight: var(--pt-fw-label);
+    letter-spacing: calc(var(--pt-ls-label) * 1em); line-height: var(--pt-lh-label);
+  }
+  #stage-timeline .pt-year { color: #938F8A; }
+  #stage-timeline .pt-content {
+    position: absolute; display: flex; flex-direction: column;
+    left: calc(var(--pt-content-x) * var(--scale)); top: calc(var(--pt-content-y) * var(--scale));
+    width: calc(var(--pt-content-w) * var(--scale));
+    gap: calc(12px * var(--scale));
+  }
+  #stage-timeline .pt-table {
+    position: absolute;
+    left: calc(var(--pt-content-x) * var(--scale)); bottom: calc(var(--pt-table-bottom) * var(--scale));
+    width: calc(var(--pt-content-w) * var(--scale));
+  }
+  #stage-timeline .pt-body-text {
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--pt-fs-body) * var(--scale)); font-weight: var(--pt-fw-body);
+    letter-spacing: calc(var(--pt-ls-body) * 1em); line-height: var(--pt-lh-body);
+    margin: 0;
+  }
+  #stage-timeline .pt-startdate {
+    display: flex;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: calc(var(--pt-fs-bold) * var(--scale)); font-weight: var(--pt-fw-bold);
+    letter-spacing: calc(var(--pt-ls-bold) * 1em); line-height: var(--pt-lh-bold);
+    text-transform: uppercase;
+  }
+  #stage-timeline .pt-table-header {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--pt-fs-tablabel) * var(--scale)); font-weight: var(--pt-fw-tablabel);
+    letter-spacing: calc(var(--pt-ls-tablabel) * 1em); line-height: var(--pt-lh-tablabel);
+    text-transform: uppercase; color: #938F8A;
+    padding-bottom: calc(12px * var(--scale));
+    border-bottom: 1px solid rgba(0,0,0,0.35);
+  }
+  #stage-timeline .pt-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--pt-fs-body) * var(--scale)); font-weight: var(--pt-fw-body);
+    letter-spacing: calc(var(--pt-ls-body) * 1em); line-height: var(--pt-lh-body);
+    padding-top: calc(13px * var(--scale)); padding-bottom: calc(13px * var(--scale));
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+  }
+  #stage-timeline .pt-total-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: calc(var(--pt-fs-bold) * var(--scale)); font-weight: var(--pt-fw-bold);
+    letter-spacing: calc(var(--pt-ls-bold) * 1em); line-height: var(--pt-lh-body);
+    padding-top: calc(13px * var(--scale));
+  }
+  #stage-timeline .pt-footer-link {
+    position: absolute;
+    right: calc(var(--pt-footer-right) * var(--scale)); bottom: calc(var(--pt-footer-bottom) * var(--scale));
+  }
+  #stage-timeline .pt-footer-link .muted { color: #938F8A; }
+
+  /* ---- Executive Summary slide stage (payment structure + breakdown table) ---- */
+  #stage-execsummary { background: #E8E8E3; color: #000000; }
+  #stage-execsummary .es-header {
+    position: absolute; display: flex; align-items: center; justify-content: space-between;
+    left: calc(var(--es-header-x) * var(--scale)); top: calc(var(--es-header-y) * var(--scale));
+    width: calc(var(--es-header-w) * var(--scale));
+  }
+  #stage-execsummary .es-header-left {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    width: calc(var(--es-header-lw) * var(--scale));
+  }
+  #stage-execsummary .es-logo svg {
+    display: block; width: auto; aspect-ratio: 87 / 20.594;
+    height: calc(var(--es-logo-h) * var(--scale));
+  }
+  #stage-execsummary .es-breadcrumb, #stage-execsummary .es-year, #stage-execsummary .es-footer-link, #stage-execsummary .es-note {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: calc(var(--es-fs-label) * var(--scale)); font-weight: var(--es-fw-label);
+    letter-spacing: calc(var(--es-ls-label) * 1em); line-height: var(--es-lh-label);
+  }
+  #stage-execsummary .es-year, #stage-execsummary .es-note { color: #938F8A; }
+  #stage-execsummary .es-note {
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--es-fs-note) * var(--scale)); font-weight: var(--es-fw-note);
+    letter-spacing: calc(var(--es-ls-note) * 1em); line-height: var(--es-lh-note);
+    text-align: right;
+  }
+  #stage-execsummary .es-intro {
+    position: absolute; display: flex; align-items: flex-start;
+    left: calc(var(--es-intro-x) * var(--scale)); top: calc(var(--es-intro-y) * var(--scale));
+    gap: calc(var(--es-intro-gap) * var(--scale));
+  }
+  #stage-execsummary .es-label {
+    width: calc(var(--es-label-w) * var(--scale));
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: calc(var(--es-fs-bold) * var(--scale)); font-weight: var(--es-fw-bold);
+    letter-spacing: calc(var(--es-ls-bold) * 1em); line-height: var(--es-lh-bold);
+  }
+  #stage-execsummary .es-body {
+    width: calc(var(--es-content-w) * var(--scale));
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--es-fs-body) * var(--scale)); font-weight: var(--es-fw-body);
+    letter-spacing: calc(var(--es-ls-body) * 1em); line-height: var(--es-lh-body);
+  }
+  #stage-execsummary .es-body p { margin: 0; }
+  #stage-execsummary .es-list { margin-top: calc(16px * var(--scale)); }
+  #stage-execsummary .es-table {
+    position: absolute;
+    left: calc(var(--es-intro-x) * var(--scale)); bottom: calc(var(--es-table-bottom) * var(--scale));
+    width: calc(var(--es-content-w) * var(--scale));
+  }
+  #stage-execsummary .es-total-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--es-fs-body) * var(--scale)); font-weight: var(--es-fw-body);
+    letter-spacing: calc(var(--es-ls-body) * 1em); line-height: var(--es-lh-body);
+    padding-top: calc(13px * var(--scale)); padding-bottom: calc(13px * var(--scale));
+    border-top: 1px solid rgba(0,0,0,0.35);
+  }
+  #stage-execsummary .es-total-row .bold {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: var(--es-fw-bold);
+  }
+  #stage-execsummary .es-breakdown { padding-left: calc(52px * var(--scale)); }
+  #stage-execsummary .es-breakdown-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--es-fs-body) * var(--scale)); font-weight: var(--es-fw-body);
+    letter-spacing: calc(var(--es-ls-body) * 1em); line-height: var(--es-lh-body);
+    padding-top: calc(6px * var(--scale)); padding-bottom: calc(6px * var(--scale));
+  }
+  #stage-execsummary .es-total-final-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: calc(var(--es-fs-bold) * var(--scale)); font-weight: var(--es-fw-bold);
+    letter-spacing: calc(var(--es-ls-bold) * 1em); line-height: var(--es-lh-bold);
+    padding-top: calc(6px * var(--scale)); padding-bottom: calc(13px * var(--scale));
+  }
+  #stage-execsummary .es-timeline-row {
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--es-fs-body) * var(--scale)); font-weight: var(--es-fw-body);
+    letter-spacing: calc(var(--es-ls-body) * 1em); line-height: var(--es-lh-body);
+    padding-top: calc(13px * var(--scale)); padding-bottom: calc(13px * var(--scale));
+    border-top: 1px solid rgba(0,0,0,0.35);
+    border-bottom: 1px solid rgba(0,0,0,0.35);
+  }
+  #stage-execsummary .es-timeline-row .bold {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: var(--es-fw-bold);
+  }
+  #stage-execsummary .es-note-box {
+    position: absolute;
+    right: calc(var(--es-footer-right) * var(--scale));
+    bottom: calc((var(--es-footer-bottom) + 80px) * var(--scale));
+    width: calc(300px * var(--scale));
+  }
+  #stage-execsummary .es-footer-link {
+    position: absolute;
+    right: calc(var(--es-footer-right) * var(--scale)); bottom: calc(var(--es-footer-bottom) * var(--scale));
+  }
+  #stage-execsummary .es-footer-link .muted { color: #938F8A; }
+
+  /* ---- Client Testimonials slide stage (dark theme, three cards) ---- */
+  #stage-testimonials { background: #000000; color: #DDDDD5; }
+  #stage-testimonials .tm-header {
+    position: absolute; display: flex; align-items: center; justify-content: space-between;
+    left: calc(var(--tm-header-x) * var(--scale)); top: calc(var(--tm-header-y) * var(--scale));
+    width: calc(var(--tm-header-w) * var(--scale));
+  }
+  #stage-testimonials .tm-header-left {
+    display: flex; align-items: center;
+    gap: calc(var(--tm-header-gap) * var(--scale));
+  }
+  #stage-testimonials .tm-logo svg {
+    display: block; width: auto; aspect-ratio: 87 / 20.594;
+    height: calc(var(--tm-logo-h) * var(--scale));
+  }
+  #stage-testimonials .tm-breadcrumb, #stage-testimonials .tm-year, #stage-testimonials .tm-footer-link {
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--tm-fs-label) * var(--scale)); font-weight: var(--tm-fw-label);
+    letter-spacing: calc(var(--tm-ls-label) * 1em); line-height: var(--tm-lh-label);
+    color: #938F8A;
+  }
+  #stage-testimonials .tm-footer-link {
+    position: absolute;
+    right: calc(var(--tm-footer-right) * var(--scale)); bottom: calc(var(--tm-footer-bottom) * var(--scale));
+  }
+  #stage-testimonials .tm-footer-link .light { color: #DDDDD5; }
+  #stage-testimonials .tm-cards {
+    position: absolute; display: flex; align-items: flex-start;
+    left: calc(var(--tm-cards-x) * var(--scale)); top: calc(var(--tm-cards-y) * var(--scale));
+    gap: calc(var(--tm-cards-gap) * var(--scale));
+  }
+  #stage-testimonials .tm-card {
+    display: flex; flex-direction: column;
+    width: calc(var(--tm-card-w) * var(--scale));
+    background: #FFFFFF;
+    border-radius: calc(var(--tm-box-radius) * var(--scale));
+    padding: calc(var(--tm-card-pad) * var(--scale));
+    gap: calc(var(--tm-card-gap) * var(--scale));
+  }
+  #stage-testimonials .tm-photo {
+    position: relative; width: 100%; aspect-ratio: 1 / 1;
+    border-radius: calc(var(--tm-box-radius) * var(--scale));
+    overflow: hidden;
+    background: linear-gradient(180deg, #E8E8E3 0%, #4FA8A8 100%);
+  }
+  #stage-testimonials .tm-play {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    bottom: calc(var(--tm-play-bottom) * var(--scale));
+    display: flex; align-items: center;
+    gap: calc(var(--tm-play-gap) * var(--scale));
+    background: #FFFFFF; border-radius: calc(var(--tm-play-radius) * var(--scale));
+    padding: calc(var(--tm-play-pady) * var(--scale)) calc(var(--tm-play-padx) * var(--scale));
+  }
+  #stage-testimonials .tm-play-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: calc(var(--tm-play-iconw) * var(--scale)); height: calc(var(--tm-fs-playicon) * var(--scale));
+    border-radius: calc(var(--tm-play-iconradius) * var(--scale)); background: #000000; color: #FFFFFF;
+  }
+  #stage-testimonials .tm-play-label {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    font-size: calc(var(--tm-fs-playicon) * var(--scale) * 0.8);
+    color: #000000;
+  }
+  #stage-testimonials .tm-quote-box {
+    background: #000000;
+    border-radius: calc(var(--tm-box-radius) * var(--scale));
+    padding: calc(var(--tm-quote-pad) * var(--scale));
+  }
+  #stage-testimonials .tm-quote {
+    margin: 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: calc(var(--tm-fs-quote) * var(--scale)); font-weight: var(--tm-fw-quote);
+    letter-spacing: calc(var(--tm-ls-quote) * 1em); line-height: var(--tm-lh-quote);
+    color: #FFFFFF; text-transform: capitalize;
+  }
+  #stage-testimonials .tm-attribution {
+    margin-top: calc(var(--tm-attr-gap) * var(--scale));
+    font-size: calc(var(--tm-fs-attr) * var(--scale));
+    line-height: var(--tm-lh-attr);
+    text-transform: capitalize;
+  }
+  #stage-testimonials .tm-attribution .name {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 700; color: #FFFFFF;
+  }
+  #stage-testimonials .tm-attribution .role {
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-weight: 500; color: #938F8A;
+  }
+
+  /* ---- Terms and Conditions slide stage (two-column numbered clauses) ---- */
+  #stage-tc { background: #E8E8E3; color: #000000; }
+  #stage-tc .tc-header {
+    position: absolute; display: flex; align-items: center; justify-content: space-between;
+    left: calc(var(--tc-header-x) * var(--scale)); top: calc(var(--tc-header-y) * var(--scale));
+    width: calc(var(--tc-header-w) * var(--scale));
+  }
+  #stage-tc .tc-header-left {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    width: calc(var(--tc-header-lw) * var(--scale));
+  }
+  #stage-tc .tc-logo svg {
+    display: block; width: auto; aspect-ratio: 87 / 20.594;
+    height: calc(var(--tc-logo-h) * var(--scale));
+  }
+  #stage-tc .tc-breadcrumb, #stage-tc .tc-year, #stage-tc .tc-footer-link {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: calc(var(--tc-fs-label) * var(--scale)); font-weight: var(--tc-fw-label);
+    letter-spacing: calc(var(--tc-ls-label) * 1em); line-height: var(--tc-lh-label);
+  }
+  #stage-tc .tc-year, #stage-tc .tc-footer-link .muted { color: #938F8A; }
+  #stage-tc .tc-footer-link {
+    position: absolute;
+    right: calc(var(--tc-footer-right) * var(--scale)); bottom: calc(var(--tc-footer-bottom) * var(--scale));
+  }
+  #stage-tc .tc-cols {
+    position: absolute; display: flex; align-items: flex-start;
+    left: calc(var(--tc-cols-x) * var(--scale)); bottom: calc(var(--tc-cols-bottom) * var(--scale));
+    gap: calc(var(--tc-cols-gap) * var(--scale));
+  }
+  #stage-tc .tc-col {
+    display: flex; flex-direction: column;
+    width: calc(var(--tc-col-w) * var(--scale));
+    gap: calc(var(--tc-clause-gap) * var(--scale));
+  }
+  #stage-tc .tc-clause {
+    display: flex; flex-direction: column;
+    gap: calc(var(--tc-para-gap) * var(--scale));
+  }
+  #stage-tc .tc-para {
+    margin: 0;
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--tc-fs-body) * var(--scale)); font-weight: var(--tc-fw-body);
+    letter-spacing: calc(var(--tc-ls-body) * 1em); line-height: var(--tc-lh-body);
+  }
 </style>
 </head>
 <body>
@@ -224,6 +691,13 @@
   <button type="button" class="active" data-slide="cover">Cover</button>
   <button type="button" data-slide="toc">Table of Contents</button>
   <button type="button" data-slide="problem">Problem</button>
+  <button type="button" data-slide="solution">Solution</button>
+  <button type="button" data-slide="impact">Impact</button>
+  <button type="button" data-slide="scope">Scope and Deliverables</button>
+  <button type="button" data-slide="timeline">Project Timeline</button>
+  <button type="button" data-slide="execsummary">Executive Summary</button>
+  <button type="button" data-slide="testimonials">Client Testimonials</button>
+  <button type="button" data-slide="tc">Terms and Conditions</button>
 </div>
 
 <div class="layout">
@@ -295,7 +769,304 @@
           </div>
         </div>
 
-        <div class="p-page">04</div>
+        <div class="p-page">03</div>
+      </div>
+
+      <div class="stage-content" id="stage-solution">
+        <div class="so-header">
+          <div class="so-header-left">
+            <div class="so-logo">
+              <svg viewBox="1455 172.109 87 20.594" xmlns="http://www.w3.org/2000/svg"><path d="M1455.014 172.061H1463.503C1465.605 172.061 1467.202 172.657 1468.323 173.821 1468.715 174.276 1469.051 174.787 1469.275 175.354 1469.5 175.922 1469.612 176.575 1469.612 177.284 1469.612 178.42 1469.303 179.357 1468.743 180.038 1468.183 180.72 1467.398 181.23 1466.389 181.543V181.628C1466.95 181.769 1467.455 181.969 1467.959 182.252 1468.463 182.537 1468.883 182.878 1469.248 183.274 1469.612 183.672 1469.892 184.155 1470.116 184.694 1470.313 185.262 1470.425 185.858 1470.425 186.539 1470.425 187.335 1470.284 188.072 1470.032 188.725 1469.78 189.378 1469.415 189.945 1468.968 190.428 1468.407 191.053 1467.679 191.507 1466.838 191.848 1465.997 192.188 1465.016 192.358 1463.952 192.358H1455.014V172.061ZM1463.84 190.059C1465.213 190.059 1466.249 189.719 1466.978 189.038 1467.258 188.753 1467.455 188.412 1467.622 188.016 1467.791 187.618 1467.874 187.192 1467.874 186.681 1467.874 185.432 1467.455 184.468 1466.669 183.842 1465.885 183.218 1464.876 182.906 1463.672 182.906H1457.535V190.059H1463.84ZM1463.195 180.749C1464.429 180.749 1465.38 180.464 1466.054 179.896 1466.726 179.329 1467.09 178.506 1467.09 177.427 1467.09 176.462 1466.754 175.694 1466.137 175.128 1465.52 174.559 1464.652 174.276 1463.532 174.276H1457.535V180.749H1463.195ZM1471.14 172.061H1473.662V192.358H1471.14V172.061ZM1474.686 183.474H1482.195V185.574H1474.686V183.474ZM1499.482 171.88L1498.092 176.668H1497.36C1497.992 174.03 1497.79 173.032 1495.996 173.032H1491.574C1490.993 173.032 1490.613 173.314 1490.436 173.877L1488.111 181.581H1491.649C1493.115 181.581 1493.721 181.069 1494.277 179.457H1494.884L1493.165 185.549H1492.508C1492.963 183.475 1492.762 182.606 1491.372 182.606H1487.809L1485.635 189.824C1485.181 191.334 1485.282 191.744 1487.96 191.744L1487.758 192.358H1479.647L1479.825 191.744C1481.744 191.744 1482.377 191.334 1482.831 189.824L1487.481 174.415C1487.935 172.903 1487.91 172.494 1485.662 172.494L1485.838 171.88H1499.482ZM1506.253 171.88L1506.076 172.494C1504.156 172.494 1503.524 172.903 1503.07 174.415L1498.522 189.542C1498.091 190.977 1498.345 191.207 1499.482 191.207H1502.488C1504.409 191.207 1505.344 190.438 1507.138 187.111L1507.871 187.341 1505.293 192.358H1492.382L1492.559 191.744C1494.504 191.744 1495.136 191.334 1495.591 189.824L1500.24 174.415C1500.695 172.903 1500.643 172.494 1498.395 172.494L1498.573 171.88H1506.253ZM1512.432 192.743C1507.807 192.743 1506.419 189.747 1507.757 185.344L1511.067 174.415C1511.523 172.903 1511.497 172.494 1509.324 172.494L1509.501 171.88H1517.031L1516.854 172.494C1514.958 172.494 1514.327 172.903 1513.872 174.415L1510.462 185.626C1509.4 189.133 1510.133 191.539 1513.089 191.539 1515.994 191.539 1518.091 189.465 1519.431 185.038L1522.666 174.415C1523.094 172.903 1523.044 172.494 1520.644 172.494L1520.821 171.88H1526.557L1526.404 172.494C1524.838 172.494 1524.283 172.903 1523.827 174.415L1520.594 185.14C1519.356 189.338 1517.385 192.743 1512.432 192.743ZM1535.974 172.494L1536.127 171.88H1541.913L1541.761 172.468C1540.523 172.468 1539.791 172.827 1538.274 174.491L1531.982 181.428 1534.08 189.799C1534.484 191.412 1535.117 191.744 1536.784 191.744L1536.582 192.358H1529.027L1529.228 191.744C1531.426 191.744 1531.553 191.309 1531.174 189.799L1529.556 183.322 1523.973 189.927C1522.811 191.257 1523.088 191.744 1525.033 191.744L1524.882 192.358H1518.819L1518.995 191.77C1520.41 191.77 1521.295 191.283 1522.987 189.363L1529.254 182.171 1527.333 174.44C1526.93 172.827 1526.373 172.494 1525.033 172.494L1525.211 171.88H1532.133L1531.932 172.494C1529.936 172.494 1529.86 172.929 1530.24 174.44L1531.705 180.276 1536.884 174.363C1538.148 172.929 1537.82 172.494 1535.974 172.494ZM1540.105 192.682C1539.358 192.682 1538.825 192.17 1538.825 191.468 1538.825 190.496 1539.705 189.497 1540.744 189.497 1541.517 189.497 1541.996 190.01 1541.996 190.711 1541.996 191.656 1541.144 192.682 1540.105 192.682Z" fill="#000000"/></svg>
+            </div>
+            <div class="so-breadcrumb">01. Project Overview</div>
+          </div>
+          <div class="so-year" id="solution-year"></div>
+        </div>
+
+        <div class="so-body">
+          <div class="so-heading">Solution</div>
+          <div class="so-text">
+            <p>The new website will transform Acme Roofing Co&rsquo;s online presence into an interactive and immersive portfolio experience. It will retain the agency&rsquo;s signature blend of digital and analog aesthetics.</p>
+            <p>Subtle micro-interactions and strategic motion design will enhance the user experience, making the site feel dynamic yet intuitive.</p>
+            <p>The design will maintain the agency&rsquo;s distinctive visual identity, leveraging dark charcoal and off-white tones with vivid accent colors to reinforce brand recognition.</p>
+          </div>
+        </div>
+
+        <div class="so-page">04</div>
+      </div>
+
+      <div class="stage-content" id="stage-impact">
+        <div class="im-header">
+          <div class="im-header-left">
+            <div class="im-logo">
+              <svg viewBox="1455 172.109 87 20.594" xmlns="http://www.w3.org/2000/svg"><path d="M1455.014 172.061H1463.503C1465.605 172.061 1467.202 172.657 1468.323 173.821 1468.715 174.276 1469.051 174.787 1469.275 175.354 1469.5 175.922 1469.612 176.575 1469.612 177.284 1469.612 178.42 1469.303 179.357 1468.743 180.038 1468.183 180.72 1467.398 181.23 1466.389 181.543V181.628C1466.95 181.769 1467.455 181.969 1467.959 182.252 1468.463 182.537 1468.883 182.878 1469.248 183.274 1469.612 183.672 1469.892 184.155 1470.116 184.694 1470.313 185.262 1470.425 185.858 1470.425 186.539 1470.425 187.335 1470.284 188.072 1470.032 188.725 1469.78 189.378 1469.415 189.945 1468.968 190.428 1468.407 191.053 1467.679 191.507 1466.838 191.848 1465.997 192.188 1465.016 192.358 1463.952 192.358H1455.014V172.061ZM1463.84 190.059C1465.213 190.059 1466.249 189.719 1466.978 189.038 1467.258 188.753 1467.455 188.412 1467.622 188.016 1467.791 187.618 1467.874 187.192 1467.874 186.681 1467.874 185.432 1467.455 184.468 1466.669 183.842 1465.885 183.218 1464.876 182.906 1463.672 182.906H1457.535V190.059H1463.84ZM1463.195 180.749C1464.429 180.749 1465.38 180.464 1466.054 179.896 1466.726 179.329 1467.09 178.506 1467.09 177.427 1467.09 176.462 1466.754 175.694 1466.137 175.128 1465.52 174.559 1464.652 174.276 1463.532 174.276H1457.535V180.749H1463.195ZM1471.14 172.061H1473.662V192.358H1471.14V172.061ZM1474.686 183.474H1482.195V185.574H1474.686V183.474ZM1499.482 171.88L1498.092 176.668H1497.36C1497.992 174.03 1497.79 173.032 1495.996 173.032H1491.574C1490.993 173.032 1490.613 173.314 1490.436 173.877L1488.111 181.581H1491.649C1493.115 181.581 1493.721 181.069 1494.277 179.457H1494.884L1493.165 185.549H1492.508C1492.963 183.475 1492.762 182.606 1491.372 182.606H1487.809L1485.635 189.824C1485.181 191.334 1485.282 191.744 1487.96 191.744L1487.758 192.358H1479.647L1479.825 191.744C1481.744 191.744 1482.377 191.334 1482.831 189.824L1487.481 174.415C1487.935 172.903 1487.91 172.494 1485.662 172.494L1485.838 171.88H1499.482ZM1506.253 171.88L1506.076 172.494C1504.156 172.494 1503.524 172.903 1503.07 174.415L1498.522 189.542C1498.091 190.977 1498.345 191.207 1499.482 191.207H1502.488C1504.409 191.207 1505.344 190.438 1507.138 187.111L1507.871 187.341 1505.293 192.358H1492.382L1492.559 191.744C1494.504 191.744 1495.136 191.334 1495.591 189.824L1500.24 174.415C1500.695 172.903 1500.643 172.494 1498.395 172.494L1498.573 171.88H1506.253ZM1512.432 192.743C1507.807 192.743 1506.419 189.747 1507.757 185.344L1511.067 174.415C1511.523 172.903 1511.497 172.494 1509.324 172.494L1509.501 171.88H1517.031L1516.854 172.494C1514.958 172.494 1514.327 172.903 1513.872 174.415L1510.462 185.626C1509.4 189.133 1510.133 191.539 1513.089 191.539 1515.994 191.539 1518.091 189.465 1519.431 185.038L1522.666 174.415C1523.094 172.903 1523.044 172.494 1520.644 172.494L1520.821 171.88H1526.557L1526.404 172.494C1524.838 172.494 1524.283 172.903 1523.827 174.415L1520.594 185.14C1519.356 189.338 1517.385 192.743 1512.432 192.743ZM1535.974 172.494L1536.127 171.88H1541.913L1541.761 172.468C1540.523 172.468 1539.791 172.827 1538.274 174.491L1531.982 181.428 1534.08 189.799C1534.484 191.412 1535.117 191.744 1536.784 191.744L1536.582 192.358H1529.027L1529.228 191.744C1531.426 191.744 1531.553 191.309 1531.174 189.799L1529.556 183.322 1523.973 189.927C1522.811 191.257 1523.088 191.744 1525.033 191.744L1524.882 192.358H1518.819L1518.995 191.77C1520.41 191.77 1521.295 191.283 1522.987 189.363L1529.254 182.171 1527.333 174.44C1526.93 172.827 1526.373 172.494 1525.033 172.494L1525.211 171.88H1532.133L1531.932 172.494C1529.936 172.494 1529.86 172.929 1530.24 174.44L1531.705 180.276 1536.884 174.363C1538.148 172.929 1537.82 172.494 1535.974 172.494ZM1540.105 192.682C1539.358 192.682 1538.825 192.17 1538.825 191.468 1538.825 190.496 1539.705 189.497 1540.744 189.497 1541.517 189.497 1541.996 190.01 1541.996 190.711 1541.996 191.656 1541.144 192.682 1540.105 192.682Z" fill="#000000"/></svg>
+            </div>
+            <div class="im-breadcrumb">01. Project Overview</div>
+          </div>
+          <div class="im-year" id="impact-year"></div>
+        </div>
+
+        <div class="im-body">
+          <div class="im-heading">Impact</div>
+          <div class="im-text">
+            <p>A refined website will position Acme Roofing Co&rsquo;s as a forward-thinking creative leader, attracting high-profile clients and top-tier creative talents.</p>
+            <p>The platform will engage visitors through a balance of curiosity-driven interactivity and clear content presentation, increasing dwell time and exploration.</p>
+            <p>With a 24/7 digital showcase, the site will streamline client acquisition by reinforcing trust and credibility. This strategic upgrade will ensure Acme Roofing Co&rsquo;s brand remains as impactful and memorable as the work they create.</p>
+          </div>
+        </div>
+
+        <div class="im-footer"><span class="muted">05 / </span><span>Next: Project Scope &amp; Deliverables</span></div>
+      </div>
+
+      <div class="stage-content" id="stage-scope">
+        <div class="sd-header">
+          <div class="sd-header-left">
+            <div class="sd-logo">
+              <svg viewBox="1455 172.109 87 20.594" xmlns="http://www.w3.org/2000/svg"><path d="M1455.014 172.061H1463.503C1465.605 172.061 1467.202 172.657 1468.323 173.821 1468.715 174.276 1469.051 174.787 1469.275 175.354 1469.5 175.922 1469.612 176.575 1469.612 177.284 1469.612 178.42 1469.303 179.357 1468.743 180.038 1468.183 180.72 1467.398 181.23 1466.389 181.543V181.628C1466.95 181.769 1467.455 181.969 1467.959 182.252 1468.463 182.537 1468.883 182.878 1469.248 183.274 1469.612 183.672 1469.892 184.155 1470.116 184.694 1470.313 185.262 1470.425 185.858 1470.425 186.539 1470.425 187.335 1470.284 188.072 1470.032 188.725 1469.78 189.378 1469.415 189.945 1468.968 190.428 1468.407 191.053 1467.679 191.507 1466.838 191.848 1465.997 192.188 1465.016 192.358 1463.952 192.358H1455.014V172.061ZM1463.84 190.059C1465.213 190.059 1466.249 189.719 1466.978 189.038 1467.258 188.753 1467.455 188.412 1467.622 188.016 1467.791 187.618 1467.874 187.192 1467.874 186.681 1467.874 185.432 1467.455 184.468 1466.669 183.842 1465.885 183.218 1464.876 182.906 1463.672 182.906H1457.535V190.059H1463.84ZM1463.195 180.749C1464.429 180.749 1465.38 180.464 1466.054 179.896 1466.726 179.329 1467.09 178.506 1467.09 177.427 1467.09 176.462 1466.754 175.694 1466.137 175.128 1465.52 174.559 1464.652 174.276 1463.532 174.276H1457.535V180.749H1463.195ZM1471.14 172.061H1473.662V192.358H1471.14V172.061ZM1474.686 183.474H1482.195V185.574H1474.686V183.474ZM1499.482 171.88L1498.092 176.668H1497.36C1497.992 174.03 1497.79 173.032 1495.996 173.032H1491.574C1490.993 173.032 1490.613 173.314 1490.436 173.877L1488.111 181.581H1491.649C1493.115 181.581 1493.721 181.069 1494.277 179.457H1494.884L1493.165 185.549H1492.508C1492.963 183.475 1492.762 182.606 1491.372 182.606H1487.809L1485.635 189.824C1485.181 191.334 1485.282 191.744 1487.96 191.744L1487.758 192.358H1479.647L1479.825 191.744C1481.744 191.744 1482.377 191.334 1482.831 189.824L1487.481 174.415C1487.935 172.903 1487.91 172.494 1485.662 172.494L1485.838 171.88H1499.482ZM1506.253 171.88L1506.076 172.494C1504.156 172.494 1503.524 172.903 1503.07 174.415L1498.522 189.542C1498.091 190.977 1498.345 191.207 1499.482 191.207H1502.488C1504.409 191.207 1505.344 190.438 1507.138 187.111L1507.871 187.341 1505.293 192.358H1492.382L1492.559 191.744C1494.504 191.744 1495.136 191.334 1495.591 189.824L1500.24 174.415C1500.695 172.903 1500.643 172.494 1498.395 172.494L1498.573 171.88H1506.253ZM1512.432 192.743C1507.807 192.743 1506.419 189.747 1507.757 185.344L1511.067 174.415C1511.523 172.903 1511.497 172.494 1509.324 172.494L1509.501 171.88H1517.031L1516.854 172.494C1514.958 172.494 1514.327 172.903 1513.872 174.415L1510.462 185.626C1509.4 189.133 1510.133 191.539 1513.089 191.539 1515.994 191.539 1518.091 189.465 1519.431 185.038L1522.666 174.415C1523.094 172.903 1523.044 172.494 1520.644 172.494L1520.821 171.88H1526.557L1526.404 172.494C1524.838 172.494 1524.283 172.903 1523.827 174.415L1520.594 185.14C1519.356 189.338 1517.385 192.743 1512.432 192.743ZM1535.974 172.494L1536.127 171.88H1541.913L1541.761 172.468C1540.523 172.468 1539.791 172.827 1538.274 174.491L1531.982 181.428 1534.08 189.799C1534.484 191.412 1535.117 191.744 1536.784 191.744L1536.582 192.358H1529.027L1529.228 191.744C1531.426 191.744 1531.553 191.309 1531.174 189.799L1529.556 183.322 1523.973 189.927C1522.811 191.257 1523.088 191.744 1525.033 191.744L1524.882 192.358H1518.819L1518.995 191.77C1520.41 191.77 1521.295 191.283 1522.987 189.363L1529.254 182.171 1527.333 174.44C1526.93 172.827 1526.373 172.494 1525.033 172.494L1525.211 171.88H1532.133L1531.932 172.494C1529.936 172.494 1529.86 172.929 1530.24 174.44L1531.705 180.276 1536.884 174.363C1538.148 172.929 1537.82 172.494 1535.974 172.494ZM1540.105 192.682C1539.358 192.682 1538.825 192.17 1538.825 191.468 1538.825 190.496 1539.705 189.497 1540.744 189.497 1541.517 189.497 1541.996 190.01 1541.996 190.711 1541.996 191.656 1541.144 192.682 1540.105 192.682Z" fill="#000000"/></svg>
+            </div>
+            <div class="sd-breadcrumb">02. Project Scope &amp; Deliverables</div>
+          </div>
+          <div class="sd-year" id="scope-year"></div>
+        </div>
+
+        <div class="sd-cols">
+          <div class="sd-col-design">
+            <div class="sd-col-heading">Website Design (2 Revisions)</div>
+
+            <div class="sd-section">
+              <div class="sd-num-row"><span>1.</span><span>8 Uniquely Designed Pages</span></div>
+              <div class="sd-bullets">
+                <div class="sd-bullet"><span>&bull;</span><span>Homepage</span></div>
+                <div class="sd-bullet"><span>&bull;</span><span>Works page</span></div>
+                <div class="sd-bullet"><span>&bull;</span><span>Case study page</span></div>
+                <div class="sd-bullet"><span>&bull;</span><span>Contact Page</span></div>
+                <div class="sd-bullet"><span>&bull;</span><span>About Page</span></div>
+                <div class="sd-bullet"><span>&bull;</span><span>Additional subpages (Join us, Policies, Documentation)</span></div>
+              </div>
+            </div>
+
+            <div class="sd-section">
+              <div class="sd-num-row"><span>2.</span><span>Research &amp; Brand Alignment</span></div>
+              <div class="sd-bullets">
+                <div class="sd-bullet"><span>&bull;</span><span><span class="bold">Competitor Analysis:</span> We study real competitor sites in your space not to copy them, but to find what's actually working, where they're falling short, and where the real opportunity sits for you.</span></div>
+                <div class="sd-bullet"><span>&bull;</span><span><span class="bold">Brand Audit:</span> We review your current identity, messaging, and positioning as it stands today, and translate that into a clear direction for the new site — not a generic refresh, but something that's actually you.</span></div>
+                <div class="sd-bullet"><span>&bull;</span><span><span class="bold">Information Architecture:</span> We organize your content so visitors find what matters in seconds, not minutes — clear navigation, no digging, no guesswork for the person landing on your site for the first time.</span></div>
+              </div>
+            </div>
+
+            <div class="sd-section">
+              <div class="sd-num-row"><span>3.</span><span>Design on Figma</span></div>
+              <div class="sd-bullets">
+                <div class="sd-bullet"><span>&bull;</span><span><span class="bold">Wireframing:</span> Create wireframes for all pages (e.g., homepage, services, contact) to establish the overall structure and layout.</span></div>
+                <div class="sd-bullet"><span>&bull;</span><span><span class="bold">High-Fidelity Mockups:</span> Full designs built around your brand — real content where possible, not lorem ipsum — built to convert, not just to look impressive in a portfolio.</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sd-divider"></div>
+
+          <div class="sd-col-dev">
+            <div class="sd-col-heading">Website Development (2 Revisions)</div>
+
+            <div class="sd-section">
+              <div class="sd-num-row"><span>1.</span><span>Framer Development</span></div>
+              <div class="sd-bullets">
+                <div class="sd-bullet"><span>&bull;</span><span>Custom development in Framer, maintaining responsive layouts across desktop, tablet, and mobile, with a build that reflects your actual design intent rather than a stretched template.</span></div>
+              </div>
+            </div>
+
+            <div class="sd-section">
+              <div class="sd-num-row"><span>2.</span><span>CMS Integration :</span></div>
+              <div class="sd-bullets">
+                <div class="sd-bullet"><span>&bull;</span><span>A structured CMS setup so you can update case studies, work samples, or blog content going forward, designed to scale as new work gets added.</span></div>
+              </div>
+            </div>
+
+            <div class="sd-section">
+              <div class="sd-num-row"><span>3.</span><span>Accessibility &amp; Performance Optimization:</span></div>
+              <div class="sd-bullets">
+                <div class="sd-bullet"><span>&bull;</span><span>Optimized for fast loading speeds and accessibility, including mobile responsiveness, image compression, lazy loading, and clear content hierarchy to ensure a high-performing user experience across all platforms.</span></div>
+              </div>
+            </div>
+
+            <div class="sd-section">
+              <div class="sd-num-row"><span>4.</span><span>Analytics &amp; SEO Implementation:</span></div>
+              <div class="sd-bullets">
+                <div class="sd-bullet"><span>&bull;</span><span>Google Analytics setup for tracking performance, alongside foundational on-page SEO (titles, meta descriptions, clean structure). A full SEO strategy is scoped separately if needed.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sd-page">06</div>
+      </div>
+
+      <div class="stage-content" id="stage-timeline">
+        <div class="pt-header">
+          <div class="pt-header-left">
+            <div class="pt-logo">
+              <svg viewBox="1455 172.109 87 20.594" xmlns="http://www.w3.org/2000/svg"><path d="M1455.014 172.061H1463.503C1465.605 172.061 1467.202 172.657 1468.323 173.821 1468.715 174.276 1469.051 174.787 1469.275 175.354 1469.5 175.922 1469.612 176.575 1469.612 177.284 1469.612 178.42 1469.303 179.357 1468.743 180.038 1468.183 180.72 1467.398 181.23 1466.389 181.543V181.628C1466.95 181.769 1467.455 181.969 1467.959 182.252 1468.463 182.537 1468.883 182.878 1469.248 183.274 1469.612 183.672 1469.892 184.155 1470.116 184.694 1470.313 185.262 1470.425 185.858 1470.425 186.539 1470.425 187.335 1470.284 188.072 1470.032 188.725 1469.78 189.378 1469.415 189.945 1468.968 190.428 1468.407 191.053 1467.679 191.507 1466.838 191.848 1465.997 192.188 1465.016 192.358 1463.952 192.358H1455.014V172.061ZM1463.84 190.059C1465.213 190.059 1466.249 189.719 1466.978 189.038 1467.258 188.753 1467.455 188.412 1467.622 188.016 1467.791 187.618 1467.874 187.192 1467.874 186.681 1467.874 185.432 1467.455 184.468 1466.669 183.842 1465.885 183.218 1464.876 182.906 1463.672 182.906H1457.535V190.059H1463.84ZM1463.195 180.749C1464.429 180.749 1465.38 180.464 1466.054 179.896 1466.726 179.329 1467.09 178.506 1467.09 177.427 1467.09 176.462 1466.754 175.694 1466.137 175.128 1465.52 174.559 1464.652 174.276 1463.532 174.276H1457.535V180.749H1463.195ZM1471.14 172.061H1473.662V192.358H1471.14V172.061ZM1474.686 183.474H1482.195V185.574H1474.686V183.474ZM1499.482 171.88L1498.092 176.668H1497.36C1497.992 174.03 1497.79 173.032 1495.996 173.032H1491.574C1490.993 173.032 1490.613 173.314 1490.436 173.877L1488.111 181.581H1491.649C1493.115 181.581 1493.721 181.069 1494.277 179.457H1494.884L1493.165 185.549H1492.508C1492.963 183.475 1492.762 182.606 1491.372 182.606H1487.809L1485.635 189.824C1485.181 191.334 1485.282 191.744 1487.96 191.744L1487.758 192.358H1479.647L1479.825 191.744C1481.744 191.744 1482.377 191.334 1482.831 189.824L1487.481 174.415C1487.935 172.903 1487.91 172.494 1485.662 172.494L1485.838 171.88H1499.482ZM1506.253 171.88L1506.076 172.494C1504.156 172.494 1503.524 172.903 1503.07 174.415L1498.522 189.542C1498.091 190.977 1498.345 191.207 1499.482 191.207H1502.488C1504.409 191.207 1505.344 190.438 1507.138 187.111L1507.871 187.341 1505.293 192.358H1492.382L1492.559 191.744C1494.504 191.744 1495.136 191.334 1495.591 189.824L1500.24 174.415C1500.695 172.903 1500.643 172.494 1498.395 172.494L1498.573 171.88H1506.253ZM1512.432 192.743C1507.807 192.743 1506.419 189.747 1507.757 185.344L1511.067 174.415C1511.523 172.903 1511.497 172.494 1509.324 172.494L1509.501 171.88H1517.031L1516.854 172.494C1514.958 172.494 1514.327 172.903 1513.872 174.415L1510.462 185.626C1509.4 189.133 1510.133 191.539 1513.089 191.539 1515.994 191.539 1518.091 189.465 1519.431 185.038L1522.666 174.415C1523.094 172.903 1523.044 172.494 1520.644 172.494L1520.821 171.88H1526.557L1526.404 172.494C1524.838 172.494 1524.283 172.903 1523.827 174.415L1520.594 185.14C1519.356 189.338 1517.385 192.743 1512.432 192.743ZM1535.974 172.494L1536.127 171.88H1541.913L1541.761 172.468C1540.523 172.468 1539.791 172.827 1538.274 174.491L1531.982 181.428 1534.08 189.799C1534.484 191.412 1535.117 191.744 1536.784 191.744L1536.582 192.358H1529.027L1529.228 191.744C1531.426 191.744 1531.553 191.309 1531.174 189.799L1529.556 183.322 1523.973 189.927C1522.811 191.257 1523.088 191.744 1525.033 191.744L1524.882 192.358H1518.819L1518.995 191.77C1520.41 191.77 1521.295 191.283 1522.987 189.363L1529.254 182.171 1527.333 174.44C1526.93 172.827 1526.373 172.494 1525.033 172.494L1525.211 171.88H1532.133L1531.932 172.494C1529.936 172.494 1529.86 172.929 1530.24 174.44L1531.705 180.276 1536.884 174.363C1538.148 172.929 1537.82 172.494 1535.974 172.494ZM1540.105 192.682C1539.358 192.682 1538.825 192.17 1538.825 191.468 1538.825 190.496 1539.705 189.497 1540.744 189.497 1541.517 189.497 1541.996 190.01 1541.996 190.711 1541.996 191.656 1541.144 192.682 1540.105 192.682Z" fill="#000000"/></svg>
+            </div>
+            <div class="pt-breadcrumb">03. Project Timeline</div>
+          </div>
+          <div class="pt-year" id="timeline-year"></div>
+        </div>
+
+        <div class="pt-content">
+          <p class="pt-body-text">The timeline below represents the projected timeline to complete your entire project with the best possible results in mind. This timeline is subject to change, but a very good estimate. Project is to be completed during typical business days &amp; hours.</p>
+
+          <div class="pt-startdate">Project start date: Once the upfront payment has been received</div>
+        </div>
+
+        <div class="pt-table">
+          <div class="pt-table-header"><span>Stage</span><span>Timeline</span></div>
+          <div class="pt-row"><span>Onboarding and Strategy</span><span>1 week</span></div>
+          <div class="pt-row"><span>Web design</span><span>4 weeks</span></div>
+          <div class="pt-row"><span>Web development</span><span>6 weeks</span></div>
+          <div class="pt-row"><span>Buffer Time</span><span>1 week</span></div>
+          <div class="pt-total-row"><span>Total Estimated Timeline</span><span>12 weeks</span></div>
+        </div>
+
+        <div class="pt-footer-link"><span class="muted">07 / </span><span>Next: Executive Summary</span></div>
+      </div>
+
+      <div class="stage-content" id="stage-execsummary">
+        <div class="es-header">
+          <div class="es-header-left">
+            <div class="es-logo">
+              <svg viewBox="1455 172.109 87 20.594" xmlns="http://www.w3.org/2000/svg"><path d="M1455.014 172.061H1463.503C1465.605 172.061 1467.202 172.657 1468.323 173.821 1468.715 174.276 1469.051 174.787 1469.275 175.354 1469.5 175.922 1469.612 176.575 1469.612 177.284 1469.612 178.42 1469.303 179.357 1468.743 180.038 1468.183 180.72 1467.398 181.23 1466.389 181.543V181.628C1466.95 181.769 1467.455 181.969 1467.959 182.252 1468.463 182.537 1468.883 182.878 1469.248 183.274 1469.612 183.672 1469.892 184.155 1470.116 184.694 1470.313 185.262 1470.425 185.858 1470.425 186.539 1470.425 187.335 1470.284 188.072 1470.032 188.725 1469.78 189.378 1469.415 189.945 1468.968 190.428 1468.407 191.053 1467.679 191.507 1466.838 191.848 1465.997 192.188 1465.016 192.358 1463.952 192.358H1455.014V172.061ZM1463.84 190.059C1465.213 190.059 1466.249 189.719 1466.978 189.038 1467.258 188.753 1467.455 188.412 1467.622 188.016 1467.791 187.618 1467.874 187.192 1467.874 186.681 1467.874 185.432 1467.455 184.468 1466.669 183.842 1465.885 183.218 1464.876 182.906 1463.672 182.906H1457.535V190.059H1463.84ZM1463.195 180.749C1464.429 180.749 1465.38 180.464 1466.054 179.896 1466.726 179.329 1467.09 178.506 1467.09 177.427 1467.09 176.462 1466.754 175.694 1466.137 175.128 1465.52 174.559 1464.652 174.276 1463.532 174.276H1457.535V180.749H1463.195ZM1471.14 172.061H1473.662V192.358H1471.14V172.061ZM1474.686 183.474H1482.195V185.574H1474.686V183.474ZM1499.482 171.88L1498.092 176.668H1497.36C1497.992 174.03 1497.79 173.032 1495.996 173.032H1491.574C1490.993 173.032 1490.613 173.314 1490.436 173.877L1488.111 181.581H1491.649C1493.115 181.581 1493.721 181.069 1494.277 179.457H1494.884L1493.165 185.549H1492.508C1492.963 183.475 1492.762 182.606 1491.372 182.606H1487.809L1485.635 189.824C1485.181 191.334 1485.282 191.744 1487.96 191.744L1487.758 192.358H1479.647L1479.825 191.744C1481.744 191.744 1482.377 191.334 1482.831 189.824L1487.481 174.415C1487.935 172.903 1487.91 172.494 1485.662 172.494L1485.838 171.88H1499.482ZM1506.253 171.88L1506.076 172.494C1504.156 172.494 1503.524 172.903 1503.07 174.415L1498.522 189.542C1498.091 190.977 1498.345 191.207 1499.482 191.207H1502.488C1504.409 191.207 1505.344 190.438 1507.138 187.111L1507.871 187.341 1505.293 192.358H1492.382L1492.559 191.744C1494.504 191.744 1495.136 191.334 1495.591 189.824L1500.24 174.415C1500.695 172.903 1500.643 172.494 1498.395 172.494L1498.573 171.88H1506.253ZM1512.432 192.743C1507.807 192.743 1506.419 189.747 1507.757 185.344L1511.067 174.415C1511.523 172.903 1511.497 172.494 1509.324 172.494L1509.501 171.88H1517.031L1516.854 172.494C1514.958 172.494 1514.327 172.903 1513.872 174.415L1510.462 185.626C1509.4 189.133 1510.133 191.539 1513.089 191.539 1515.994 191.539 1518.091 189.465 1519.431 185.038L1522.666 174.415C1523.094 172.903 1523.044 172.494 1520.644 172.494L1520.821 171.88H1526.557L1526.404 172.494C1524.838 172.494 1524.283 172.903 1523.827 174.415L1520.594 185.14C1519.356 189.338 1517.385 192.743 1512.432 192.743ZM1535.974 172.494L1536.127 171.88H1541.913L1541.761 172.468C1540.523 172.468 1539.791 172.827 1538.274 174.491L1531.982 181.428 1534.08 189.799C1534.484 191.412 1535.117 191.744 1536.784 191.744L1536.582 192.358H1529.027L1529.228 191.744C1531.426 191.744 1531.553 191.309 1531.174 189.799L1529.556 183.322 1523.973 189.927C1522.811 191.257 1523.088 191.744 1525.033 191.744L1524.882 192.358H1518.819L1518.995 191.77C1520.41 191.77 1521.295 191.283 1522.987 189.363L1529.254 182.171 1527.333 174.44C1526.93 172.827 1526.373 172.494 1525.033 172.494L1525.211 171.88H1532.133L1531.932 172.494C1529.936 172.494 1529.86 172.929 1530.24 174.44L1531.705 180.276 1536.884 174.363C1538.148 172.929 1537.82 172.494 1535.974 172.494ZM1540.105 192.682C1539.358 192.682 1538.825 192.17 1538.825 191.468 1538.825 190.496 1539.705 189.497 1540.744 189.497 1541.517 189.497 1541.996 190.01 1541.996 190.711 1541.996 191.656 1541.144 192.682 1540.105 192.682Z" fill="#000000"/></svg>
+            </div>
+            <div class="es-breadcrumb">04. Executive Summary</div>
+          </div>
+          <div class="es-year" id="execsummary-year"></div>
+        </div>
+
+        <div class="es-intro">
+          <div class="es-label">Payment Structure</div>
+          <div class="es-body">
+            <p>A deposit equivalent to 50% of the total project invesment is required to commence your project.</p>
+            <div class="es-list">
+              <div>50% Initial Deposit ($13,774.5 AUD)</div>
+              <div>25% Upon Design Completion ($6,887.25 AUD)</div>
+              <div>25% Upon Development Completion ($6,887.25 AUD)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="es-table">
+          <div class="es-total-row"><span>Total Project Invesment</span><span class="bold">$27,549 AUD</span></div>
+          <div class="es-breakdown">
+            <div class="es-breakdown-row"><span>Website Design</span><span>$8850</span></div>
+            <div class="es-breakdown-row"><span>Website Development &amp; Animations</span><span>$14000</span></div>
+            <div class="es-breakdown-row"><span>SEO</span><span>$4500</span></div>
+            <div class="es-breakdown-row"><span>Social Assets (Favicon, Social Share Images)</span><span>$199</span></div>
+            <div class="es-total-final-row"><span>TOTAL</span><span>$27,549</span></div>
+          </div>
+          <div class="es-timeline-row"><span>Total Timeline</span><span class="bold">12 weeks</span></div>
+        </div>
+
+        <div class="es-note-box es-note">Note: The price does not include domain hosting fees or any other external fees aside from stock photos and similar assets. The domain fees will be accordingly handled by the client.</div>
+
+        <div class="es-footer-link"><span class="muted">08 / </span><span>Next: Client Testimonials</span></div>
+      </div>
+
+      <div class="stage-content" id="stage-testimonials">
+        <div class="tm-header">
+          <div class="tm-header-left">
+            <div class="tm-logo">
+              <svg viewBox="1455 172.109 87 20.594" xmlns="http://www.w3.org/2000/svg"><path d="M1455.014 172.061H1463.503C1465.605 172.061 1467.202 172.657 1468.323 173.821 1468.715 174.276 1469.051 174.787 1469.275 175.354 1469.5 175.922 1469.612 176.575 1469.612 177.284 1469.612 178.42 1469.303 179.357 1468.743 180.038 1468.183 180.72 1467.398 181.23 1466.389 181.543V181.628C1466.95 181.769 1467.455 181.969 1467.959 182.252 1468.463 182.537 1468.883 182.878 1469.248 183.274 1469.612 183.672 1469.892 184.155 1470.116 184.694 1470.313 185.262 1470.425 185.858 1470.425 186.539 1470.425 187.335 1470.284 188.072 1470.032 188.725 1469.78 189.378 1469.415 189.945 1468.968 190.428 1468.407 191.053 1467.679 191.507 1466.838 191.848 1465.997 192.188 1465.016 192.358 1463.952 192.358H1455.014V172.061ZM1463.84 190.059C1465.213 190.059 1466.249 189.719 1466.978 189.038 1467.258 188.753 1467.455 188.412 1467.622 188.016 1467.791 187.618 1467.874 187.192 1467.874 186.681 1467.874 185.432 1467.455 184.468 1466.669 183.842 1465.885 183.218 1464.876 182.906 1463.672 182.906H1457.535V190.059H1463.84ZM1463.195 180.749C1464.429 180.749 1465.38 180.464 1466.054 179.896 1466.726 179.329 1467.09 178.506 1467.09 177.427 1467.09 176.462 1466.754 175.694 1466.137 175.128 1465.52 174.559 1464.652 174.276 1463.532 174.276H1457.535V180.749H1463.195ZM1471.14 172.061H1473.662V192.358H1471.14V172.061ZM1474.686 183.474H1482.195V185.574H1474.686V183.474ZM1499.482 171.88L1498.092 176.668H1497.36C1497.992 174.03 1497.79 173.032 1495.996 173.032H1491.574C1490.993 173.032 1490.613 173.314 1490.436 173.877L1488.111 181.581H1491.649C1493.115 181.581 1493.721 181.069 1494.277 179.457H1494.884L1493.165 185.549H1492.508C1492.963 183.475 1492.762 182.606 1491.372 182.606H1487.809L1485.635 189.824C1485.181 191.334 1485.282 191.744 1487.96 191.744L1487.758 192.358H1479.647L1479.825 191.744C1481.744 191.744 1482.377 191.334 1482.831 189.824L1487.481 174.415C1487.935 172.903 1487.91 172.494 1485.662 172.494L1485.838 171.88H1499.482ZM1506.253 171.88L1506.076 172.494C1504.156 172.494 1503.524 172.903 1503.07 174.415L1498.522 189.542C1498.091 190.977 1498.345 191.207 1499.482 191.207H1502.488C1504.409 191.207 1505.344 190.438 1507.138 187.111L1507.871 187.341 1505.293 192.358H1492.382L1492.559 191.744C1494.504 191.744 1495.136 191.334 1495.591 189.824L1500.24 174.415C1500.695 172.903 1500.643 172.494 1498.395 172.494L1498.573 171.88H1506.253ZM1512.432 192.743C1507.807 192.743 1506.419 189.747 1507.757 185.344L1511.067 174.415C1511.523 172.903 1511.497 172.494 1509.324 172.494L1509.501 171.88H1517.031L1516.854 172.494C1514.958 172.494 1514.327 172.903 1513.872 174.415L1510.462 185.626C1509.4 189.133 1510.133 191.539 1513.089 191.539 1515.994 191.539 1518.091 189.465 1519.431 185.038L1522.666 174.415C1523.094 172.903 1523.044 172.494 1520.644 172.494L1520.821 171.88H1526.557L1526.404 172.494C1524.838 172.494 1524.283 172.903 1523.827 174.415L1520.594 185.14C1519.356 189.338 1517.385 192.743 1512.432 192.743ZM1535.974 172.494L1536.127 171.88H1541.913L1541.761 172.468C1540.523 172.468 1539.791 172.827 1538.274 174.491L1531.982 181.428 1534.08 189.799C1534.484 191.412 1535.117 191.744 1536.784 191.744L1536.582 192.358H1529.027L1529.228 191.744C1531.426 191.744 1531.553 191.309 1531.174 189.799L1529.556 183.322 1523.973 189.927C1522.811 191.257 1523.088 191.744 1525.033 191.744L1524.882 192.358H1518.819L1518.995 191.77C1520.41 191.77 1521.295 191.283 1522.987 189.363L1529.254 182.171 1527.333 174.44C1526.93 172.827 1526.373 172.494 1525.033 172.494L1525.211 171.88H1532.133L1531.932 172.494C1529.936 172.494 1529.86 172.929 1530.24 174.44L1531.705 180.276 1536.884 174.363C1538.148 172.929 1537.82 172.494 1535.974 172.494ZM1540.105 192.682C1539.358 192.682 1538.825 192.17 1538.825 191.468 1538.825 190.496 1539.705 189.497 1540.744 189.497 1541.517 189.497 1541.996 190.01 1541.996 190.711 1541.996 191.656 1541.144 192.682 1540.105 192.682Z" fill="#DDDDD5"/></svg>
+            </div>
+            <div class="tm-breadcrumb">Client Testimonials</div>
+          </div>
+          <div class="tm-year" id="testimonials-year"></div>
+        </div>
+
+        <div class="tm-cards">
+          <div class="tm-card">
+            <div class="tm-photo">
+              <div class="tm-play">
+                <span class="tm-play-icon">&#9654;</span>
+                <span class="tm-play-label">Play</span>
+              </div>
+            </div>
+            <div class="tm-quote-box">
+              <p class="tm-quote">Umar rebuilt our website in two weeks, and every decision had real thought behind it. He spotted problems we hadn't even noticed ourselves and helped us see our business completely differently.</p>
+              <div class="tm-attribution"><span class="name">Sam Wayne</span><span class="role"> | Founder of Leadgeneration.com</span></div>
+            </div>
+          </div>
+          <div class="tm-card">
+            <div class="tm-photo">
+              <div class="tm-play">
+                <span class="tm-play-icon">&#9654;</span>
+                <span class="tm-play-label">Play</span>
+              </div>
+            </div>
+            <div class="tm-quote-box">
+              <p class="tm-quote">Before working with Umar, I thought our website was good enough. He completely changed how I looked at it, pointing out things I'd never considered. Years later, he still replies whenever I reach out..</p>
+              <div class="tm-attribution"><span class="name">Sam Wayne</span><span class="role"> | Founder of Leadgeneration.com</span></div>
+            </div>
+          </div>
+          <div class="tm-card">
+            <div class="tm-photo">
+              <div class="tm-play">
+                <span class="tm-play-icon">&#9654;</span>
+                <span class="tm-play-label">Play</span>
+              </div>
+            </div>
+            <div class="tm-quote-box">
+              <p class="tm-quote">Umar rebuilt our website in two weeks, and every decision had real thought behind it. He spotted problems we hadn't even noticed ourselves and helped us see our business completely differently.</p>
+              <div class="tm-attribution"><span class="name">Sam Wayne</span><span class="role"> | Founder of Leadgeneration.com</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tm-footer-link"><span class="muted">09 / </span><span class="light">Next: T&amp;C</span></div>
+      </div>
+
+      <div class="stage-content" id="stage-tc">
+        <div class="tc-header">
+          <div class="tc-header-left">
+            <div class="tc-logo">
+              <svg viewBox="1455 172.109 87 20.594" xmlns="http://www.w3.org/2000/svg"><path d="M1455.014 172.061H1463.503C1465.605 172.061 1467.202 172.657 1468.323 173.821 1468.715 174.276 1469.051 174.787 1469.275 175.354 1469.5 175.922 1469.612 176.575 1469.612 177.284 1469.612 178.42 1469.303 179.357 1468.743 180.038 1468.183 180.72 1467.398 181.23 1466.389 181.543V181.628C1466.95 181.769 1467.455 181.969 1467.959 182.252 1468.463 182.537 1468.883 182.878 1469.248 183.274 1469.612 183.672 1469.892 184.155 1470.116 184.694 1470.313 185.262 1470.425 185.858 1470.425 186.539 1470.425 187.335 1470.284 188.072 1470.032 188.725 1469.78 189.378 1469.415 189.945 1468.968 190.428 1468.407 191.053 1467.679 191.507 1466.838 191.848 1465.997 192.188 1465.016 192.358 1463.952 192.358H1455.014V172.061ZM1463.84 190.059C1465.213 190.059 1466.249 189.719 1466.978 189.038 1467.258 188.753 1467.455 188.412 1467.622 188.016 1467.791 187.618 1467.874 187.192 1467.874 186.681 1467.874 185.432 1467.455 184.468 1466.669 183.842 1465.885 183.218 1464.876 182.906 1463.672 182.906H1457.535V190.059H1463.84ZM1463.195 180.749C1464.429 180.749 1465.38 180.464 1466.054 179.896 1466.726 179.329 1467.09 178.506 1467.09 177.427 1467.09 176.462 1466.754 175.694 1466.137 175.128 1465.52 174.559 1464.652 174.276 1463.532 174.276H1457.535V180.749H1463.195ZM1471.14 172.061H1473.662V192.358H1471.14V172.061ZM1474.686 183.474H1482.195V185.574H1474.686V183.474ZM1499.482 171.88L1498.092 176.668H1497.36C1497.992 174.03 1497.79 173.032 1495.996 173.032H1491.574C1490.993 173.032 1490.613 173.314 1490.436 173.877L1488.111 181.581H1491.649C1493.115 181.581 1493.721 181.069 1494.277 179.457H1494.884L1493.165 185.549H1492.508C1492.963 183.475 1492.762 182.606 1491.372 182.606H1487.809L1485.635 189.824C1485.181 191.334 1485.282 191.744 1487.96 191.744L1487.758 192.358H1479.647L1479.825 191.744C1481.744 191.744 1482.377 191.334 1482.831 189.824L1487.481 174.415C1487.935 172.903 1487.91 172.494 1485.662 172.494L1485.838 171.88H1499.482ZM1506.253 171.88L1506.076 172.494C1504.156 172.494 1503.524 172.903 1503.07 174.415L1498.522 189.542C1498.091 190.977 1498.345 191.207 1499.482 191.207H1502.488C1504.409 191.207 1505.344 190.438 1507.138 187.111L1507.871 187.341 1505.293 192.358H1492.382L1492.559 191.744C1494.504 191.744 1495.136 191.334 1495.591 189.824L1500.24 174.415C1500.695 172.903 1500.643 172.494 1498.395 172.494L1498.573 171.88H1506.253ZM1512.432 192.743C1507.807 192.743 1506.419 189.747 1507.757 185.344L1511.067 174.415C1511.523 172.903 1511.497 172.494 1509.324 172.494L1509.501 171.88H1517.031L1516.854 172.494C1514.958 172.494 1514.327 172.903 1513.872 174.415L1510.462 185.626C1509.4 189.133 1510.133 191.539 1513.089 191.539 1515.994 191.539 1518.091 189.465 1519.431 185.038L1522.666 174.415C1523.094 172.903 1523.044 172.494 1520.644 172.494L1520.821 171.88H1526.557L1526.404 172.494C1524.838 172.494 1524.283 172.903 1523.827 174.415L1520.594 185.14C1519.356 189.338 1517.385 192.743 1512.432 192.743ZM1535.974 172.494L1536.127 171.88H1541.913L1541.761 172.468C1540.523 172.468 1539.791 172.827 1538.274 174.491L1531.982 181.428 1534.08 189.799C1534.484 191.412 1535.117 191.744 1536.784 191.744L1536.582 192.358H1529.027L1529.228 191.744C1531.426 191.744 1531.553 191.309 1531.174 189.799L1529.556 183.322 1523.973 189.927C1522.811 191.257 1523.088 191.744 1525.033 191.744L1524.882 192.358H1518.819L1518.995 191.77C1520.41 191.77 1521.295 191.283 1522.987 189.363L1529.254 182.171 1527.333 174.44C1526.93 172.827 1526.373 172.494 1525.033 172.494L1525.211 171.88H1532.133L1531.932 172.494C1529.936 172.494 1529.86 172.929 1530.24 174.44L1531.705 180.276 1536.884 174.363C1538.148 172.929 1537.82 172.494 1535.974 172.494ZM1540.105 192.682C1539.358 192.682 1538.825 192.17 1538.825 191.468 1538.825 190.496 1539.705 189.497 1540.744 189.497 1541.517 189.497 1541.996 190.01 1541.996 190.711 1541.996 191.656 1541.144 192.682 1540.105 192.682Z" fill="#000000"/></svg>
+            </div>
+            <div class="tc-breadcrumb">05. Terms and Conditions</div>
+          </div>
+          <div class="tc-year" id="tc-year"></div>
+        </div>
+
+        <div class="tc-cols">
+          <div class="tc-col">
+            <div class="tc-clause">
+              <p class="tc-para">1. Additional assets, such as paid fonts, third-party tools, are not included in the price. If such expenses arise, it will be discussed with the client before making any purchases.</p>
+            </div>
+            <div class="tc-clause">
+              <p class="tc-para">2. If the freelancer cancels the project after it has started, the client will pay only for the produced work it intends to use.</p>
+              <p class="tc-para">If the client cancels the project after it has started, the client will pay for the time the freelancer has worked on the project. Even if the client does not intend to use the produced work.</p>
+            </div>
+            <div class="tc-clause">
+              <p class="tc-para">3. The client owns all produced work. The freelancer's creation and all intellectual property rights associated with it are given to the client after the freelancer has been paid in full.</p>
+            </div>
+            <div class="tc-clause">
+              <p class="tc-para">4. It is expected from the client to provide feedback or requested collaterals in a timely manner to prevent any project delays and ensure the work will be delivered accordingly to the estimated timeline. If the client fails to meet this expectation and the project timeline gets significantly extended compared to the estimated timeline, further cost penalties will be applied accordingly.</p>
+            </div>
+          </div>
+          <div class="tc-col">
+            <div class="tc-clause">
+              <p class="tc-para">5. It is the freelancer's responsibility to meet the estimated timeline. If there should be a delay from the freelancer's end, cost penalties will not be applied to the client. The freelancer will take full responsibility to deliver the project in a timely manner.</p>
+            </div>
+            <div class="tc-clause">
+              <p class="tc-para">6. All invoices are due and payable within 14 days from the invoice date. If payment is not received within 14 days from the invoice date, a late fee of 2% of the total invoice amount will be applied for each 14 days the payment is overdue. If the payment is not received within 28 days of the due date, the Freelancer reserves the right to suspend all services until the account is brought current.</p>
+            </div>
+            <div class="tc-clause">
+              <p class="tc-para">7. The freelancer will provide a reminder of the overdue payment within 7 days after the due date before applying any late fees.</p>
+            </div>
+            <div class="tc-clause">
+              <p class="tc-para">8. Subcontracting: The freelancer reserves the right to assign subcontractors to ensure quality and on-time completion.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tc-footer-link"><span class="muted">10 / </span><span>Next: Contract Agreement</span></div>
       </div>
 
     </div>
@@ -319,6 +1090,13 @@
     <div id="panel-cover" class="panel-slide active"></div>
     <div id="panel-toc" class="panel-slide" style="display:none"></div>
     <div id="panel-problem" class="panel-slide" style="display:none"></div>
+    <div id="panel-solution" class="panel-slide" style="display:none"></div>
+    <div id="panel-impact" class="panel-slide" style="display:none"></div>
+    <div id="panel-scope" class="panel-slide" style="display:none"></div>
+    <div id="panel-timeline" class="panel-slide" style="display:none"></div>
+    <div id="panel-execsummary" class="panel-slide" style="display:none"></div>
+    <div id="panel-testimonials" class="panel-slide" style="display:none"></div>
+    <div id="panel-tc" class="panel-slide" style="display:none"></div>
   </div>
 </div>
 
@@ -365,7 +1143,14 @@
   // ---------------------------------------------------------------------
   function fmtLs(v) { return (v >= 0 ? '+' : '') + v.toFixed(3) + 'em'; }
 
-  function buildLayoutSliders(container, prefix, layoutFields, onChange) {
+  // `layoutState` (a plain object shared across every buildLayoutSliders
+  // call for one slide) and `layoutRefs` (a mutable holder whose `.refresh`
+  // gets pointed at the real refresh function once buildLayoutOutputBox
+  // runs) let every layout slider on a slide feed one shared, copyable
+  // output box — mirroring how buildTypographyPanels already has its own
+  // copy button, so a slide's full set of numbers (layout AND typography)
+  // can be copied and handed over, not just typography.
+  function buildLayoutSliders(container, prefix, layoutFields, onChange, layoutState, layoutRefs) {
     const wrap = document.createElement('div');
     wrap.innerHTML = '<p class="section-label">Layout</p>';
     layoutFields.forEach((f) => {
@@ -376,11 +1161,16 @@
         <input type="range" id="in-${prefix}-${f.key}" min="${f.min}" max="${f.max}" step="${f.step || 1}" value="${f.default}" />
       `;
       wrap.appendChild(group);
+      if (layoutState) {
+        layoutState[`${prefix}-${f.key}`] = { label: f.label, value: f.default, unit: f.unit ?? 'px' };
+      }
       const input = group.querySelector('input');
       input.addEventListener('input', () => {
         const v = Number(input.value);
         group.querySelector('.val').textContent = v + (f.unit || 'px');
         stage.style.setProperty(`--${prefix}-${f.key}`, v + (f.unit === '' ? '' : 'px'));
+        if (layoutState) layoutState[`${prefix}-${f.key}`].value = v;
+        if (layoutRefs) layoutRefs.refresh();
         onChange();
       });
       stage.style.setProperty(`--${prefix}-${f.key}`, f.default + (f.unit === '' ? '' : 'px'));
@@ -394,11 +1184,51 @@
         input.value = f.default;
         wrap.querySelector(`#val-${prefix}-${f.key}`).textContent = f.default + (f.unit || 'px');
         stage.style.setProperty(`--${prefix}-${f.key}`, f.default + (f.unit === '' ? '' : 'px'));
+        if (layoutState) layoutState[`${prefix}-${f.key}`].value = f.default;
       });
+      if (layoutRefs) layoutRefs.refresh();
       onChange();
     });
     wrap.appendChild(resetBtn);
     container.appendChild(wrap);
+    const hr = document.createElement('hr');
+    hr.className = 'divider';
+    container.appendChild(hr);
+  }
+
+  // One shared copyable box for every layout slider on a slide — call once
+  // per slide, after all of that slide's buildLayoutSliders calls.
+  function buildLayoutOutputBox(container, layoutState, layoutRefs) {
+    const title = document.createElement('p');
+    title.className = 'section-label';
+    title.textContent = 'Layout — copyable values';
+    container.appendChild(title);
+
+    const outputBox = document.createElement('div');
+    outputBox.className = 'output';
+
+    function refresh() {
+      const lines = Object.entries(layoutState).map(
+        ([key, v]) => `${key}: ${v.value}${v.unit}, // ${v.label}`,
+      );
+      outputBox.textContent = lines.join('\n');
+    }
+    layoutRefs.refresh = refresh;
+    refresh();
+    container.appendChild(outputBox);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'action';
+    copyBtn.textContent = 'Copy all layout values';
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(outputBox.textContent).then(() => {
+        const original = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => (copyBtn.textContent = original), 1200);
+      });
+    });
+    container.appendChild(copyBtn);
+
     const hr = document.createElement('hr');
     hr.className = 'divider';
     container.appendChild(hr);
@@ -530,15 +1360,18 @@
   // Cover slide module
   // ---------------------------------------------------------------------
   const coverPanel = document.getElementById('panel-cover');
+  const cLayoutState = {};
+  const cLayoutRefs = {};
   buildLayoutSliders(coverPanel, 'c-pad', [
     { key: 'top', label: 'Padding Top', min: 0, max: 150, default: 19 },
     { key: 'bottom', label: 'Padding Bottom', min: 0, max: 150, default: 41 },
     { key: 'left', label: 'Padding Left', min: 0, max: 150, default: 42 },
     { key: 'right', label: 'Padding Right', min: 0, max: 150, default: 42 },
-  ], updateScale);
+  ], updateScale, cLayoutState, cLayoutRefs);
   buildLayoutSliders(coverPanel, 'c-logo', [
     { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
-  ], updateScale);
+  ], updateScale, cLayoutState, cLayoutRefs);
+  buildLayoutOutputBox(coverPanel, cLayoutState, cLayoutRefs);
   buildTypographyPanels(coverPanel, 'c', [
     { key: 'title', name: 'Title', font: 'Inter', defaults: { fs: 187.5, lh: 1.0, ls: -0.06, fw: 500 }, fsRange: [100, 260, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600] },
     { key: 'subtitle', name: 'Subtitle', font: 'Helvetica Neue (system)', defaults: { fs: 72, lh: 1.11, ls: -0.06, fw: 600 }, fsRange: [30, 120, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
@@ -552,27 +1385,30 @@
   document.getElementById('toc-year').textContent = new Date().getFullYear();
 
   const tocPanel = document.getElementById('panel-toc');
+  const tLayoutState = {};
+  const tLayoutRefs = {};
   buildLayoutSliders(tocPanel, 't-header', [
     { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
     { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
     { key: 'gap', label: 'Logo ↔ Label Gap', min: 0, max: 300, default: 174 },
-  ], updateScale);
+  ], updateScale, tLayoutState, tLayoutRefs);
   buildLayoutSliders(tocPanel, 't-list', [
     { key: 'x', label: 'List X', min: 0, max: 300, default: 56 },
     { key: 'y', label: 'List Y', min: 200, max: 900, default: 420 },
     { key: 'gap', label: 'Row Gap (vertical)', min: 0, max: 60, default: 12 },
-  ], updateScale);
+  ], updateScale, tLayoutState, tLayoutRefs);
   buildLayoutSliders(tocPanel, 't-row', [
     { key: 'gap', label: 'Number ↔ Title Gap', min: 0, max: 400, default: 199 },
-  ], updateScale);
+  ], updateScale, tLayoutState, tLayoutRefs);
   buildLayoutSliders(tocPanel, 't-page', [
     { key: 'x', label: 'Page Number X', min: 1400, max: 1900, default: 1855 },
     { key: 'y', label: 'Page Number Y', min: 800, max: 1060, default: 998 },
-  ], updateScale);
+  ], updateScale, tLayoutState, tLayoutRefs);
   buildLayoutSliders(tocPanel, 't-logo', [
     { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
-  ], updateScale);
+  ], updateScale, tLayoutState, tLayoutRefs);
+  buildLayoutOutputBox(tocPanel, tLayoutState, tLayoutRefs);
   buildTypographyPanels(tocPanel, 't', [
     { key: 'number', name: 'Row Number ("/01.")', font: 'Instrument Serif', defaults: { fs: 72, lh: 0.97, ls: -0.025, fw: 400 }, fsRange: [30, 120, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: null },
     { key: 'title', name: 'Section Title', font: 'Neue Haas Grotesk Roman', defaults: { fs: 75.8, lh: 1.04, ls: 0.003, fw: 400 }, fsRange: [30, 120, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: null },
@@ -585,34 +1421,355 @@
   document.getElementById('problem-year').textContent = new Date().getFullYear();
 
   const problemPanel = document.getElementById('panel-problem');
+  const pLayoutState = {};
+  const pLayoutRefs = {};
   buildLayoutSliders(problemPanel, 'p-header', [
     { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
     { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
     { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 900, default: 545 },
-  ], updateScale);
+  ], updateScale, pLayoutState, pLayoutRefs);
   buildLayoutSliders(problemPanel, 'p-body', [
     { key: 'x', label: 'Body X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Body Y', min: 200, max: 900, default: 500 },
     { key: 'gap', label: 'Heading ↔ Text Gap', min: 0, max: 300, default: 174 },
-  ], updateScale);
+  ], updateScale, pLayoutState, pLayoutRefs);
   buildLayoutSliders(problemPanel, 'p-text', [
     { key: 'w', label: 'Body Text Width', min: 400, max: 1200, default: 710 },
-  ], updateScale);
+  ], updateScale, pLayoutState, pLayoutRefs);
   buildLayoutSliders(problemPanel, 'p-para', [
     { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 36 },
-  ], updateScale);
+  ], updateScale, pLayoutState, pLayoutRefs);
   buildLayoutSliders(problemPanel, 'p-page', [
     { key: 'x', label: 'Page Number X', min: 1400, max: 1900, default: 1855 },
     { key: 'y', label: 'Page Number Y', min: 800, max: 1060, default: 998 },
-  ], updateScale);
+  ], updateScale, pLayoutState, pLayoutRefs);
   buildLayoutSliders(problemPanel, 'p-logo', [
     { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
-  ], updateScale);
+  ], updateScale, pLayoutState, pLayoutRefs);
+  buildLayoutOutputBox(problemPanel, pLayoutState, pLayoutRefs);
   buildTypographyPanels(problemPanel, 'p', [
     { key: 'heading', name: 'Heading ("Problem")', font: 'Inter', defaults: { fs: 27, lh: 1.8, ls: -0.03, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
     { key: 'body', name: 'Body Text', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
     { key: 'label', name: 'Breadcrumb / Year / Page', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+  ], document.createElement('div'));
+
+  // ---------------------------------------------------------------------
+  // Solution slide module (second of three Project Overview sub-slides)
+  // ---------------------------------------------------------------------
+  document.getElementById('solution-year').textContent = new Date().getFullYear();
+
+  const solutionPanel = document.getElementById('panel-solution');
+  const soLayoutState = {};
+  const soLayoutRefs = {};
+  buildLayoutSliders(solutionPanel, 'so-header', [
+    { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
+    { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
+    { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
+    { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 900, default: 545 },
+  ], updateScale, soLayoutState, soLayoutRefs);
+  buildLayoutSliders(solutionPanel, 'so-body', [
+    { key: 'x', label: 'Body X', min: 0, max: 200, default: 48 },
+    { key: 'y', label: 'Body Y', min: 200, max: 900, default: 500 },
+    { key: 'gap', label: 'Heading ↔ Text Gap', min: 0, max: 300, default: 174 },
+  ], updateScale, soLayoutState, soLayoutRefs);
+  buildLayoutSliders(solutionPanel, 'so-text', [
+    { key: 'w', label: 'Body Text Width', min: 400, max: 1200, default: 677 },
+  ], updateScale, soLayoutState, soLayoutRefs);
+  buildLayoutSliders(solutionPanel, 'so-para', [
+    { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 36 },
+  ], updateScale, soLayoutState, soLayoutRefs);
+  buildLayoutSliders(solutionPanel, 'so-page', [
+    { key: 'x', label: 'Page Number X', min: 1400, max: 1900, default: 1855 },
+    { key: 'y', label: 'Page Number Y', min: 800, max: 1060, default: 998 },
+  ], updateScale, soLayoutState, soLayoutRefs);
+  buildLayoutSliders(solutionPanel, 'so-logo', [
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
+  ], updateScale, soLayoutState, soLayoutRefs);
+  buildLayoutOutputBox(solutionPanel, soLayoutState, soLayoutRefs);
+  buildTypographyPanels(solutionPanel, 'so', [
+    { key: 'heading', name: 'Heading ("Solution")', font: 'Inter', defaults: { fs: 27, lh: 1.8, ls: -0.03, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'body', name: 'Body Text', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'label', name: 'Breadcrumb / Year / Page', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+  ], document.createElement('div'));
+
+  // ---------------------------------------------------------------------
+  // Impact slide module (third of three Project Overview sub-slides —
+  // footer is a "Next:" link instead of a plain page number)
+  // ---------------------------------------------------------------------
+  document.getElementById('impact-year').textContent = new Date().getFullYear();
+
+  const impactPanel = document.getElementById('panel-impact');
+  const imLayoutState = {};
+  const imLayoutRefs = {};
+  buildLayoutSliders(impactPanel, 'im-header', [
+    { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
+    { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
+    { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
+    { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 900, default: 545 },
+  ], updateScale, imLayoutState, imLayoutRefs);
+  buildLayoutSliders(impactPanel, 'im-body', [
+    { key: 'x', label: 'Body X', min: 0, max: 200, default: 48 },
+    { key: 'y', label: 'Body Y', min: 200, max: 900, default: 500 },
+    { key: 'gap', label: 'Heading ↔ Text Gap', min: 0, max: 300, default: 199 },
+  ], updateScale, imLayoutState, imLayoutRefs);
+  buildLayoutSliders(impactPanel, 'im-text', [
+    { key: 'w', label: 'Body Text Width', min: 400, max: 1200, default: 740 },
+  ], updateScale, imLayoutState, imLayoutRefs);
+  buildLayoutSliders(impactPanel, 'im-para', [
+    { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 36 },
+  ], updateScale, imLayoutState, imLayoutRefs);
+  buildLayoutSliders(impactPanel, 'im-footer', [
+    { key: 'x', label: 'Footer Link X', min: 1000, max: 1900, default: 1413 },
+  ], updateScale, imLayoutState, imLayoutRefs);
+  buildLayoutSliders(impactPanel, 'im-page', [
+    { key: 'y', label: 'Footer Link Y', min: 800, max: 1060, default: 998 },
+  ], updateScale, imLayoutState, imLayoutRefs);
+  buildLayoutSliders(impactPanel, 'im-logo', [
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
+  ], updateScale, imLayoutState, imLayoutRefs);
+  buildLayoutOutputBox(impactPanel, imLayoutState, imLayoutRefs);
+  buildTypographyPanels(impactPanel, 'im', [
+    { key: 'heading', name: 'Heading ("Impact")', font: 'Inter', defaults: { fs: 27, lh: 1.8, ls: -0.03, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'body', name: 'Body Text', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'label', name: 'Breadcrumb / Year / Footer Link', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+  ], document.createElement('div'));
+
+  // ---------------------------------------------------------------------
+  // Scope and Deliverables slide module (numbered sections + bullets) —
+  // rebuilt from a real Figma screenshot the user provided (the earlier
+  // flowing-paragraph version was from stale data). Still no exact Figma
+  // tokens (rate-limited), so sizes are estimated — tune here.
+  // ---------------------------------------------------------------------
+  document.getElementById('scope-year').textContent = new Date().getFullYear();
+
+  const scopePanel = document.getElementById('panel-scope');
+  const sdLayoutState = {};
+  const sdLayoutRefs = {};
+  buildLayoutSliders(scopePanel, 'sd-header', [
+    { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
+    { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
+    { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
+    { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 1000, default: 760 },
+  ], updateScale, sdLayoutState, sdLayoutRefs);
+  buildLayoutSliders(scopePanel, 'sd-cols', [
+    { key: 'x', label: 'Columns X', min: 0, max: 200, default: 48 },
+    { key: 'bottom', label: 'Columns Bottom (grows upward, like Problem/Solution/Impact)', min: 20, max: 300, default: 60 },
+    { key: 'gap', label: 'Column Gap (incl. divider)', min: 0, max: 300, default: 133 },
+  ], updateScale, sdLayoutState, sdLayoutRefs);
+  buildLayoutSliders(scopePanel, 'sd-col', [
+    { key: 'w1', label: 'Design Column Width', min: 400, max: 1100, default: 826 },
+    { key: 'w2', label: 'Development Column Width', min: 400, max: 1100, default: 731 },
+  ], updateScale, sdLayoutState, sdLayoutRefs);
+  buildLayoutSliders(scopePanel, 'sd-heading', [
+    { key: 'gap', label: 'Column Heading ↔ Sections Gap', min: 0, max: 120, default: 24 },
+  ], updateScale, sdLayoutState, sdLayoutRefs);
+  buildLayoutSliders(scopePanel, 'sd-section', [
+    { key: 'gap', label: 'Gap Between Numbered Sections', min: 0, max: 80, default: 14 },
+  ], updateScale, sdLayoutState, sdLayoutRefs);
+  buildLayoutSliders(scopePanel, 'sd-page', [
+    { key: 'x', label: 'Page Number X', min: 1400, max: 1900, default: 1855 },
+    { key: 'y', label: 'Page Number Y', min: 800, max: 1060, default: 998 },
+  ], updateScale, sdLayoutState, sdLayoutRefs);
+  buildLayoutSliders(scopePanel, 'sd-logo', [
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
+  ], updateScale, sdLayoutState, sdLayoutRefs);
+  buildLayoutOutputBox(scopePanel, sdLayoutState, sdLayoutRefs);
+  buildTypographyPanels(scopePanel, 'sd', [
+    { key: 'colheading', name: 'Column Heading ("Website Design (2 Revisions)") — Helvetica Neue Bold', font: 'Helvetica Neue (system)', defaults: { fs: 31.8, lh: 1.66, ls: -0.015, fw: 700 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'numheading', name: 'Numbered Section Heading ("1. Framer Development") — Helvetica Neue Bold', font: 'Helvetica Neue (system)', defaults: { fs: 24.9, lh: 1.24, ls: -0.019, fw: 700 }, fsRange: [12, 40, 0.1], lhRange: [0.8, 1.9, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'body', name: 'Bullet Body Text — Neue Haas Grotesk (bold inline labels stay Helvetica Neue Bold)', font: 'Neue Haas Grotesk Roman', defaults: { fs: 19.9, lh: 1.53, ls: -0.010, fw: 500 }, fsRange: [11, 32, 0.1], lhRange: [0.8, 1.9, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: null },
+    { key: 'label', name: 'Breadcrumb / Year / Page — Inter', font: 'Inter', defaults: { fs: 27.3, lh: 1.35, ls: -0.030, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+  ], document.createElement('div'));
+
+  // ---------------------------------------------------------------------
+  // Project Timeline slide module (paragraph + stage/duration table) —
+  // built from a screenshot, no exact Figma tokens. Same font split as
+  // Scope: bold text (start-date label, total row) is Helvetica Neue,
+  // everything else is Neue Haas Grotesk.
+  // ---------------------------------------------------------------------
+  document.getElementById('timeline-year').textContent = new Date().getFullYear();
+
+  const timelinePanel = document.getElementById('panel-timeline');
+  const ptLayoutState = {};
+  const ptLayoutRefs = {};
+  buildLayoutSliders(timelinePanel, 'pt-header', [
+    { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
+    { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
+    { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
+    { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 1000, default: 700 },
+  ], updateScale, ptLayoutState, ptLayoutRefs);
+  buildLayoutSliders(timelinePanel, 'pt-content', [
+    { key: 'x', label: 'Intro X', min: 0, max: 200, default: 48 },
+    { key: 'y', label: 'Intro Y (top-anchored, under header)', min: 20, max: 400, default: 90 },
+    { key: 'w', label: 'Content Width (intro + table)', min: 400, max: 1200, default: 760 },
+  ], updateScale, ptLayoutState, ptLayoutRefs);
+  buildLayoutSliders(timelinePanel, 'pt-table', [
+    { key: 'bottom', label: 'Table Bottom (bottom-anchored, grows upward — independent of the intro above)', min: 20, max: 300, default: 60 },
+  ], updateScale, ptLayoutState, ptLayoutRefs);
+  buildLayoutSliders(timelinePanel, 'pt-footer', [
+    { key: 'right', label: 'Footer Link — Distance From Right Edge', min: 20, max: 400, default: 65 },
+    { key: 'bottom', label: 'Footer Link — Distance From Bottom', min: 20, max: 300, default: 60 },
+  ], updateScale, ptLayoutState, ptLayoutRefs);
+  buildLayoutSliders(timelinePanel, 'pt-logo', [
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
+  ], updateScale, ptLayoutState, ptLayoutRefs);
+  buildLayoutOutputBox(timelinePanel, ptLayoutState, ptLayoutRefs);
+  buildTypographyPanels(timelinePanel, 'pt', [
+    { key: 'body', name: 'Paragraph / Table Rows — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 27.4, lh: 1.93, ls: -0.009, fw: 500 }, fsRange: [11, 40, 0.1], lhRange: [0.8, 2.2, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: null },
+    { key: 'bold', name: 'Bold Text ("Project start date:", Total row) — Helvetica Neue Bold', font: 'Helvetica Neue (system)', defaults: { fs: 31.7, lh: 1.90, ls: -0.007, fw: 700 }, fsRange: [11, 44, 0.1], lhRange: [0.8, 2.2, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'tablabel', name: 'Table Header Label ("Stage" / "Timeline") — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 22.1, lh: 1.80, ls: 0.125, fw: 500 }, fsRange: [8, 32, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.05, 0.3, 0.001], weights: null },
+    { key: 'label', name: 'Breadcrumb / Year / Footer Link — Inter', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+  ], document.createElement('div'));
+
+  // ---------------------------------------------------------------------
+  // Executive Summary slide module (payment structure + breakdown table) —
+  // built from a screenshot, no exact Figma tokens. Same font split as
+  // Timeline/Scope: bold (dollar values, "TOTAL") is Helvetica Neue,
+  // everything else is Neue Haas Grotesk.
+  // ---------------------------------------------------------------------
+  document.getElementById('execsummary-year').textContent = new Date().getFullYear();
+
+  const execsummaryPanel = document.getElementById('panel-execsummary');
+  const esLayoutState = {};
+  const esLayoutRefs = {};
+  buildLayoutSliders(execsummaryPanel, 'es-header', [
+    { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
+    { key: 'y', label: 'Header Y', min: 0, max: 200, default: 32 },
+    { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1795 },
+    { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 1000, default: 700 },
+  ], updateScale, esLayoutState, esLayoutRefs);
+  buildLayoutSliders(execsummaryPanel, 'es-intro', [
+    { key: 'x', label: 'Intro X', min: 0, max: 200, default: 57 },
+    { key: 'y', label: 'Intro Y (top-anchored, under header)', min: 20, max: 400, default: 178 },
+    { key: 'gap', label: 'Label ↔ Body Gap', min: 0, max: 300, default: 61 },
+  ], updateScale, esLayoutState, esLayoutRefs);
+  buildLayoutSliders(execsummaryPanel, 'es-label', [
+    { key: 'w', label: 'Label Width ("Payment Structure")', min: 80, max: 400, default: 168 },
+  ], updateScale, esLayoutState, esLayoutRefs);
+  buildLayoutSliders(execsummaryPanel, 'es-content', [
+    { key: 'w', label: 'Content Width (body + table)', min: 400, max: 1200, default: 1108 },
+  ], updateScale, esLayoutState, esLayoutRefs);
+  buildLayoutSliders(execsummaryPanel, 'es-table', [
+    { key: 'bottom', label: 'Table Bottom (bottom-anchored, grows upward — independent of the intro above)', min: 20, max: 300, default: 74 },
+  ], updateScale, esLayoutState, esLayoutRefs);
+  buildLayoutSliders(execsummaryPanel, 'es-footer', [
+    { key: 'right', label: 'Footer Link — Distance From Right Edge', min: 20, max: 400, default: 65 },
+    { key: 'bottom', label: 'Footer Link — Distance From Bottom', min: 20, max: 300, default: 60 },
+  ], updateScale, esLayoutState, esLayoutRefs);
+  buildLayoutSliders(execsummaryPanel, 'es-logo', [
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
+  ], updateScale, esLayoutState, esLayoutRefs);
+  buildLayoutOutputBox(execsummaryPanel, esLayoutState, esLayoutRefs);
+  buildTypographyPanels(execsummaryPanel, 'es', [
+    { key: 'body', name: 'Body Text (paragraph, list, breakdown rows) — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 26.1, lh: 1.87, ls: -0.013, fw: 500 }, fsRange: [11, 40, 0.1], lhRange: [0.8, 2.2, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: null },
+    { key: 'bold', name: 'Bold Text ("Payment Structure", dollar values, "TOTAL") — Helvetica Neue Bold', font: 'Helvetica Neue (system)', defaults: { fs: 29.4, lh: 1.20, ls: 0.016, fw: 700 }, fsRange: [11, 44, 0.1], lhRange: [0.8, 2.2, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'label', name: 'Breadcrumb / Year / Footer Link — Inter', font: 'Inter', defaults: { fs: 29.4, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'note', name: 'Domain Fees Note (bottom right) — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 16.2, lh: 1.5, ls: -0.005, fw: 500 }, fsRange: [10, 24, 0.1], lhRange: [0.8, 1.9, 0.01], lsRange: [-0.05, 0.1, 0.001], weights: null },
+  ], document.createElement('div'));
+
+  // ---------------------------------------------------------------------
+  // Client Testimonials slide module (dark theme, three cards) — built
+  // from a screenshot, no exact Figma tokens. Photo is a placeholder
+  // gradient (no real client photo yet); Play button is static (real
+  // video wiring is a Notion-backend concern, not a layout concern).
+  // ---------------------------------------------------------------------
+  document.getElementById('testimonials-year').textContent = new Date().getFullYear();
+
+  const testimonialsPanel = document.getElementById('panel-testimonials');
+  const tmLayoutState = {};
+  const tmLayoutRefs = {};
+  buildLayoutSliders(testimonialsPanel, 'tm-header', [
+    { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
+    { key: 'y', label: 'Header Y', min: 0, max: 200, default: 30 },
+    { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
+    { key: 'gap', label: 'Logo ↔ Breadcrumb Gap', min: 0, max: 300, default: 174 },
+  ], updateScale, tmLayoutState, tmLayoutRefs);
+  buildLayoutSliders(testimonialsPanel, 'tm-cards', [
+    { key: 'x', label: 'Cards X', min: 0, max: 300, default: 111 },
+    { key: 'y', label: 'Cards Y', min: 20, max: 400, default: 98 },
+    { key: 'gap', label: 'Gap Between Cards', min: 0, max: 200, default: 66 },
+  ], updateScale, tmLayoutState, tmLayoutRefs);
+  buildLayoutSliders(testimonialsPanel, 'tm-card', [
+    { key: 'w', label: 'Card Width', min: 300, max: 800, default: 521 },
+    { key: 'pad', label: 'Card Outer Padding (white border thickness)', min: 0, max: 40, default: 9 },
+    { key: 'gap', label: 'Gap Between Photo And Quote Box', min: 0, max: 40, default: 9 },
+  ], updateScale, tmLayoutState, tmLayoutRefs);
+  buildLayoutSliders(testimonialsPanel, 'tm-box', [
+    { key: 'radius', label: 'Box Corner Radius (card, photo, quote box)', min: 0, max: 40, default: 19 },
+  ], updateScale, tmLayoutState, tmLayoutRefs);
+  buildLayoutSliders(testimonialsPanel, 'tm-quote', [
+    { key: 'pad', label: 'Quote Box Inner Padding', min: 0, max: 60, default: 35 },
+  ], updateScale, tmLayoutState, tmLayoutRefs);
+  buildLayoutSliders(testimonialsPanel, 'tm-attr', [
+    { key: 'gap', label: 'Quote ↔ Name/Role Gap', min: 0, max: 40, default: 26 },
+  ], updateScale, tmLayoutState, tmLayoutRefs);
+  buildLayoutSliders(testimonialsPanel, 'tm-play', [
+    { key: 'bottom', label: 'Play Button — Distance From Photo Bottom', min: 0, max: 100, default: 19 },
+    { key: 'padx', label: 'Play Button — Horizontal Padding', min: 0, max: 60, default: 18 },
+    { key: 'pady', label: 'Play Button — Vertical Padding', min: 0, max: 40, default: 17 },
+    { key: 'gap', label: 'Play Button — Icon ↔ Text Gap', min: 0, max: 40, default: 9 },
+    { key: 'radius', label: 'Play Button — Corner Radius', min: 0, max: 60, default: 10 },
+    { key: 'iconw', label: 'Play Button — Icon Width (independent of icon height)', min: 10, max: 100, default: 53 },
+    { key: 'iconradius', label: 'Play Button — Icon Corner Radius', min: 0, max: 30, default: 4 },
+  ], updateScale, tmLayoutState, tmLayoutRefs);
+  buildLayoutSliders(testimonialsPanel, 'tm-footer', [
+    { key: 'right', label: 'Footer Link — Distance From Right Edge', min: 20, max: 400, default: 41 },
+    { key: 'bottom', label: 'Footer Link — Distance From Bottom', min: 20, max: 300, default: 60 },
+  ], updateScale, tmLayoutState, tmLayoutRefs);
+  buildLayoutSliders(testimonialsPanel, 'tm-logo', [
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
+  ], updateScale, tmLayoutState, tmLayoutRefs);
+  buildLayoutOutputBox(testimonialsPanel, tmLayoutState, tmLayoutRefs);
+  buildTypographyPanels(testimonialsPanel, 'tm', [
+    { key: 'quote', name: 'Quote Text — Helvetica Neue Bold', font: 'Helvetica Neue (system)', defaults: { fs: 25.4, lh: 1.20, ls: 0.024, fw: 700 }, fsRange: [11, 40, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'attr', name: 'Name / Role — Helvetica Neue Bold + Neue Haas Grotesk', font: 'Mixed (see card)', defaults: { fs: 17.8, lh: 1.14, ls: 0.002, fw: 500 }, fsRange: [10, 28, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.05, 0.05, 0.001], weights: null },
+    { key: 'label', name: 'Breadcrumb / Year / Footer Link — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 30.8, lh: 1.20, ls: -0.005, fw: 400 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
+    { key: 'playicon', name: 'Play Button Icon Height (text is 0.8× this; icon width is its own slider above)', font: 'Helvetica Neue (system)', defaults: { fs: 38.9, lh: 1, ls: 0, fw: 700 }, fsRange: [12, 60, 0.1], lhRange: [1, 1, 0.01], lsRange: [0, 0, 0.001], weights: null },
+  ], document.createElement('div'));
+
+  // ---------------------------------------------------------------------
+  // Terms and Conditions slide module (two-column numbered clauses) —
+  // built from a screenshot, no exact Figma tokens. No bold anywhere in
+  // the reference, so everything is plain Neue Haas Grotesk; header/
+  // footer chrome stays Inter, matching every other content slide.
+  // ---------------------------------------------------------------------
+  document.getElementById('tc-year').textContent = new Date().getFullYear();
+
+  const tcPanel = document.getElementById('panel-tc');
+  const tcLayoutState = {};
+  const tcLayoutRefs = {};
+  buildLayoutSliders(tcPanel, 'tc-header', [
+    { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
+    { key: 'y', label: 'Header Y', min: 0, max: 200, default: 41 },
+    { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
+    { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 1000, default: 700 },
+  ], updateScale, tcLayoutState, tcLayoutRefs);
+  buildLayoutSliders(tcPanel, 'tc-cols', [
+    { key: 'x', label: 'Columns X', min: 0, max: 200, default: 56 },
+    { key: 'bottom', label: 'Columns Bottom (bottom-anchored, grows upward)', min: 20, max: 300, default: 85 },
+    { key: 'gap', label: 'Gap Between Columns', min: 0, max: 300, default: 153 },
+  ], updateScale, tcLayoutState, tcLayoutRefs);
+  buildLayoutSliders(tcPanel, 'tc-col', [
+    { key: 'w', label: 'Column Width', min: 400, max: 1000, default: 797 },
+  ], updateScale, tcLayoutState, tcLayoutRefs);
+  buildLayoutSliders(tcPanel, 'tc-clause', [
+    { key: 'gap', label: 'Gap Between Numbered Clauses', min: 0, max: 60, default: 37 },
+  ], updateScale, tcLayoutState, tcLayoutRefs);
+  buildLayoutSliders(tcPanel, 'tc-para', [
+    { key: 'gap', label: 'Gap Between Paragraphs Within One Clause', min: 0, max: 40, default: 16 },
+  ], updateScale, tcLayoutState, tcLayoutRefs);
+  buildLayoutSliders(tcPanel, 'tc-footer', [
+    { key: 'right', label: 'Footer Link — Distance From Right Edge', min: 20, max: 400, default: 65 },
+    { key: 'bottom', label: 'Footer Link — Distance From Bottom', min: 20, max: 300, default: 60 },
+  ], updateScale, tcLayoutState, tcLayoutRefs);
+  buildLayoutSliders(tcPanel, 'tc-logo', [
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
+  ], updateScale, tcLayoutState, tcLayoutRefs);
+  buildLayoutOutputBox(tcPanel, tcLayoutState, tcLayoutRefs);
+  buildTypographyPanels(tcPanel, 'tc', [
+    { key: 'body', name: 'Clause Body Text — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 26.3, lh: 1.61, ls: -0.006, fw: 500 }, fsRange: [11, 32, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: null },
+    { key: 'label', name: 'Breadcrumb / Year / Footer Link — Inter', font: 'Inter', defaults: { fs: 29, lh: 1.28, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
   ], document.createElement('div'));
 
   // ---- init ----

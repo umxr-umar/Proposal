@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 // Real screen pixels the nav pill actually occupies from the viewport's
 // bottom edge (pill height ~54px + its bottom-8 margin), plus a ~24px
@@ -93,6 +100,28 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
   const canPrev = index > 0;
   const canNext = index < slides.length - 1;
 
+  // `translateX(-N * 100vw)` recomputes on every resize tick, and with the
+  // transition always on, the browser tries to animate toward that
+  // constantly-moving target while the window is being dragged — reads as
+  // laggy/jittery. Disabling the transition only while a resize is
+  // actively happening (and restoring it ~150ms after it stops) keeps the
+  // slide snapped instantly during a drag, while clicks still animate.
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    function handleResize() {
+      setIsResizing(true);
+      if (resizeTimeout.current) clearTimeout(resizeTimeout.current);
+      resizeTimeout.current = setTimeout(() => setIsResizing(false), 150);
+    }
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      if (resizeTimeout.current) clearTimeout(resizeTimeout.current);
+    };
+  }, []);
+
   function goToSlide(i: number) {
     setIndex(Math.min(Math.max(i, 0), slides.length - 1));
   }
@@ -100,7 +129,7 @@ export function SlideDeck({ slides }: { slides: ReactNode[] }) {
   return (
     <div className="relative h-screen w-full overflow-hidden bg-black">
       <div
-        className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)]"
+        className={`flex h-full ${isResizing ? "" : "transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)]"}`}
         style={{ transform: `translateX(-${index * 100}vw)` }}
       >
         {slides.map((slide, i) => (

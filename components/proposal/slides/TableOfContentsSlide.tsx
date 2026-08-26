@@ -19,8 +19,11 @@ const SECTIONS = [
 // target shifts accordingly. Clicking a section that doesn't exist yet
 // just clamps to the last built slide (SlideDeck's goToSlide already
 // clamps), so these can stay accurate ahead of the slides actually
-// existing.
-const SECTION_TARGETS = [2, 5, 6, 7, 8, 9];
+// existing. "Client Testimonials" (index 8) sits between Executive
+// Summary and Terms and Conditions but has no TOC row of its own (its
+// breadcrumb has no section number either) — that's why Terms and
+// Conditions/Contract Agreement are 10/11 here, not 9/10.
+const SECTION_TARGETS = [2, 5, 6, 7, 10, 11];
 
 /**
  * Table of Contents slide, values pulled 1:1 from Paper's "Table of
