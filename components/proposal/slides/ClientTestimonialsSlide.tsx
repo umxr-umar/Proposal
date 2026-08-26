@@ -41,6 +41,26 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * dimension (padding, gap, both radii) — all as sliders in the padding
  * tool, so exact pixel-matching can happen there without a round trip
  * through me for each tweak.
+ *
+ * The card row is bottom-anchored, not `top`-anchored — each card's
+ * height is driven by its photo's `aspect-ratio: 1/1` on a `fx()`
+ * (width-scaled) width, so on a short-but-wide viewport the cards stay
+ * tall while the space above the fixed nav pill shrinks. Pinning the row
+ * to a fixed `top` let that tall content run into the nav pill;
+ * bottom-anchoring (the fix already used on Timeline/Executive
+ * Summary/Terms and Conditions for the same reason) keeps it clear at
+ * any window height.
+ *
+ * Its bottom offset is `navSafeBottom` PLUS an extra real-px clearance
+ * (`cardsFooterGap`, same `calc(navSafeBottom + fy(...))` pattern as
+ * Cover's padding) — not the bare `navSafeBottom` the footer link uses.
+ * The footer link sits at that same bare `navSafeBottom`, right-anchored;
+ * with the cards row at the same bottom, the third card's right edge and
+ * the footer text end up on the same row and can collide horizontally at
+ * some window sizes even though there's no *vertical* overlap with the
+ * nav pill. The extra clearance guarantees the two rows stay vertically
+ * separate instead of relying on horizontal slack that varies by
+ * viewport width.
  */
 
 const testimonials: { quote: string; name: string; role: string }[] = [
@@ -234,7 +254,11 @@ export function ClientTestimonialsSlide({ proposal: _proposal }: { proposal: Pro
 
       <div
         className="absolute flex items-start"
-        style={{ left: fx(111), top: fy(98), gap: fx(66) }}
+        style={{
+          left: fx(111),
+          bottom: `calc(${navSafeBottom}px + ${fy(70)})`,
+          gap: fx(66),
+        }}
       >
         {testimonials.map((t, i) => (
           <TestimonialCard key={i} {...t} width={cardWidth} />
@@ -243,7 +267,7 @@ export function ClientTestimonialsSlide({ proposal: _proposal }: { proposal: Pro
 
       <button
         type="button"
-        onClick={() => goToSlide(10)}
+        onClick={() => goToSlide(9)}
         className="absolute cursor-pointer border-0 bg-transparent p-0 text-right transition-opacity hover:opacity-70"
         style={{
           right: fx(41),

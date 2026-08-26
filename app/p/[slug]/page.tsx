@@ -12,6 +12,7 @@ import { ProjectTimelineSlide } from "@/components/proposal/slides/ProjectTimeli
 import { ExecutiveSummarySlide } from "@/components/proposal/slides/ExecutiveSummarySlide";
 import { ClientTestimonialsSlide } from "@/components/proposal/slides/ClientTestimonialsSlide";
 import { TermsAndConditionsSlide } from "@/components/proposal/slides/TermsAndConditionsSlide";
+import { ContractAgreementSlide } from "@/components/proposal/slides/ContractAgreementSlide";
 
 export async function generateStaticParams() {
   const slugs = await getAllProposalSlugs();
@@ -54,6 +55,7 @@ export default async function ProposalPage({
         <ExecutiveSummarySlide key="executive-summary" proposal={proposal} />,
         <ClientTestimonialsSlide key="client-testimonials" proposal={proposal} />,
         <TermsAndConditionsSlide key="terms-and-conditions" proposal={proposal} />,
+        <ContractAgreementSlide key="contract-agreement" proposal={proposal} />,
       ]}
     />
   );
