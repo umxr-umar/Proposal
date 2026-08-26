@@ -96,3 +96,28 @@ editing genuinely different files merge cleanly; two workspaces both touching
 the same slide files (e.g. one building a new slide while another does a
 sweeping change like adding mobile breakpoints across every slide) will conflict
 at merge time. Prefer giving parallel workspaces disjoint areas of the codebase.
+
+## Roadmap — planned but not started
+
+These are agreed next steps, not yet implemented. Don't start on them unless
+explicitly asked — they're recorded here so any session (including a fresh
+Conductor workspace) has the context without needing it re-explained.
+
+**Mobile/tablet responsive breakpoints** are intentionally deferred until every
+desktop slide is finished and stable. All current slides are built to a fixed
+1920x1080 reference canvas via `lib/fluid.ts`'s clamp()-based fluid sizing,
+which reflows within a desktop-shaped viewport but is not a real mobile/tablet
+layout. Reworking this touches every slide file at once, so it's sequenced
+after the full desktop deck is done specifically to avoid conflicting with
+in-progress work on individual slides in other Conductor workspaces.
+
+**Notion as the per-client CMS backend** is the agreed direction for how
+proposals eventually get authored, replacing hand-editing slide content per
+client. The rough shape: each client gets a row/page in a Notion database
+holding that proposal's content (client name, section copy, pricing, timeline
+dates, testimonials, etc.); `app/p/[slug]/page.tsx` would fetch from Notion
+(via a Notion MCP/API integration) instead of the current static data source
+in `lib/proposals`, keyed by the same `slug`. The exact Notion database schema
+(fields, property types) hasn't been finalized in code yet — treat this as
+the direction, not a spec to implement blindly; confirm the schema before
+building the integration.
