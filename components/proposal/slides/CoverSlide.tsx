@@ -33,6 +33,11 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * client name's length (Paper's placeholder wraps to 3; a longer real
  * name can wrap to 4+) — the fields row flows after it with a fixed 71px
  * margin rather than an independent fixed position, so it never collides.
+ *
+ * The left field group under the logo is "Umar" + "hello@biflux.design" —
+ * same two-line Name/email shape as the Client group beside it, matching
+ * the Freelancer/Client pairing already established on Contract
+ * Agreement's signature block.
  */
 export function CoverSlide({ proposal }: { proposal: Proposal }) {
   const { navSafeBottom } = useSlideDeck();
@@ -101,6 +106,7 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
                 letterSpacing: "-0.03em",
               }}
             >
+              <div>Umar</div>
               <div>hello@biflux.design</div>
             </div>
           </div>

@@ -22,8 +22,8 @@ const SECTIONS = [
 // existing. "Client Testimonials" (index 8) sits between Executive
 // Summary and Terms and Conditions but has no TOC row of its own (its
 // breadcrumb has no section number either) — that's why Terms and
-// Conditions/Contract Agreement are 10/11 here, not 9/10.
-const SECTION_TARGETS = [2, 5, 6, 7, 10, 11];
+// Conditions/Contract Agreement are 9/10 here, not 8/9.
+const SECTION_TARGETS = [2, 5, 6, 7, 9, 10];
 
 /**
  * Table of Contents slide, values pulled 1:1 from Paper's "Table of

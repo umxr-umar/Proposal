@@ -259,7 +259,7 @@ export function ClientTestimonialsSlide({ proposal: _proposal }: { proposal: Pro
 
       <button
         type="button"
-        onClick={() => goToSlide(10)}
+        onClick={() => goToSlide(9)}
         className="absolute cursor-pointer border-0 bg-transparent p-0 text-right transition-opacity hover:opacity-70"
         style={{
           right: fx(41),
