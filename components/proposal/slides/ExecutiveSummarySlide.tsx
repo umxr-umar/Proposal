@@ -102,8 +102,9 @@ export function ExecutiveSummarySlide({ proposal: _proposal }: { proposal: Propo
         <div style={{ ...boldStyle, width: fx(168) }}>Payment Structure</div>
         <div style={{ ...bodyStyle, width: fx(contentWidth) }}>
           <p style={{ margin: 0 }}>
-            A deposit equivalent to 50% of the total project invesment is
-            required to commence your project.
+            A deposit equivalent to 50% of the total project
+            <br />
+            invesment is required to commence your project.
           </p>
           <div style={{ marginTop: fy(16) }}>
             <div>50% Initial Deposit ($13,774.5 AUD)</div>

@@ -41,26 +41,6 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * dimension (padding, gap, both radii) — all as sliders in the padding
  * tool, so exact pixel-matching can happen there without a round trip
  * through me for each tweak.
- *
- * The card row is bottom-anchored, not `top`-anchored — each card's
- * height is driven by its photo's `aspect-ratio: 1/1` on a `fx()`
- * (width-scaled) width, so on a short-but-wide viewport the cards stay
- * tall while the space above the fixed nav pill shrinks. Pinning the row
- * to a fixed `top` let that tall content run into the nav pill;
- * bottom-anchoring (the fix already used on Timeline/Executive
- * Summary/Terms and Conditions for the same reason) keeps it clear at
- * any window height.
- *
- * Its bottom offset is `navSafeBottom` PLUS an extra real-px clearance
- * (`cardsFooterGap`, same `calc(navSafeBottom + fy(...))` pattern as
- * Cover's padding) — not the bare `navSafeBottom` the footer link uses.
- * The footer link sits at that same bare `navSafeBottom`, right-anchored;
- * with the cards row at the same bottom, the third card's right edge and
- * the footer text end up on the same row and can collide horizontally at
- * some window sizes even though there's no *vertical* overlap with the
- * nav pill. The extra clearance guarantees the two rows stay vertically
- * separate instead of relying on horizontal slack that varies by
- * viewport width.
  */
 
 const testimonials: { quote: string; name: string; role: string }[] = [
@@ -114,9 +94,13 @@ function TestimonialCard({
       className="flex flex-col"
       style={{
         width: fx(width),
+        maxHeight: "100%",
         backgroundColor: "#FFFFFF",
         borderRadius: fx(19),
-        padding: fx(9),
+        paddingLeft: fx(9),
+        paddingRight: fx(9),
+        paddingTop: fy(9),
+        paddingBottom: fy(9),
         gap: fy(9),
       }}
     >
@@ -124,7 +108,8 @@ function TestimonialCard({
         className="relative"
         style={{
           width: "100%",
-          aspectRatio: "1 / 1",
+          aspectRatio: "1 / 0.8",
+          flexShrink: 0,
           borderRadius: fx(19),
           overflow: "hidden",
           background: "linear-gradient(180deg, #E8E8E3 0%, #4FA8A8 100%)",
@@ -172,7 +157,13 @@ function TestimonialCard({
         style={{
           backgroundColor: "#000000",
           borderRadius: fx(19),
-          padding: fx(35),
+          paddingLeft: fx(35),
+          paddingRight: fx(35),
+          paddingTop: fy(35),
+          paddingBottom: fy(35),
+          flex: "0 1 auto",
+          minHeight: 0,
+          overflow: "hidden",
         }}
       >
         <p
@@ -253,10 +244,11 @@ export function ClientTestimonialsSlide({ proposal: _proposal }: { proposal: Pro
       </div>
 
       <div
-        className="absolute flex items-start"
+        className="absolute flex items-center"
         style={{
           left: fx(111),
-          bottom: `calc(${navSafeBottom}px + ${fy(70)})`,
+          top: fy(98),
+          bottom: `calc(${navSafeBottom}px + ${fy(68)})`,
           gap: fx(66),
         }}
       >
