@@ -91,9 +91,10 @@ function TestimonialCard({
 
   return (
     <div
-      className="flex h-full flex-col"
+      className="flex flex-col"
       style={{
         width: fx(width),
+        maxHeight: "100%",
         backgroundColor: "#FFFFFF",
         borderRadius: fx(19),
         paddingLeft: fx(9),
@@ -107,9 +108,8 @@ function TestimonialCard({
         className="relative"
         style={{
           width: "100%",
-          aspectRatio: "1 / 1",
-          flexShrink: 1,
-          minHeight: 0,
+          aspectRatio: "1 / 0.8",
+          flexShrink: 0,
           borderRadius: fx(19),
           overflow: "hidden",
           background: "linear-gradient(180deg, #E8E8E3 0%, #4FA8A8 100%)",
@@ -161,7 +161,7 @@ function TestimonialCard({
           paddingRight: fx(35),
           paddingTop: fy(35),
           paddingBottom: fy(35),
-          flex: "1 1 auto",
+          flex: "0 1 auto",
           minHeight: 0,
           overflow: "hidden",
         }}
@@ -244,8 +244,13 @@ export function ClientTestimonialsSlide({ proposal: _proposal }: { proposal: Pro
       </div>
 
       <div
-        className="absolute flex items-start"
-        style={{ left: fx(111), top: fy(98), gap: fx(66) }}
+        className="absolute flex items-center"
+        style={{
+          left: fx(111),
+          top: fy(98),
+          bottom: `calc(${navSafeBottom}px + ${fy(68)})`,
+          gap: fx(66),
+        }}
       >
         {testimonials.map((t, i) => (
           <TestimonialCard key={i} {...t} width={cardWidth} />
