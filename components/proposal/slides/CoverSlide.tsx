@@ -15,7 +15,7 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * differently-shaped windows instead of staying pixel-identical.
  *
  * Layout: title pinned to the top, the subtitle+fields group pinned to the
- * bottom — padding is 19px top, 41px bottom, 42px left, 42px right (tuned
+ * bottom — padding is 21px top, 51px bottom, 47px left, 24px right (tuned
  * via public/padding-tool.html) — no fixed gap between title and fields,
  * so the space between naturally fills whatever room is left instead of a
  * hardcoded value that would overflow on a longer subtitle. navSafeBottom
@@ -26,7 +26,7 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * desktop font with no web-license file available here, so Inter
  * substitutes for it. Inter renders wider than the real font at the same
  * point size (measured: 1975px vs Paper's real 1729px at 212.18px), so
- * the title size below is corrected (187.5px, tuned via padding-tool.html)
+ * the title size below is corrected (196.4px, tuned via padding-tool.html)
  * to match that real width.
  *
  * The subtitle wraps to a different number of lines depending on the
@@ -53,10 +53,10 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
     <div
       className="flex h-full w-full flex-col justify-between bg-[#000000] text-[#DDDDD5]"
       style={{
-        paddingTop: fy(19),
-        paddingBottom: `calc(${fy(41)} + ${navSafeBottom}px)`,
-        paddingLeft: fx(42),
-        paddingRight: fx(42),
+        paddingTop: fy(21),
+        paddingBottom: `calc(${fy(51)} + ${navSafeBottom}px)`,
+        paddingLeft: fx(47),
+        paddingRight: fx(24),
       }}
     >
       <h1
@@ -64,9 +64,9 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
         style={{
           fontFamily: inter,
           fontWeight: 500,
-          fontSize: ffont(187.5, { min: 56 }),
-          lineHeight: "100%",
-          letterSpacing: "-0.06em",
+          fontSize: ffont(196.4, { min: 56 }),
+          lineHeight: "97%",
+          letterSpacing: "-0.060em",
         }}
       >
         Project Proposal
@@ -79,9 +79,9 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
             width: fx(727),
             fontFamily: helveticaNeue,
             fontWeight: 600,
-            fontSize: ffont(72),
-            lineHeight: "111%",
-            letterSpacing: "-0.06em",
+            fontSize: ffont(74.6),
+            lineHeight: "117%",
+            letterSpacing: "-0.060em",
             textTransform: "capitalize",
           }}
         >
@@ -94,16 +94,16 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
           style={{ marginTop: fy(71), gap: fx(105) }}
         >
           <div className="flex flex-col" style={{ gap: fy(27) }}>
-            <BifluxLogo height={ffont(20.6)} />
+            <BifluxLogo height={ffont(21.7)} />
             <div
               className="flex flex-col"
               style={{
                 gap: fy(4),
                 fontFamily: neueHaas,
                 fontWeight: 400,
-                fontSize: ffont(27),
-                lineHeight: "135%",
-                letterSpacing: "-0.03em",
+                fontSize: ffont(27.4),
+                lineHeight: "132%",
+                letterSpacing: "-0.030em",
               }}
             >
               <div>Umar</div>
@@ -116,10 +116,10 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
               className="uppercase"
               style={{
                 fontFamily: neueHaas,
-                fontWeight: 500,
-                fontSize: ffont(21),
-                lineHeight: "109%",
-                letterSpacing: "0.2em",
+                fontWeight: 400,
+                fontSize: ffont(19.9),
+                lineHeight: "107%",
+                letterSpacing: "0.135em",
               }}
             >
               Client
@@ -130,9 +130,9 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
                 gap: fy(4),
                 fontFamily: neueHaas,
                 fontWeight: 400,
-                fontSize: ffont(27),
-                lineHeight: "135%",
-                letterSpacing: "-0.03em",
+                fontSize: ffont(27.4),
+                lineHeight: "132%",
+                letterSpacing: "-0.030em",
               }}
             >
               <div>{proposal.clientName}</div>

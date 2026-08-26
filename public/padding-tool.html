@@ -1492,20 +1492,20 @@
   const cLayoutState = {};
   const cLayoutRefs = {};
   buildLayoutSliders(coverPanel, 'c-pad', [
-    { key: 'top', label: 'Padding Top', min: 0, max: 150, default: 19 },
-    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 150, default: 41 },
-    { key: 'left', label: 'Padding Left', min: 0, max: 150, default: 42 },
-    { key: 'right', label: 'Padding Right', min: 0, max: 150, default: 42 },
+    { key: 'top', label: 'Padding Top', min: 0, max: 150, default: 21 },
+    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 150, default: 51 },
+    { key: 'left', label: 'Padding Left', min: 0, max: 150, default: 47 },
+    { key: 'right', label: 'Padding Right', min: 0, max: 150, default: 24 },
   ], updateScale, cLayoutState, cLayoutRefs);
   buildLayoutSliders(coverPanel, 'c-logo', [
-    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 21.7 },
   ], updateScale, cLayoutState, cLayoutRefs);
   buildLayoutOutputBox(coverPanel, cLayoutState, cLayoutRefs);
   buildTypographyPanels(coverPanel, 'c', [
-    { key: 'title', name: 'Title', font: 'Inter', defaults: { fs: 187.5, lh: 1.0, ls: -0.06, fw: 500 }, fsRange: [100, 260, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600] },
-    { key: 'subtitle', name: 'Subtitle', font: 'Helvetica Neue (system)', defaults: { fs: 72, lh: 1.11, ls: -0.06, fw: 600 }, fsRange: [30, 120, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
-    { key: 'label', name: 'Client Label ("CLIENT")', font: 'Neue Haas Grotesk Roman', defaults: { fs: 21, lh: 1.09, ls: 0.2, fw: 400 }, fsRange: [10, 40, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.05, 0.35, 0.001], weights: null },
-    { key: 'value', name: 'Value Text (names, emails)', font: 'Neue Haas Grotesk Roman', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 400 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
+    { key: 'title', name: 'Title', font: 'Inter', defaults: { fs: 196.4, lh: 0.97, ls: -0.060, fw: 500 }, fsRange: [100, 260, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600] },
+    { key: 'subtitle', name: 'Subtitle', font: 'Helvetica Neue (system)', defaults: { fs: 74.6, lh: 1.17, ls: -0.060, fw: 600 }, fsRange: [30, 120, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'label', name: 'Client Label ("CLIENT")', font: 'Neue Haas Grotesk Roman', defaults: { fs: 19.9, lh: 1.07, ls: 0.135, fw: 400 }, fsRange: [10, 40, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.05, 0.35, 0.001], weights: null },
+    { key: 'value', name: 'Value Text (names, emails)', font: 'Neue Haas Grotesk Roman', defaults: { fs: 27.4, lh: 1.32, ls: -0.030, fw: 400 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
   ], document.createElement('div'));
 
   // ---------------------------------------------------------------------
