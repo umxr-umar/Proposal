@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Proposal } from "@/lib/types";
 import { BifluxLogo } from "./BifluxLogo";
 import { pad, useSlideDeck } from "./SlideDeck";
@@ -24,9 +24,13 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * (`testimonial.photoUrl` / `videoUrl`) — a card without an uploaded
  * photo falls back to the gradient placeholder block, and the Play
  * button only renders when a video is actually present. Clicking it
- * swaps the photo for an inline `<video>` (autoplaying, with controls)
+ * crossfades from the photo to an inline `<video>` (with controls)
  * rather than opening a separate modal/lightbox — keeps the card's own
- * layout as the single source of truth for where the video appears.
+ * layout as the single source of truth for where the video appears. Both
+ * layers stay mounted simultaneously (opacity-crossfaded, not swapped)
+ * so the transition is smooth in both directions; playback itself is
+ * driven imperatively via a ref rather than the `autoPlay` attribute,
+ * since the video element no longer mounts/unmounts on state change.
  *
  * Bold text (quote, name) is Helvetica Neue; regular text (role) is Neue
  * Haas Grotesk, matching the font split established on Scope/Timeline/
@@ -78,6 +82,17 @@ function TestimonialCard({
   const playIconWidth = ffont(53);
   const playTextSize = ffont(31.1);
   const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  function handlePlayClick() {
+    setIsPlaying(true);
+    videoRef.current?.play();
+  }
+
+  function handleEnded() {
+    setIsPlaying(false);
+    if (videoRef.current) videoRef.current.currentTime = 0;
+  }
 
   return (
     <div
@@ -107,67 +122,79 @@ function TestimonialCard({
             : "linear-gradient(180deg, #E8E8E3 0%, #4FA8A8 100%)",
         }}
       >
-        {isPlaying && videoUrl ? (
-          <video
-            src={videoUrl}
-            controls
-            autoPlay
-            onEnded={() => setIsPlaying(false)}
-            className="absolute inset-0 h-full w-full object-cover"
-          />
-        ) : (
-          <>
-            {photoUrl && (
-              // Notion file URLs are signed/expiring, not local static
-              // assets, so next/image's build-time optimization doesn't apply.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={photoUrl}
-                alt={name}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-            )}
-            {videoUrl && (
-              <button
-                type="button"
-                onClick={() => setIsPlaying(true)}
-                className="absolute flex cursor-pointer items-center border-0 transition-opacity hover:opacity-80"
+        <div
+          className="absolute inset-0"
+          style={{
+            opacity: isPlaying ? 0 : 1,
+            transition: "opacity 400ms ease",
+            pointerEvents: isPlaying ? "none" : "auto",
+          }}
+        >
+          {photoUrl && (
+            // Notion file URLs are signed/expiring, not local static
+            // assets, so next/image's build-time optimization doesn't apply.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={photoUrl}
+              alt={name}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          )}
+          {videoUrl && (
+            <button
+              type="button"
+              onClick={handlePlayClick}
+              className="absolute flex cursor-pointer items-center border-0 transition-opacity hover:opacity-80"
+              style={{
+                left: "50%",
+                bottom: fy(19),
+                transform: "translateX(-50%)",
+                gap: fx(9),
+                backgroundColor: "#FFFFFF",
+                borderRadius: fx(10),
+                padding: `${fy(17)} ${fx(18)}`,
+              }}
+            >
+              <span
+                className="flex items-center justify-center"
                 style={{
-                  left: "50%",
-                  bottom: fy(19),
-                  transform: "translateX(-50%)",
-                  gap: fx(9),
-                  backgroundColor: "#FFFFFF",
-                  borderRadius: fx(10),
-                  padding: `${fy(17)} ${fx(18)}`,
+                  width: playIconWidth,
+                  height: playIconHeight,
+                  borderRadius: fx(4),
+                  backgroundColor: "#000000",
+                  color: "#FFFFFF",
                 }}
               >
-                <span
-                  className="flex items-center justify-center"
-                  style={{
-                    width: playIconWidth,
-                    height: playIconHeight,
-                    borderRadius: fx(4),
-                    backgroundColor: "#000000",
-                    color: "#FFFFFF",
-                  }}
-                >
-                  <PlayIcon />
-                </span>
-                <span
-                  style={{
-                    fontFamily: helveticaNeue,
-                    fontWeight: 700,
-                    fontSize: playTextSize,
-                    lineHeight: "100%",
-                    color: "#000000",
-                  }}
-                >
-                  Play
-                </span>
-              </button>
-            )}
-          </>
+                <PlayIcon />
+              </span>
+              <span
+                style={{
+                  fontFamily: helveticaNeue,
+                  fontWeight: 700,
+                  fontSize: playTextSize,
+                  lineHeight: "100%",
+                  color: "#000000",
+                }}
+              >
+                Play
+              </span>
+            </button>
+          )}
+        </div>
+
+        {videoUrl && (
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            controls
+            onEnded={handleEnded}
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{
+              opacity: isPlaying ? 1 : 0,
+              transition: "opacity 400ms ease",
+              pointerEvents: isPlaying ? "auto" : "none",
+            }}
+          />
         )}
       </div>
 
