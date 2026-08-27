@@ -24,7 +24,6 @@ export function TOCMobileSlide() {
   const { scrollToSection } = useMobileSlideDeck();
   const neueHaas = "var(--font-neue-haas), system-ui, sans-serif";
   const instrumentSerif = "var(--font-instrument-serif), serif";
-  const year = new Date().getFullYear();
 
   return (
     <div
@@ -37,21 +36,10 @@ export function TOCMobileSlide() {
         paddingRight: mpx(24),
       }}
     >
+      {/* No room for the year next to the label on mobile the way desktop
+          has it — logo and label just anchor opposite ends of the row. */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center" style={{ gap: mpx(10) }}>
-          <BifluxLogo height={mfont(11.3)} />
-          <div
-            style={{
-              fontFamily: neueHaas,
-              fontSize: mfont(11.5),
-              color: "#938F8A",
-              letterSpacing: "-0.006em",
-              lineHeight: "131%",
-            }}
-          >
-            Table of content(s)
-          </div>
-        </div>
+        <BifluxLogo height={mfont(11.3)} />
         <div
           style={{
             fontFamily: neueHaas,
@@ -61,7 +49,7 @@ export function TOCMobileSlide() {
             lineHeight: "131%",
           }}
         >
-          {year}
+          Table of content(s)
         </div>
       </div>
 
@@ -71,8 +59,8 @@ export function TOCMobileSlide() {
             key={title}
             type="button"
             onClick={() => scrollToSection(SECTION_TARGETS[i])}
-            className="flex cursor-pointer items-baseline border-0 bg-transparent p-0 text-left transition-opacity active:opacity-60"
-            style={{ gap: mpx(14) }}
+            className="flex cursor-pointer flex-col border-0 bg-transparent p-0 text-left transition-opacity active:opacity-60"
+            style={{ gap: mpx(2) }}
           >
             <span
               style={{
@@ -81,7 +69,6 @@ export function TOCMobileSlide() {
                 fontSize: mfont(24),
                 letterSpacing: "-0.025em",
                 lineHeight: "97%",
-                flexShrink: 0,
               }}
             >
               /{String(i + 1).padStart(2, "0")}.
