@@ -97,27 +97,115 @@ the same slide files (e.g. one building a new slide while another does a
 sweeping change like adding mobile breakpoints across every slide) will conflict
 at merge time. Prefer giving parallel workspaces disjoint areas of the codebase.
 
+## Notion-backed CMS (built and live)
+
+Proposal content is no longer hardcoded — every slide reads from Notion via
+`lib/notion.ts` (official `@notionhq/client` SDK, using `dataSources.query`/
+`pages.retrieve`, not the older `databases.query`). Two Notion databases:
+
+- **Proposals** — one row per client (scalar fields: `Client Name`, `Slug`
+  matching the `/p/[slug]` route, `Client Email`, `Project Type`, pricing
+  numbers, `Problem`/`Solution`/`Impact` body text, `Freelancer Photo`/
+  `Brand Mark` file uploads with a static-asset fallback when empty, etc.)
+- **Proposal Items** — repeating per-proposal content (timeline steps,
+  pricing lines, scope sections, contract clauses), one row per item, linked
+  to its Proposal via a relation, distinguished by a `Type` select field,
+  ordered by an `Order` number. `lib/notion.ts` groups these by Type and
+  assembles them into the arrays on the `Proposal` type (see `lib/types.ts`).
+- **Testimonials** — a separate *shared, reusable* library (not per-proposal
+  rows) — upload a client's photo/video once, tag by `Industry`, and pick
+  which ones to feature on a given proposal via a relation
+  (`Featured Testimonials` on Proposals, `Featured In` on Testimonials).
+  Bullet lines needing an inline bold label use `**Label:** rest of text`
+  (parsed in `lib/notion.ts`'s `parseBullet`) — plain markdown-style syntax
+  that stays readable to whoever is editing content in Notion directly.
+
+`app/p/[slug]/page.tsx` sets `revalidate = 60`, so a new client or an edited
+field goes live within about a minute — no code change, no redeploy, ever,
+for content changes. `NOTION_API_KEY` must be set both locally (`.env.local`)
+and on Vercel (all three environments) for this to work; without it, the
+build itself fails (`lib/notion.ts` throws at build time when fetching
+existing proposals for `generateStaticParams`).
+
+Notion's uploaded-file URLs (`.file.url`) are signed and expire after about
+an hour — fine given the 60s revalidate window (each regeneration fetches a
+fresh URL), and images render via `unoptimized` (either `next/image` or a
+plain `<img>`) since Notion's file host can't go through Next's built-in
+image optimizer without allow-listing it, and isn't worth the config for
+short-lived signed URLs. **Browsers can't display `.heic` files** (iPhone's
+default photo format) — if an uploaded photo doesn't render, that's very
+likely why; the fix is re-exporting as JPG/PNG before upload, not a code fix.
+
+## Mobile — in progress
+
+Desktop is fully built; mobile is the current focus, using the navigation
+model below (confirmed after prototyping several alternatives — see decision
+log). **Do not start parallel per-screen work across multiple Conductor
+workspaces until the shared mobile shell (navigation/scroll mechanism,
+mobile fluid-sizing helpers) exists in the actual codebase** — building it
+in one lane first, then parallelizing individual screens once they share
+that foundation, avoids every workspace re-deciding the shell independently
+and conflicting at merge time. Same reasoning as "finish desktop before
+starting mobile" above, one level down.
+
+**Navigation model:** no bottom nav pill, no dots-as-buttons, no hamburger
+menu. Each section is its own scrollable "page" (content can be taller than
+the viewport — Terms and Conditions especially), and the primary way to move
+between sections is scroll/swipe, matching native mobile app conventions
+(nothing to tap, nothing to discover) rather than desktop's click-driven
+carousel.
+
+**CSS scroll-snap, `proximity` not `mandatory`.** Each section gets
+`scroll-snap-align: start` inside a `scroll-snap-type: y proximity`
+container. `proximity` only pulls to a section boundary when the scroll
+position is already near one — it won't fight a user mid-read on a long
+section (Terms and Conditions, Scope and Deliverables) the way `mandatory`
+would by always resolving to the nearest boundary regardless of where they
+paused. Confirmed via a side-by-side toggle in a prototype; `mandatory` felt
+more decisive on short sections but actively hostile on long ones.
+
+**Sections keep their own fixed background/theme — do not tie it to
+anything dynamic.** Same content-owned theming as desktop (Cover/TOC/Client
+Testimonials dark `#000000`, everything else light `#E8E8E3`) — this was
+explicitly confirmed, not a place to introduce a toggle or auto-switching.
+
+**"How does the user know they moved to a new section" — three signals,
+not one, since the background sometimes doesn't change** (e.g. Cover→TOC and
+Testimonials→Contract Agreement are both dark-to-dark):
+1. The scroll-snap settle motion itself (a physical cue, distinct from
+   mid-scroll movement)
+2. Each section's own header label, which is already different text the
+   instant you land on a new section
+3. An ambient position indicator (small dots, one per section, fixed to the
+   screen edge) that updates via `IntersectionObserver` and is a passive
+   *orientation* aid, not a clickable nav control — don't wire it up to
+   accept taps/jumps, that reintroduces the discoverability problem a menu
+   had
+
+**Scroll discoverability, Cover only:** a small animated "Scroll ↓" hint,
+visible only on the Cover section, that fades out permanently the first time
+the user scrolls past it (once via `IntersectionObserver`, never reappears).
+Solves the specific problem of a first screen that *looks* complete (title,
+breathing room, nothing overflowing) giving no visual reason to suspect
+there's more below.
+
+**Mobile needs its own fluid-sizing helpers**, parallel to but separate from
+`lib/fluid.ts`'s desktop `fx()/fy()/ffont()` (those are anchored to a
+1920x1080 reference canvas). The mobile equivalent should be anchored to a
+phone-width reference and `clamp()` across the *full* realistic range down
+to the smallest common devices (~375px, e.g. iPhone 12 mini) through the
+largest (iPhone 16 Pro Max and beyond) — not just "looks right on one
+reference device," which is the exact mistake to avoid (confirmed via the
+user's own experience shipping the BIFLUX Framer site: designing at one
+fixed reference size, even with Framer's `relative`/`fill`/`contain`, only
+adapts *upward* from whatever the smallest tested size was — anything
+smaller still clips). Test against the small end explicitly, not just the
+size the screenshot happens to be exported at.
+
+**Mobile padding-tool** — `public/padding-tool.html` gets a mobile section
+too, following the exact same pattern as the existing desktop panels
+(sliders per element, layout + typography copy boxes), not a separate tool.
+
 ## Roadmap — planned but not started
 
-These are agreed next steps, not yet implemented. Don't start on them unless
-explicitly asked — they're recorded here so any session (including a fresh
-Conductor workspace) has the context without needing it re-explained.
-
-**Mobile/tablet responsive breakpoints** are intentionally deferred until every
-desktop slide is finished and stable. All current slides are built to a fixed
-1920x1080 reference canvas via `lib/fluid.ts`'s clamp()-based fluid sizing,
-which reflows within a desktop-shaped viewport but is not a real mobile/tablet
-layout. Reworking this touches every slide file at once, so it's sequenced
-after the full desktop deck is done specifically to avoid conflicting with
-in-progress work on individual slides in other Conductor workspaces.
-
-**Notion as the per-client CMS backend** is the agreed direction for how
-proposals eventually get authored, replacing hand-editing slide content per
-client. The rough shape: each client gets a row/page in a Notion database
-holding that proposal's content (client name, section copy, pricing, timeline
-dates, testimonials, etc.); `app/p/[slug]/page.tsx` would fetch from Notion
-(via a Notion MCP/API integration) instead of the current static data source
-in `lib/proposals`, keyed by the same `slug`. The exact Notion database schema
-(fields, property types) hasn't been finalized in code yet — treat this as
-the direction, not a spec to implement blindly; confirm the schema before
-building the integration.
+Nothing currently queued beyond mobile/tablet (in progress, see above).

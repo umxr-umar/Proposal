@@ -13,6 +13,8 @@ import { ExecutiveSummarySlide } from "@/components/proposal/slides/ExecutiveSum
 import { ClientTestimonialsSlide } from "@/components/proposal/slides/ClientTestimonialsSlide";
 import { TermsAndConditionsSlide } from "@/components/proposal/slides/TermsAndConditionsSlide";
 import { ContractAgreementSlide } from "@/components/proposal/slides/ContractAgreementSlide";
+import { MobileSlideDeck } from "@/components/proposal/slides-mobile/MobileSlideDeck";
+import { CoverMobileSlide } from "@/components/proposal/slides-mobile/CoverMobileSlide";
 
 // Proposals live in Notion. Re-fetch at most once per 60s so edits (or a
 // brand-new client's row) show up without a redeploy — generateStaticParams
@@ -50,20 +52,32 @@ export default async function ProposalPage({
   if (!proposal) notFound();
 
   return (
-    <SlideDeck
-      slides={[
-        <CoverSlide key="cover" proposal={proposal} />,
-        <TableOfContentsSlide key="toc" />,
-        <ProblemSlide key="problem" proposal={proposal} />,
-        <SolutionSlide key="solution" proposal={proposal} />,
-        <ImpactSlide key="impact" proposal={proposal} />,
-        <ScopeDeliverablesSlide key="scope-deliverables" proposal={proposal} />,
-        <ProjectTimelineSlide key="project-timeline" proposal={proposal} />,
-        <ExecutiveSummarySlide key="executive-summary" proposal={proposal} />,
-        <ClientTestimonialsSlide key="client-testimonials" proposal={proposal} />,
-        <TermsAndConditionsSlide key="terms-and-conditions" proposal={proposal} />,
-        <ContractAgreementSlide key="contract-agreement" proposal={proposal} />,
-      ]}
-    />
+    <>
+      {/* Desktop — unchanged, hidden below the md breakpoint (768px) */}
+      <div className="hidden md:block">
+        <SlideDeck
+          slides={[
+            <CoverSlide key="cover" proposal={proposal} />,
+            <TableOfContentsSlide key="toc" />,
+            <ProblemSlide key="problem" proposal={proposal} />,
+            <SolutionSlide key="solution" proposal={proposal} />,
+            <ImpactSlide key="impact" proposal={proposal} />,
+            <ScopeDeliverablesSlide key="scope-deliverables" proposal={proposal} />,
+            <ProjectTimelineSlide key="project-timeline" proposal={proposal} />,
+            <ExecutiveSummarySlide key="executive-summary" proposal={proposal} />,
+            <ClientTestimonialsSlide key="client-testimonials" proposal={proposal} />,
+            <TermsAndConditionsSlide key="terms-and-conditions" proposal={proposal} />,
+            <ContractAgreementSlide key="contract-agreement" proposal={proposal} />,
+          ]}
+        />
+      </div>
+
+      {/* Mobile — in progress; only Cover exists so far, see AGENTS.md */}
+      <div className="md:hidden">
+        <MobileSlideDeck
+          sections={[{ theme: "dark", content: <CoverMobileSlide proposal={proposal} /> }]}
+        />
+      </div>
+    </>
   );
 }
