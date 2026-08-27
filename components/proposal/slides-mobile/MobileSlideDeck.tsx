@@ -34,11 +34,11 @@ const THEME_TEXT: Record<"dark" | "light", string> = {
   light: "#131310",
 };
 
-// A solid pill backdrop rather than bare floating text — a slide's own
-// tuned bottom padding can legitimately end up shorter than whatever gap
-// this needs to stay clear of, and re-coordinating that padding by hand
-// every time Cover gets re-tuned isn't durable. A pill stays legible
-// regardless of what content sits underneath it.
+// Same pill treatment as desktop's nav pill (SlideDeck.tsx) — dark
+// gradient, hairline border, layered inset+drop shadow — not a plain
+// white pill. Reserved-space guarantee (SCROLL_HINT_SAFE_BOTTOM_PX) is
+// what keeps it clear of content; the styling match is a separate,
+// purely visual requirement on top of that.
 function ScrollHint() {
   return (
     <div
@@ -48,16 +48,18 @@ function ScrollHint() {
         bottom: mpx(20),
         transform: "translateX(-50%)",
         gap: mpx(6),
-        backgroundColor: "#FFFFFF",
+        background: "linear-gradient(180deg, #303236 0%, #18191b 55%, #0b0b0c 100%)",
+        border: "1px solid rgba(255,255,255,0.10)",
         borderRadius: 999,
-        padding: `${mpx(8)} ${mpx(14)}`,
+        padding: `${mpx(10)} ${mpx(16)}`,
         fontFamily: "var(--font-neue-haas), system-ui, sans-serif",
         fontWeight: 600,
         fontSize: mfont(10.5),
         letterSpacing: "0.12em",
         textTransform: "uppercase",
-        color: "#131310",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
+        color: "#FFFFFF",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 1px rgba(0,0,0,0.5), 0 14px 32px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.4)",
         pointerEvents: "none",
       }}
     >

@@ -1,6 +1,6 @@
 import type { Proposal } from "@/lib/types";
 import { BifluxLogo } from "../slides/BifluxLogo";
-import { mfont, mpx } from "@/lib/fluidMobile";
+import { mfont, mpx, SCROLL_HINT_SAFE_BOTTOM_PX } from "@/lib/fluidMobile";
 
 /**
  * Mobile Cover — same content/data as desktop's CoverSlide (proposal.clientName/
@@ -34,12 +34,13 @@ export function CoverMobileSlide({ proposal }: { proposal: Proposal }) {
       style={{
         minHeight: "100dvh",
         paddingTop: mpx(18),
-        // NOTE: 38px was the value that cleared MobileSlideDeck's Cover-only
-        // scroll hint (absolutely-positioned near this section's bottom
-        // edge — see ScrollHint in MobileSlideDeck.tsx). The padding tool
-        // mockup doesn't simulate that overlay, so this tuned value needs
-        // re-verifying against it, not just against the static screenshot.
-        paddingBottom: mpx(38),
+        // Tuned padding (design intent) + SCROLL_HINT_SAFE_BOTTOM_PX (hard
+        // guarantee, real px not mpx()-scaled — same pattern as desktop's
+        // navSafeBottom in SlideDeck.tsx) added on top. This is Cover's
+        // own content clearing the hint by construction, not by the tuned
+        // value happening to be large enough — re-tuning this padding via
+        // the padding tool can never reintroduce the overlap again.
+        paddingBottom: `calc(${mpx(38)} + ${SCROLL_HINT_SAFE_BOTTOM_PX}px)`,
         paddingLeft: mpx(24),
         paddingRight: mpx(24),
       }}
@@ -63,7 +64,7 @@ export function CoverMobileSlide({ proposal }: { proposal: Proposal }) {
             margin: 0,
             fontFamily: helveticaNeue,
             fontWeight: 600,
-            fontSize: mfont(30.5),
+            fontSize: mfont(40.2),
             lineHeight: "119%",
             letterSpacing: "-0.033em",
             textTransform: "capitalize",

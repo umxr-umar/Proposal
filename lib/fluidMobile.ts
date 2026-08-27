@@ -38,3 +38,13 @@ export function mpx(px: number, opts?: { min?: number; max?: number }): string {
 export function mfont(px: number, opts?: { min?: number; max?: number }): string {
   return mclamp(px, opts);
 }
+
+// Real screen px (not scaled — mirrors desktop's NAV_GUTTER_PX constant in
+// SlideDeck.tsx exactly) that the Cover-only scroll hint occupies from the
+// bottom edge. Lives here (a plain module, no "use client") rather than in
+// MobileSlideDeck.tsx — that file is a Client Component, and importing a
+// plain constant from a "use client" module into a Server Component (Cover
+// has no "use client" of its own) breaks across the server/client
+// boundary: Next.js wraps it as a client reference instead of the real
+// value, so it silently isn't the number 84 anymore in a Server Component.
+export const SCROLL_HINT_SAFE_BOTTOM_PX = 84;
