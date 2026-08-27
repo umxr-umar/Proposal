@@ -112,6 +112,7 @@ function TestimonialCard({
             src={videoUrl}
             controls
             autoPlay
+            onEnded={() => setIsPlaying(false)}
             className="absolute inset-0 h-full w-full object-cover"
           />
         ) : (
