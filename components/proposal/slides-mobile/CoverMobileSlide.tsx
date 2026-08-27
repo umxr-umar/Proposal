@@ -33,13 +33,13 @@ export function CoverMobileSlide({ proposal }: { proposal: Proposal }) {
       className="flex h-full flex-col justify-between"
       style={{
         minHeight: "100dvh",
-        paddingTop: mpx(38),
-        // Extra clearance vs. desktop's equivalent (28px) — this is the
-        // deck's only index-0 section, and MobileSlideDeck's scroll hint
-        // sits absolutely-positioned near the section's own bottom edge
-        // (see ScrollHint in MobileSlideDeck.tsx), so this content needs
-        // to end clear of it rather than colliding.
-        paddingBottom: mpx(78),
+        paddingTop: mpx(18),
+        // NOTE: 38px was the value that cleared MobileSlideDeck's Cover-only
+        // scroll hint (absolutely-positioned near this section's bottom
+        // edge — see ScrollHint in MobileSlideDeck.tsx). The padding tool
+        // mockup doesn't simulate that overlay, so this tuned value needs
+        // re-verifying against it, not just against the static screenshot.
+        paddingBottom: mpx(38),
         paddingLeft: mpx(24),
         paddingRight: mpx(24),
       }}
@@ -48,10 +48,10 @@ export function CoverMobileSlide({ proposal }: { proposal: Proposal }) {
         className="uppercase"
         style={{
           fontFamily: inter,
-          fontWeight: 500,
-          fontSize: mfont(52, { max: 60 }),
+          fontWeight: 400,
+          fontSize: mfont(68.5),
           lineHeight: "97%",
-          letterSpacing: "-0.02em",
+          letterSpacing: "-0.020em",
         }}
       >
         Project Proposal
@@ -63,9 +63,9 @@ export function CoverMobileSlide({ proposal }: { proposal: Proposal }) {
             margin: 0,
             fontFamily: helveticaNeue,
             fontWeight: 600,
-            fontSize: mfont(30),
-            lineHeight: "117%",
-            letterSpacing: "-0.02em",
+            fontSize: mfont(30.5),
+            lineHeight: "119%",
+            letterSpacing: "-0.033em",
             textTransform: "capitalize",
           }}
         >
@@ -75,16 +75,16 @@ export function CoverMobileSlide({ proposal }: { proposal: Proposal }) {
 
         <div className="flex items-start" style={{ marginTop: mpx(28), gap: mpx(28) }}>
           <div className="flex flex-col" style={{ gap: mpx(10) }}>
-            <BifluxLogo height={mfont(13)} />
+            <BifluxLogo height={mfont(11.3)} />
             <div
               className="flex flex-col"
               style={{
                 gap: mpx(2),
                 fontFamily: neueHaas,
                 fontWeight: 400,
-                fontSize: mfont(13.5),
+                fontSize: mfont(13.4),
                 lineHeight: "132%",
-                letterSpacing: "-0.02em",
+                letterSpacing: "-0.020em",
               }}
             >
               <div>{proposal.freelancerName ?? "Umar"}</div>
@@ -98,9 +98,9 @@ export function CoverMobileSlide({ proposal }: { proposal: Proposal }) {
               style={{
                 fontFamily: neueHaas,
                 fontWeight: 400,
-                fontSize: mfont(10),
+                fontSize: mfont(10.7),
                 lineHeight: "107%",
-                letterSpacing: "0.13em",
+                letterSpacing: "0.130em",
               }}
             >
               Client
@@ -111,9 +111,9 @@ export function CoverMobileSlide({ proposal }: { proposal: Proposal }) {
                 gap: mpx(2),
                 fontFamily: neueHaas,
                 fontWeight: 400,
-                fontSize: mfont(13.5),
+                fontSize: mfont(13.4),
                 lineHeight: "132%",
-                letterSpacing: "-0.02em",
+                letterSpacing: "-0.020em",
               }}
             >
               <div>{proposal.clientName}</div>

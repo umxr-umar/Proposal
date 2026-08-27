@@ -34,22 +34,30 @@ const THEME_TEXT: Record<"dark" | "light", string> = {
   light: "#131310",
 };
 
+// A solid pill backdrop rather than bare floating text — a slide's own
+// tuned bottom padding can legitimately end up shorter than whatever gap
+// this needs to stay clear of, and re-coordinating that padding by hand
+// every time Cover gets re-tuned isn't durable. A pill stays legible
+// regardless of what content sits underneath it.
 function ScrollHint() {
   return (
     <div
-      className="absolute flex flex-col items-center"
+      className="absolute flex items-center"
       style={{
         left: "50%",
-        bottom: mpx(26),
+        bottom: mpx(20),
         transform: "translateX(-50%)",
         gap: mpx(6),
+        backgroundColor: "#FFFFFF",
+        borderRadius: 999,
+        padding: `${mpx(8)} ${mpx(14)}`,
         fontFamily: "var(--font-neue-haas), system-ui, sans-serif",
         fontWeight: 600,
         fontSize: mfont(10.5),
         letterSpacing: "0.12em",
         textTransform: "uppercase",
-        color: THEME_TEXT.dark,
-        opacity: 0.85,
+        color: "#131310",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
         pointerEvents: "none",
       }}
     >
