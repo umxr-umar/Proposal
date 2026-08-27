@@ -16,8 +16,13 @@ import { mfont, mpx } from "@/lib/fluidMobile";
  * menu: sections are scroll-snapped pages, and orientation comes from
  * three passive signals instead of one active control:
  *
- * 1. The scroll-snap settle motion itself (`proximity`, not `mandatory` —
- *    never fights a user mid-read on a long section).
+ * 1. The scroll-snap settle motion itself (`mandatory` + `scrollSnapStop:
+ *    "always"` — a resting scroll position is always exactly one section,
+ *    never a torn view with two sections' content both partially visible.
+ *    An earlier `proximity` version was rejected after testing on device:
+ *    on short sections like Cover/TOC it let scroll rest mid-transition,
+ *    showing both sections' chrome overlapping, which read as broken
+ *    rather than "scrollable." `mandatory` always resolves to one section).
  * 2. Each section's own header label (different text the instant you land
  *    on a new one) — that lives in each section's own content, not here.
  * 3. The ambient position dots below — ORIENTATION, not navigation; they
@@ -152,7 +157,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
         height: "100dvh",
         overflowY: "scroll",
         overflowX: "hidden",
-        scrollSnapType: "y proximity",
+        scrollSnapType: "y mandatory",
       }}
     >
       {sections.map((section, i) => (
@@ -162,6 +167,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
           className="relative w-full"
           style={{
             scrollSnapAlign: "start",
+            scrollSnapStop: "always",
             minHeight: "100dvh",
             backgroundColor: THEME_BG[section.theme],
             color: THEME_TEXT[section.theme],

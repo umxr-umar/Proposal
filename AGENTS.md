@@ -155,14 +155,23 @@ between sections is scroll/swipe, matching native mobile app conventions
 (nothing to tap, nothing to discover) rather than desktop's click-driven
 carousel.
 
-**CSS scroll-snap, `proximity` not `mandatory`.** Each section gets
-`scroll-snap-align: start` inside a `scroll-snap-type: y proximity`
-container. `proximity` only pulls to a section boundary when the scroll
-position is already near one — it won't fight a user mid-read on a long
-section (Terms and Conditions, Scope and Deliverables) the way `mandatory`
-would by always resolving to the nearest boundary regardless of where they
-paused. Confirmed via a side-by-side toggle in a prototype; `mandatory` felt
-more decisive on short sections but actively hostile on long ones.
+**CSS scroll-snap, `mandatory` not `proximity`.** Each section gets
+`scroll-snap-align: start` + `scroll-snap-stop: always` inside a
+`scroll-snap-type: y mandatory` container. Originally built with `proximity`
+(see below for why), but rejected after testing Cover→TOC on a real device:
+`proximity` let scroll rest mid-transition on short sections, leaving both
+sections' chrome visible and overlapping at once — read as broken, not
+"scrollable." `mandatory` always resolves to exactly one section at rest.
+
+Known open risk: this reintroduces the exact problem `proximity` was
+originally chosen to avoid — on a long section (Terms and Conditions, Scope
+and Deliverables), `mandatory` snaps to the nearest boundary regardless of
+where the user paused mid-read, which tested as "actively hostile" in the
+original prototype comparison. Only Cover/TOC exist today, both short, so
+this hasn't bitten yet. Revisit when a long section is built — options
+include scoping snap behavior per-section rather than globally, or testing
+`proximity` again now that `scroll-snap-stop: always` is in place (untested
+combination). Don't assume `mandatory` is settled for the whole deck.
 
 **Sections keep their own fixed background/theme — do not tie it to
 anything dynamic.** Same content-owned theming as desktop (Cover/TOC/Client
