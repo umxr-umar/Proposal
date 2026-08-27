@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { mfont, mpx } from "@/lib/fluidMobile";
 
 /**
@@ -33,6 +40,25 @@ const THEME_TEXT: Record<"dark" | "light", string> = {
   dark: "#DDDDD5",
   light: "#131310",
 };
+
+// Lets a section's own content (e.g. TOC's rows) jump to another section —
+// scrollIntoView, not desktop's index-swap goToSlide, since mobile sections
+// are real scrollable DOM nodes, not a translateX carousel. A target index
+// past the last real section clamps to the last one, same as desktop's
+// goToSlide, so TOC rows can point ahead of slides that don't exist yet.
+type MobileSlideDeckContextValue = {
+  sectionCount: number;
+  scrollToSection: (index: number) => void;
+};
+const MobileSlideDeckContext = createContext<MobileSlideDeckContextValue | null>(null);
+
+export function useMobileSlideDeck(): MobileSlideDeckContextValue {
+  const ctx = useContext(MobileSlideDeckContext);
+  if (!ctx) {
+    throw new Error("useMobileSlideDeck must be used within a MobileSlideDeck");
+  }
+  return ctx;
+}
 
 // Same pill treatment as desktop's nav pill (SlideDeck.tsx) — dark
 // gradient, hairline border, layered inset+drop shadow — not a plain
@@ -109,7 +135,16 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
 
   const activeTheme = sections[activeIndex]?.theme ?? "dark";
 
+  const scrollToSection = (index: number) => {
+    const root = screenRef.current;
+    if (!root) return;
+    const clamped = Math.max(0, Math.min(index, sections.length - 1));
+    const target = root.querySelector<HTMLElement>(`[data-mobile-section="${clamped}"]`);
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
+    <MobileSlideDeckContext.Provider value={{ sectionCount: sections.length, scrollToSection }}>
     <div
       ref={screenRef}
       className="relative w-full"
@@ -164,5 +199,6 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
         ))}
       </div>
     </div>
+    </MobileSlideDeckContext.Provider>
   );
 }
