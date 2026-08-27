@@ -24,16 +24,17 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * sit at very different `left` offsets, so anchoring each independently
  * avoids one block's width tweaks ever dragging the other's position.
  *
- * The freelancer photo (`public/images/freelancer-photo.jpg`), brand
- * mark (`public/images/brand-mark.png` — already a white square with the
- * mark baked in, so it's rendered `object-cover` with no extra
- * background/padding needed), and signature (`public/images/
- * signature.png`, a transparent SignWell export) are real studio assets
- * the user supplied, not placeholders — unlike Client Testimonials'
- * per-client photos, these are fixed studio assets so there's no
- * `proposal.*` field for them. The signature's container height is
- * driven by `aspectRatio` (matching the PNG's real 218:78 proportions)
- * rather than an independent `fy()` height, so it can never distort.
+ * The freelancer photo and brand mark come from the proposal's Notion
+ * data (`freelancerPhotoUrl`/`brandMarkUrl`, uploaded via the Freelancer
+ * Photo/Brand Mark file fields on the Proposals row) — each falls back to
+ * the studio's default static file (`public/images/freelancer-photo.jpg`
+ * / `brand-mark.png`) when nothing's been uploaded for a given proposal.
+ * The signature (`public/images/signature.png`, a transparent SignWell
+ * export) stays a fixed studio asset — there's no per-client signature
+ * concept, so no `proposal.*` field for it. The signature's container
+ * height is driven by `aspectRatio` (matching the PNG's real 218:78
+ * proportions) rather than an independent `fy()` height, so it can never
+ * distort.
  *
  * All three use `priority` (skips native `loading="lazy"`) — SlideDeck
  * renders every slide side-by-side and reveals the active one via a
@@ -41,21 +42,19 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * lazy-load heuristic has no scroll position to key off and can leave an
  * always-visible image stuck un-requested indefinitely.
  *
- * The freelancer photo also uses `unoptimized` — this dev environment's
- * sharp/libvips build hangs indefinitely (not just slow — verified with a
- * 90s timeout) re-encoding this specific photographic JPEG to WebP/AVIF
- * through Next's `/_next/image` optimizer, while the flat-color brand
- * mark/signature PNGs convert fine. `unoptimized` serves the file as-is,
- * sidestepping that pipeline entirely; the source is already pre-sized to
- * 640x640 and compressed, so there's no real quality/weight cost.
+ * The freelancer photo and brand mark both use `unoptimized` — Notion's
+ * uploaded-file URLs are external and can't go through Next's built-in
+ * `/_next/image` optimizer without allow-listing Notion's file host, and
+ * this dev environment's sharp/libvips build separately hangs indefinitely
+ * (verified with a 90s timeout) re-encoding the studio's default
+ * photographic JPEG. `unoptimized` sidesteps both issues by serving
+ * whichever source is active as-is.
  *
- * FREELANCER/CLIENT fields mirror Cover's Client block: CLIENT pulls
- * `proposal.clientName`/`clientEmail` (real data, not a hardcoded
- * placeholder), FREELANCER uses the studio's real name/email already
- * hardcoded elsewhere in the app (Hero/CtaSection/Questions all use
- * "Umar" / "hello@biflux.design"). The date is today's real date
- * (DD/MM/YYYY), not a hardcoded placeholder — matching the header year's
- * `new Date()` convention. The Freelancer column (only) also gets a small
+ * FREELANCER/CLIENT fields mirror Cover's Client block: both pull from
+ * the proposal's Notion data (`clientName`/`clientEmail` and
+ * `freelancerName`/`freelancerEmail`), same as Cover. The date is today's
+ * real date (DD/MM/YYYY), not a hardcoded placeholder — matching the
+ * header year's `new Date()` convention. The Freelancer column (only) also gets a small
  * BI-FLUX wordmark next to its "FREELANCER" label — Client has no
  * matching mark since the client has no logo asset to show.
  *
@@ -215,8 +214,8 @@ export function ContractAgreementSlide({ proposal }: { proposal: Proposal }) {
             style={{ width: fx(199), aspectRatio: "1 / 1", borderRadius: fx(17) }}
           >
             <Image
-              src="/images/freelancer-photo.jpg"
-              alt="Umar, BI-FLUX founder"
+              src={proposal.freelancerPhotoUrl ?? "/images/freelancer-photo.jpg"}
+              alt={`${proposal.freelancerName ?? "Umar"}, BI-FLUX founder`}
               fill
               unoptimized
               priority
@@ -233,10 +232,10 @@ export function ContractAgreementSlide({ proposal }: { proposal: Proposal }) {
             }}
           >
             <Image
-              src="/images/brand-mark.png"
+              src={proposal.brandMarkUrl ?? "/images/brand-mark.png"}
               alt="BI-FLUX brand mark"
               fill
-              sizes="11vw"
+              unoptimized
               priority
               className="object-cover"
             />
@@ -251,8 +250,8 @@ export function ContractAgreementSlide({ proposal }: { proposal: Proposal }) {
         <div className="flex items-start" style={{ gap: fx(164) }}>
           <PartyColumn
             label="Freelancer"
-            name="Umar"
-            email="hello@biflux.design"
+            name={proposal.freelancerName ?? "Umar"}
+            email={proposal.freelancerEmail ?? "hello@biflux.design"}
             showLogo
           />
           <PartyColumn

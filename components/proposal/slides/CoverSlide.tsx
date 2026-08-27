@@ -39,6 +39,13 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * the Freelancer/Client pairing already established on Contract
  * Agreement's signature block.
  */
+const PROJECT_TYPE_LEDE: Record<Proposal["projectType"], string> = {
+  "Website Design": "Web design and web development",
+  "Website Redesign": "Web redesign and web development",
+  "Landing Page Design": "Landing page design",
+  "No-Code Development": "No-code development",
+};
+
 export function CoverSlide({ proposal }: { proposal: Proposal }) {
   const { navSafeBottom } = useSlideDeck();
   const inter = "var(--font-inter), system-ui, sans-serif";
@@ -85,7 +92,7 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
             textTransform: "capitalize",
           }}
         >
-          Web design and web development contract proposal for{" "}
+          {PROJECT_TYPE_LEDE[proposal.projectType]} contract proposal for{" "}
           {proposal.clientName}.
         </p>
 
@@ -106,8 +113,8 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
                 letterSpacing: "-0.030em",
               }}
             >
-              <div>Umar</div>
-              <div>hello@biflux.design</div>
+              <div>{proposal.freelancerName ?? "Umar"}</div>
+              <div>{proposal.freelancerEmail ?? "hello@biflux.design"}</div>
             </div>
           </div>
 

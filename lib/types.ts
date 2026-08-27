@@ -4,18 +4,15 @@ export type ProjectType =
   | "Landing Page Design"
   | "No-Code Development";
 
-export type ProposalStatus = "draft" | "sent" | "accepted";
+export type ProposalStatus = "Draft" | "Sent" | "Accepted";
 
-export type ProposalImage = {
-  src: string;
-  caption?: string;
-};
+export type ScopeBullet = { bold?: string; text: string };
 
-export type PricingPackage = {
-  name: string;
-  price: string;
-  note?: string;
-  bullets: string[];
+export type ScopeSection = {
+  column: "Design" | "Development";
+  number: number;
+  heading: string;
+  bullets: ScopeBullet[];
 };
 
 export type TimelineStep = {
@@ -24,48 +21,55 @@ export type TimelineStep = {
   description: string;
 };
 
-export type PaymentLinks = {
-  payoneer?: string;
-  wise?: string;
+export type PricingLine = {
+  name: string;
+  price: number;
 };
 
+export type Testimonial = {
+  quote: string;
+  name: string;
+  role: string;
+  photoUrl?: string;
+  videoUrl?: string;
+};
+
+export type ContractClause = {
+  number: number;
+  column: "Left" | "Right";
+  paragraphs: string[];
+};
+
+/**
+ * Mirrors the "Proposals" + "Proposal Items" Notion databases (see
+ * lib/notion.ts). Proposal Items rows are grouped by their Type field and
+ * assembled into the arrays below, sorted by Order.
+ */
 export type Proposal = {
   slug: string;
   clientName: string;
   clientEmail?: string;
   projectType: ProjectType;
-  heroHeadline?: string;
-  heroLede?: string;
-  situation?: string;
-  approachNotes?: string;
-  caseStudySlugs: string[];
-  images?: ProposalImage[];
-  packages: PricingPackage[];
-  timeline: TimelineStep[];
-  paymentLinks?: PaymentLinks;
   status: ProposalStatus;
-  createdAt: string;
-  /** Short cinematic brand intro, plays before the hero. Optional — add the file later. */
-  introVideoUrl?: string;
-  /** A short personal video message addressed to this client. Optional — add the file later. */
-  personalMessageVideoUrl?: string;
-};
-
-export type CaseStudyStat = {
-  value: string;
-  label: string;
-};
-
-export type CaseStudy = {
-  slug: string;
-  name: string;
-  category: string;
-  tagline: string;
-  overview: string;
-  finding: string;
-  detail?: string;
-  stats: CaseStudyStat[];
-  image?: string;
-  quote?: string;
-  quoteAttribution?: string;
+  problem?: string;
+  solution?: string;
+  impact?: string;
+  timelineIntro?: string;
+  totalTimelineWeeks?: number;
+  depositPercent?: number;
+  designPercent?: number;
+  devPercent?: number;
+  totalInvestment?: number;
+  freelancerName?: string;
+  freelancerEmail?: string;
+  freelancerPhotoUrl?: string;
+  brandMarkUrl?: string;
+  contractDate?: string;
+  scopeDesignHeading?: string;
+  scopeDevHeading?: string;
+  scopeSections: ScopeSection[];
+  timelineSteps: TimelineStep[];
+  pricingLines: PricingLine[];
+  testimonials: Testimonial[];
+  contractClauses: ContractClause[];
 };

@@ -19,19 +19,17 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * via `top`, table pinned above the nav pill via `bottom: navSafeBottom`
  * — so resizing one never drags the other with it.
  *
- * "invesment" is spelled that way in the reference screenshot (appears
- * twice, consistently) — kept verbatim per "copy everything," but it's
- * very likely a typo worth fixing to "investment" before this ships.
+ * Deposit percentages, the pricing breakdown, and the total come from the
+ * proposal's Notion data (Deposit/Design/Dev Percent + Total Investment +
+ * Pricing Line items) — dollar amounts per milestone are computed from
+ * the percentages rather than typed in twice.
  */
 
-const breakdown: { label: string; amount: string }[] = [
-  { label: "Website Design", amount: "$8850" },
-  { label: "Website Development & Animations", amount: "$14000" },
-  { label: "SEO", amount: "$4500" },
-  { label: "Social Assets (Favicon, Social Share Images)", amount: "$199" },
-];
+function formatAud(amount: number): string {
+  return `$${amount.toLocaleString("en-AU", { maximumFractionDigits: 2 })} AUD`;
+}
 
-export function ExecutiveSummarySlide({ proposal: _proposal }: { proposal: Proposal }) {
+export function ExecutiveSummarySlide({ proposal }: { proposal: Proposal }) {
   const { index, navSafeBottom, goToSlide } = useSlideDeck();
   const inter = "var(--font-inter), system-ui, sans-serif";
   const helveticaNeue = '"Helvetica Neue", Helvetica, Arial, sans-serif';
@@ -102,14 +100,27 @@ export function ExecutiveSummarySlide({ proposal: _proposal }: { proposal: Propo
         <div style={{ ...boldStyle, width: fx(168) }}>Payment Structure</div>
         <div style={{ ...bodyStyle, width: fx(contentWidth) }}>
           <p style={{ margin: 0 }}>
-            A deposit equivalent to 50% of the total project
+            A deposit equivalent to {proposal.depositPercent}% of the total
+            project
             <br />
-            invesment is required to commence your project.
+            investment is required to commence your project.
           </p>
           <div style={{ marginTop: fy(16) }}>
-            <div>50% Initial Deposit ($13,774.5 AUD)</div>
-            <div>25% Upon Design Completion ($6,887.25 AUD)</div>
-            <div>25% Upon Development Completion ($6,887.25 AUD)</div>
+            <div>
+              {proposal.depositPercent}% Initial Deposit (
+              {formatAud(((proposal.depositPercent ?? 0) / 100) * (proposal.totalInvestment ?? 0))}
+              )
+            </div>
+            <div>
+              {proposal.designPercent}% Upon Design Completion (
+              {formatAud(((proposal.designPercent ?? 0) / 100) * (proposal.totalInvestment ?? 0))}
+              )
+            </div>
+            <div>
+              {proposal.devPercent}% Upon Development Completion (
+              {formatAud(((proposal.devPercent ?? 0) / 100) * (proposal.totalInvestment ?? 0))}
+              )
+            </div>
           </div>
         </div>
       </div>
@@ -127,19 +138,19 @@ export function ExecutiveSummarySlide({ proposal: _proposal }: { proposal: Propo
             borderTop: "1px solid rgba(0,0,0,0.35)",
           }}
         >
-          <span>Total Project Invesment</span>
-          <span style={boldStyle}>$27,549 AUD</span>
+          <span>Total Project Investment</span>
+          <span style={boldStyle}>{formatAud(proposal.totalInvestment ?? 0)}</span>
         </div>
 
         <div style={{ paddingLeft: fx(52) }}>
-          {breakdown.map((b) => (
+          {proposal.pricingLines.map((line) => (
             <div
-              key={b.label}
+              key={line.name}
               className="flex items-center justify-between"
               style={{ ...bodyStyle, paddingTop: fy(6), paddingBottom: fy(6) }}
             >
-              <span>{b.label}</span>
-              <span>{b.amount}</span>
+              <span>{line.name}</span>
+              <span>${line.price.toLocaleString("en-AU")}</span>
             </div>
           ))}
 
@@ -148,7 +159,7 @@ export function ExecutiveSummarySlide({ proposal: _proposal }: { proposal: Propo
             style={{ ...boldStyle, paddingTop: fy(6), paddingBottom: fy(13) }}
           >
             <span>TOTAL</span>
-            <span>$27,549</span>
+            <span>${(proposal.totalInvestment ?? 0).toLocaleString("en-AU")}</span>
           </div>
         </div>
 
@@ -163,7 +174,7 @@ export function ExecutiveSummarySlide({ proposal: _proposal }: { proposal: Propo
           }}
         >
           <span>Total Timeline</span>
-          <span style={boldStyle}>12 weeks</span>
+          <span style={boldStyle}>{proposal.totalTimelineWeeks} weeks</span>
         </div>
       </div>
 

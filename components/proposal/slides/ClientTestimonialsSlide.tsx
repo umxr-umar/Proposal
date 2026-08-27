@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Proposal } from "@/lib/types";
 import { BifluxLogo } from "./BifluxLogo";
 import { pad, useSlideDeck } from "./SlideDeck";
@@ -19,12 +20,13 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * between Executive Summary and Terms and Conditions but isn't a TOC
  * section of its own (see TableOfContentsSlide's SECTION_TARGETS comment).
  *
- * Each card's photo is a plain placeholder gradient block, not a real
- * photo — there's no client photo to use yet, and this is exactly the
- * kind of per-client asset that becomes `testimonial.photoUrl` /
- * `testimonial.videoUrl` once Notion is wired up as the data source. The
- * Play button is static for the same reason — real video playback is a
- * later step, not a frontend layout concern today.
+ * Photo/video come from the shared Testimonials library in Notion
+ * (`testimonial.photoUrl` / `videoUrl`) — a card without an uploaded
+ * photo falls back to the gradient placeholder block, and the Play
+ * button only renders when a video is actually present. Clicking it
+ * swaps the photo for an inline `<video>` (autoplaying, with controls)
+ * rather than opening a separate modal/lightbox — keeps the card's own
+ * layout as the single source of truth for where the video appears.
  *
  * Bold text (quote, name) is Helvetica Neue; regular text (role) is Neue
  * Haas Grotesk, matching the font split established on Scope/Timeline/
@@ -41,28 +43,11 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * dimension (padding, gap, both radii) — all as sliders in the padding
  * tool, so exact pixel-matching can happen there without a round trip
  * through me for each tweak.
+ *
+ * Quotes/name/role come from the proposal's Notion data (Testimonial
+ * items) — photo and video are still static placeholders, same reasoning
+ * as before, just now per the actual asset pipeline once one exists.
  */
-
-const testimonials: { quote: string; name: string; role: string }[] = [
-  {
-    quote:
-      "Umar rebuilt our website in two weeks, and every decision had real thought behind it. He spotted problems we hadn't even noticed ourselves and helped us see our business completely differently.",
-    name: "Sam Wayne",
-    role: "Founder of Leadgeneration.com",
-  },
-  {
-    quote:
-      "Before working with Umar, I thought our website was good enough. He completely changed how I looked at it, pointing out things I'd never considered. Years later, he still replies whenever I reach out..",
-    name: "Sam Wayne",
-    role: "Founder of Leadgeneration.com",
-  },
-  {
-    quote:
-      "Umar rebuilt our website in two weeks, and every decision had real thought behind it. He spotted problems we hadn't even noticed ourselves and helped us see our business completely differently.",
-    name: "Sam Wayne",
-    role: "Founder of Leadgeneration.com",
-  },
-];
 
 function PlayIcon() {
   return (
@@ -76,11 +61,15 @@ function TestimonialCard({
   quote,
   name,
   role,
+  photoUrl,
+  videoUrl,
   width,
 }: {
   quote: string;
   name: string;
   role: string;
+  photoUrl?: string;
+  videoUrl?: string;
   width: number;
 }) {
   const helveticaNeue = '"Helvetica Neue", Helvetica, Arial, sans-serif';
@@ -88,6 +77,7 @@ function TestimonialCard({
   const playIconHeight = ffont(38.9);
   const playIconWidth = ffont(53);
   const playTextSize = ffont(31.1);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   return (
     <div
@@ -112,45 +102,72 @@ function TestimonialCard({
           flexShrink: 0,
           borderRadius: fx(19),
           overflow: "hidden",
-          background: "linear-gradient(180deg, #E8E8E3 0%, #4FA8A8 100%)",
+          background: photoUrl
+            ? undefined
+            : "linear-gradient(180deg, #E8E8E3 0%, #4FA8A8 100%)",
         }}
       >
-        <div
-          className="absolute flex items-center"
-          style={{
-            left: "50%",
-            bottom: fy(19),
-            transform: "translateX(-50%)",
-            gap: fx(9),
-            backgroundColor: "#FFFFFF",
-            borderRadius: fx(10),
-            padding: `${fy(17)} ${fx(18)}`,
-          }}
-        >
-          <span
-            className="flex items-center justify-center"
-            style={{
-              width: playIconWidth,
-              height: playIconHeight,
-              borderRadius: fx(4),
-              backgroundColor: "#000000",
-              color: "#FFFFFF",
-            }}
-          >
-            <PlayIcon />
-          </span>
-          <span
-            style={{
-              fontFamily: helveticaNeue,
-              fontWeight: 700,
-              fontSize: playTextSize,
-              lineHeight: "100%",
-              color: "#000000",
-            }}
-          >
-            Play
-          </span>
-        </div>
+        {isPlaying && videoUrl ? (
+          <video
+            src={videoUrl}
+            controls
+            autoPlay
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <>
+            {photoUrl && (
+              // Notion file URLs are signed/expiring, not local static
+              // assets, so next/image's build-time optimization doesn't apply.
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={photoUrl}
+                alt={name}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            )}
+            {videoUrl && (
+              <button
+                type="button"
+                onClick={() => setIsPlaying(true)}
+                className="absolute flex cursor-pointer items-center border-0 transition-opacity hover:opacity-80"
+                style={{
+                  left: "50%",
+                  bottom: fy(19),
+                  transform: "translateX(-50%)",
+                  gap: fx(9),
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: fx(10),
+                  padding: `${fy(17)} ${fx(18)}`,
+                }}
+              >
+                <span
+                  className="flex items-center justify-center"
+                  style={{
+                    width: playIconWidth,
+                    height: playIconHeight,
+                    borderRadius: fx(4),
+                    backgroundColor: "#000000",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <PlayIcon />
+                </span>
+                <span
+                  style={{
+                    fontFamily: helveticaNeue,
+                    fontWeight: 700,
+                    fontSize: playTextSize,
+                    lineHeight: "100%",
+                    color: "#000000",
+                  }}
+                >
+                  Play
+                </span>
+              </button>
+            )}
+          </>
+        )}
       </div>
 
       <div
@@ -204,7 +221,7 @@ function TestimonialCard({
   );
 }
 
-export function ClientTestimonialsSlide({ proposal: _proposal }: { proposal: Proposal }) {
+export function ClientTestimonialsSlide({ proposal }: { proposal: Proposal }) {
   const { index, navSafeBottom, goToSlide } = useSlideDeck();
   const neueHaas = "var(--font-neue-haas), system-ui, sans-serif";
   const year = new Date().getFullYear();
@@ -252,7 +269,7 @@ export function ClientTestimonialsSlide({ proposal: _proposal }: { proposal: Pro
           gap: fx(66),
         }}
       >
-        {testimonials.map((t, i) => (
+        {proposal.testimonials.map((t, i) => (
           <TestimonialCard key={i} {...t} width={cardWidth} />
         ))}
       </div>

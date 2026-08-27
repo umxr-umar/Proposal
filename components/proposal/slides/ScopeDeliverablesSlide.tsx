@@ -6,26 +6,21 @@ import { pad, useSlideDeck } from "./SlideDeck";
 import { fx, fy, ffont } from "@/lib/fluid";
 
 /**
- * "Scope and Deliverables" — Design + Development columns. Rebuilt from a
- * screenshot the user pulled directly from Figma (the earlier version was
- * built from a stale full-canvas structural pass that had the wrong copy
- * entirely — "Webflow"/generic client-name text instead of the real
- * "Framer"/numbered-list content below). No exact type tokens available
- * (Figma MCP is rate-limited), so sizes/positions are estimated from the
- * screenshot's proportions and Inter is used throughout to match every
- * other detail slide in the deck — re-tune via public/padding-tool.html
- * once real values can be pulled or eyeballed against Figma directly.
+ * "Scope and Deliverables" — Design + Development columns. Each column is
+ * a numbered list (1, 2, 3…) of bold section headings, each with its own
+ * bulleted sub-items — some sub-items are a bare line, others start with
+ * their own bold inline label ("Brand Audit:") followed by regular
+ * description text.
  *
- * Each column is a numbered list (1, 2, 3…) of bold section headings, each
- * with its own bulleted sub-items — some sub-items are a bare line, others
- * start with their own bold inline label ("Brand Audit:") followed by
- * regular description text.
+ * Sections/bullets come from the proposal's "Proposal Items" rows (Type =
+ * "Scope Section", Subtitle = "Design"/"Development" for which column) —
+ * see lib/notion.ts's buildScopeSections. Column titles come from the
+ * "Scope Design Heading"/"Scope Dev Heading" fields on the Notion row.
  */
 
-type Bullet = { bold?: string; text: string };
-type Section = { number: number; heading: string; bullets: Bullet[] };
+import type { ScopeSection } from "@/lib/types";
 
-function ColumnList({ sections }: { sections: Section[] }) {
+function ColumnList({ sections }: { sections: ScopeSection[] }) {
   const helveticaNeue = '"Helvetica Neue", Helvetica, Arial, sans-serif';
   const neueHaas = "var(--font-neue-haas), system-ui, sans-serif";
 
@@ -89,97 +84,16 @@ function ColumnList({ sections }: { sections: Section[] }) {
   );
 }
 
-export function ScopeDeliverablesSlide({ proposal: _proposal }: { proposal: Proposal }) {
+export function ScopeDeliverablesSlide({ proposal }: { proposal: Proposal }) {
   const { index, navSafeBottom } = useSlideDeck();
   const inter = "var(--font-inter), system-ui, sans-serif";
   const helveticaNeue = '"Helvetica Neue", Helvetica, Arial, sans-serif';
   const year = new Date().getFullYear();
 
-  const designSections: Section[] = [
-    {
-      number: 1,
-      heading: "8 Uniquely Designed Pages",
-      bullets: [
-        { text: "Homepage" },
-        { text: "Works page" },
-        { text: "Case study page" },
-        { text: "Contact Page" },
-        { text: "About Page" },
-        { text: "Additional subpages (Join us, Policies, Documentation)" },
-      ],
-    },
-    {
-      number: 2,
-      heading: "Research & Brand Alignment",
-      bullets: [
-        {
-          bold: "Competitor Analysis:",
-          text: "We study real competitor sites in your space not to copy them, but to find what's actually working, where they're falling short, and where the real opportunity sits for you.",
-        },
-        {
-          bold: "Brand Audit:",
-          text: "We review your current identity, messaging, and positioning as it stands today, and translate that into a clear direction for the new site — not a generic refresh, but something that's actually you.",
-        },
-        {
-          bold: "Information Architecture:",
-          text: "We organize your content so visitors find what matters in seconds, not minutes — clear navigation, no digging, no guesswork for the person landing on your site for the first time.",
-        },
-      ],
-    },
-    {
-      number: 3,
-      heading: "Design on Figma",
-      bullets: [
-        {
-          bold: "Wireframing:",
-          text: "Create wireframes for all pages (e.g., homepage, services, contact) to establish the overall structure and layout.",
-        },
-        {
-          bold: "High-Fidelity Mockups:",
-          text: "Full designs built around your brand — real content where possible, not lorem ipsum — built to convert, not just to look impressive in a portfolio.",
-        },
-      ],
-    },
-  ];
-
-  const developmentSections: Section[] = [
-    {
-      number: 1,
-      heading: "Framer Development",
-      bullets: [
-        {
-          text: "Custom development in Framer, maintaining responsive layouts across desktop, tablet, and mobile, with a build that reflects your actual design intent rather than a stretched template.",
-        },
-      ],
-    },
-    {
-      number: 2,
-      heading: "CMS Integration :",
-      bullets: [
-        {
-          text: "A structured CMS setup so you can update case studies, work samples, or blog content going forward, designed to scale as new work gets added.",
-        },
-      ],
-    },
-    {
-      number: 3,
-      heading: "Accessibility & Performance Optimization:",
-      bullets: [
-        {
-          text: "Optimized for fast loading speeds and accessibility, including mobile responsiveness, image compression, lazy loading, and clear content hierarchy to ensure a high-performing user experience across all platforms.",
-        },
-      ],
-    },
-    {
-      number: 4,
-      heading: "Analytics & SEO Implementation:",
-      bullets: [
-        {
-          text: "Google Analytics setup for tracking performance, alongside foundational on-page SEO (titles, meta descriptions, clean structure). A full SEO strategy is scoped separately if needed.",
-        },
-      ],
-    },
-  ];
+  const designSections = proposal.scopeSections.filter((s) => s.column === "Design");
+  const developmentSections = proposal.scopeSections.filter(
+    (s) => s.column === "Development"
+  );
 
   return (
     <div
@@ -236,7 +150,7 @@ export function ScopeDeliverablesSlide({ proposal: _proposal }: { proposal: Prop
               marginBottom: fy(24),
             }}
           >
-            Website Design (2 Revisions)
+            {proposal.scopeDesignHeading}
           </div>
           <ColumnList sections={designSections} />
         </div>
@@ -260,7 +174,7 @@ export function ScopeDeliverablesSlide({ proposal: _proposal }: { proposal: Prop
               marginBottom: fy(24),
             }}
           >
-            Website Development (2 Revisions)
+            {proposal.scopeDevHeading}
           </div>
           <ColumnList sections={developmentSections} />
         </div>

@@ -14,6 +14,13 @@ import { ClientTestimonialsSlide } from "@/components/proposal/slides/ClientTest
 import { TermsAndConditionsSlide } from "@/components/proposal/slides/TermsAndConditionsSlide";
 import { ContractAgreementSlide } from "@/components/proposal/slides/ContractAgreementSlide";
 
+// Proposals live in Notion. Re-fetch at most once per 60s so edits (or a
+// brand-new client's row) show up without a redeploy — generateStaticParams
+// pre-renders the proposals that exist at build/deploy time, and
+// dynamicParams (default true) lets any new slug added after that render
+// on-demand on first request.
+export const revalidate = 60;
+
 export async function generateStaticParams() {
   const slugs = await getAllProposalSlugs();
   return slugs.map((slug) => ({ slug }));

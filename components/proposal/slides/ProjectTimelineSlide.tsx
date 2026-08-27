@@ -22,16 +22,14 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * way to open up extra space between the two sections independently of
  * their own internal spacing. With two anchors, the gap between them is
  * just whatever room is left — resizing the table only moves the table.
+ *
+ * Table rows, the bold start-date line, and the total weeks come from the
+ * proposal's Notion data (Timeline Step items + Timeline Intro/Total
+ * Timeline Weeks fields) — the intro paragraph above them is boilerplate
+ * shared across every proposal, so it stays hardcoded here.
  */
 
-const rows: { stage: string; timeline: string }[] = [
-  { stage: "Onboarding and Strategy", timeline: "1 week" },
-  { stage: "Web design", timeline: "4 weeks" },
-  { stage: "Web development", timeline: "6 weeks" },
-  { stage: "Buffer Time", timeline: "1 week" },
-];
-
-export function ProjectTimelineSlide({ proposal: _proposal }: { proposal: Proposal }) {
+export function ProjectTimelineSlide({ proposal }: { proposal: Proposal }) {
   const { index, navSafeBottom, goToSlide } = useSlideDeck();
   const inter = "var(--font-inter), system-ui, sans-serif";
   const helveticaNeue = '"Helvetica Neue", Helvetica, Arial, sans-serif';
@@ -115,7 +113,7 @@ export function ProjectTimelineSlide({ proposal: _proposal }: { proposal: Propos
             textTransform: "uppercase",
           }}
         >
-          Project start date: Once the upfront payment has been received
+          {proposal.timelineIntro}
         </div>
       </div>
 
@@ -141,9 +139,9 @@ export function ProjectTimelineSlide({ proposal: _proposal }: { proposal: Propos
           <span>Timeline</span>
         </div>
 
-        {rows.map((r) => (
+        {proposal.timelineSteps.map((r) => (
           <div
-            key={r.stage}
+            key={r.name}
             className="flex items-center justify-between"
             style={{
               fontFamily: neueHaas,
@@ -156,8 +154,8 @@ export function ProjectTimelineSlide({ proposal: _proposal }: { proposal: Propos
               borderBottom: "1px solid rgba(0,0,0,0.12)",
             }}
           >
-            <span>{r.stage}</span>
-            <span>{r.timeline}</span>
+            <span>{r.name}</span>
+            <span>{r.duration}</span>
           </div>
         ))}
 
@@ -173,7 +171,7 @@ export function ProjectTimelineSlide({ proposal: _proposal }: { proposal: Propos
           }}
         >
           <span>Total Estimated Timeline</span>
-          <span>12 weeks</span>
+          <span>{proposal.totalTimelineWeeks} weeks</span>
         </div>
       </div>
 
