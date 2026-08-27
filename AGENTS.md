@@ -140,13 +140,61 @@ likely why; the fix is re-exporting as JPG/PNG before upload, not a code fix.
 
 Desktop is fully built; mobile is the current focus, using the navigation
 model below (confirmed after prototyping several alternatives — see decision
-log). **Do not start parallel per-screen work across multiple Conductor
-workspaces until the shared mobile shell (navigation/scroll mechanism,
-mobile fluid-sizing helpers) exists in the actual codebase** — building it
-in one lane first, then parallelizing individual screens once they share
-that foundation, avoids every workspace re-deciding the shell independently
-and conflicting at merge time. Same reasoning as "finish desktop before
-starting mobile" above, one level down.
+log).
+
+**Shared mobile shell is now built and proven — parallel per-screen work
+across Conductor workspaces is fine.** `MobileSlideDeck.tsx` (nav/scroll
+shell) and `lib/fluidMobile.ts` (fluid-sizing helpers) exist in the real
+codebase and have shipped across two real slides (Cover, Table of
+Contents), so a new workspace building the next slide isn't re-deciding the
+shell — it's just following the recipe below and reusing what's already
+proven, not still-in-flux.
+
+Still to build: Problem/Solution/Impact (share one desktop layout — a
+single workspace covering all three, back to back, is more efficient than
+splitting them across separate workspaces), Scope and Deliverables, Project
+Timeline, Executive Summary, Client Testimonials, Terms and Conditions,
+Contract Agreement. Scope and Deliverables and Terms and Conditions are
+long-content sections — read the "Known open risk" note on `mandatory`
+scroll-snap below before building either.
+
+**Building a new mobile slide — the recipe every workspace should follow:**
+1. Read the matching desktop slide component (`components/proposal/slides/`)
+   for the real content/data it renders — the mobile version carries the
+   same data, just re-laid-out for a single scrolling column.
+2. Build `components/proposal/slides-mobile/<Name>MobileSlide.tsx`. Every
+   dimension goes through `mpx()`/`mfont()` from `lib/fluidMobile.ts` —
+   never a raw `px`/`vw` value (same rule as desktop's `fx()`/`fy()`/
+   `ffont()`, see "Fluid sizing" above). Start from reasonable estimated
+   values against the reference screenshot; exact tuning happens in step 4.
+3. Register the new slide as the next entry in the mobile `sections` array
+   in `app/p/[slug]/page.tsx` (`{ theme: "dark" | "light", content: <... /> }`)
+   — **this file is shared across every mobile slide**, see the merge-conflict
+   note below.
+4. Add a matching panel to `public/padding-tool.html`'s Mobile tab — mirror
+   an existing mobile panel's structure (CSS block, stage markup, tab
+   button, `buildLayoutSliders`/`buildTypographyPanels` registration) with a
+   new short prefix. **This file is also shared across every mobile slide.**
+   Hand tuned values back to the user's screenshot/Figma reference; when
+   they paste tuned values back, apply them verbatim (same rule as desktop).
+5. Verify: `npx tsc --noEmit`, `npx eslint .`, then check the actual page in
+   a browser at both ends of the mobile range (375px and ~430px) — confirm
+   no overlap, no gaps, scroll-snap lands cleanly, ambient dots track the
+   right section.
+6. If the new slide needs to be a TOC jump target, update `SECTION_TARGETS`
+   in **both** `TableOfContentsSlide.tsx` (desktop) and `TOCMobileSlide.tsx`
+   (mobile, separate array, same index convention) — see "SECTION_TARGETS
+   must stay in sync" above; the same staleness risk applies to the mobile
+   copy.
+
+**Merge-conflict risk across parallel mobile workspaces:** every new slide
+touches the same two shared files — `app/p/[slug]/page.tsx`'s mobile
+`sections` array and `public/padding-tool.html`'s mobile tab. Two workspaces
+both appending a new entry to the end of the same array/tab list will
+usually merge cleanly (git handles two independent appends to the same list
+fine), but don't reorder or reformat either file while adding your entry —
+that turns a clean append into a real conflict. If a merge does conflict,
+resolve by keeping both new entries, not by picking one side.
 
 **Navigation model:** no bottom nav pill, no dots-as-buttons, no hamburger
 menu. Each section is its own scrollable "page" (content can be taller than
@@ -192,11 +240,15 @@ Testimonials→Contract Agreement are both dark-to-dark):
    had
 
 **Scroll discoverability, Cover only:** a small animated "Scroll ↓" hint,
-visible only on the Cover section, that fades out permanently the first time
-the user scrolls past it (once via `IntersectionObserver`, never reappears).
-Solves the specific problem of a first screen that *looks* complete (title,
-breathing room, nothing overflowing) giving no visual reason to suspect
-there's more below.
+rendered only inside the Cover section and shown whenever Cover is the
+active section (`activeIndex === 0` in `MobileSlideDeck.tsx`), hidden
+otherwise. Solves the specific problem of a first screen that *looks*
+complete (title, breathing room, nothing overflowing) giving no visual
+reason to suspect there's more below. Earlier version used a one-way
+"dismissed forever" flag instead of tying it to the active section — bug:
+scrolling back up to Cover left the hint permanently missing. Don't
+reintroduce a dismiss-once flag here; tie visibility to the active section,
+full stop.
 
 **Mobile needs its own fluid-sizing helpers**, parallel to but separate from
 `lib/fluid.ts`'s desktop `fx()/fy()/ffont()` (those are anchored to a
