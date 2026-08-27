@@ -1819,25 +1819,25 @@
   const mtLayoutState = {};
   const mtLayoutRefs = {};
   buildLayoutSliders(mtPanel, 'mt-pad', [
-    { key: 'top', label: 'Padding Top', min: 0, max: 100, default: 18 },
-    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 100, default: 38 },
+    { key: 'top', label: 'Padding Top', min: 0, max: 100, default: 28 },
+    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 100, default: 16 },
     { key: 'left', label: 'Padding Left', min: 0, max: 60, default: 24 },
     { key: 'right', label: 'Padding Right', min: 0, max: 60, default: 24 },
   ], updateMobileScale, mtLayoutState, mtLayoutRefs, stageMobile);
   buildLayoutSliders(mtPanel, 'mt-list', [
-    { key: 'gap', label: 'Row Gap (vertical)', min: 0, max: 60, default: 22 },
+    { key: 'gap', label: 'Row Gap (vertical)', min: 0, max: 60, default: 29 },
   ], updateMobileScale, mtLayoutState, mtLayoutRefs, stageMobile);
   buildLayoutSliders(mtPanel, 'mt-row', [
-    { key: 'gap', label: 'Number → Title Gap (vertical, within a row)', min: 0, max: 30, default: 2 },
+    { key: 'gap', label: 'Number → Title Gap (vertical, within a row)', min: 0, max: 30, default: 11 },
   ], updateMobileScale, mtLayoutState, mtLayoutRefs, stageMobile);
   buildLayoutSliders(mtPanel, 'mt-logo', [
-    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 40, step: 0.1, default: 11.3 },
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 40, step: 0.1, default: 13.3 },
   ], updateMobileScale, mtLayoutState, mtLayoutRefs, stageMobile);
   buildLayoutOutputBox(mtPanel, mtLayoutState, mtLayoutRefs);
   buildTypographyPanels(mtPanel, 'mt', [
-    { key: 'number', name: 'Row Number ("/01.")', font: 'Instrument Serif', defaults: { fs: 24, lh: 0.97, ls: -0.025, fw: 400 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: null },
-    { key: 'title', name: 'Section Title', font: 'Neue Haas Grotesk Roman', defaults: { fs: 21, lh: 1.12, ls: 0.003, fw: 400 }, fsRange: [12, 40, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: null },
-    { key: 'label', name: 'Header Label ("Table of content(s)")', font: 'Neue Haas Grotesk Roman', defaults: { fs: 11.5, lh: 1.31, ls: -0.006, fw: 400 }, fsRange: [6, 24, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
+    { key: 'number', name: 'Row Number ("/01.")', font: 'Instrument Serif', defaults: { fs: 31.6, lh: 0.97, ls: -0.025, fw: 400 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: null },
+    { key: 'title', name: 'Section Title', font: 'Neue Haas Grotesk Roman', defaults: { fs: 31.7, lh: 1.19, ls: 0.008, fw: 400 }, fsRange: [12, 40, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: null },
+    { key: 'label', name: 'Header Label ("Table of content(s)")', font: 'Neue Haas Grotesk Roman', defaults: { fs: 13.7, lh: 1.31, ls: -0.006, fw: 400 }, fsRange: [6, 24, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
   ], document.createElement('div'), stageMobile);
 
   // ---------------------------------------------------------------------

@@ -30,8 +30,8 @@ export function TOCMobileSlide() {
       className="flex h-full flex-col"
       style={{
         minHeight: "100dvh",
-        paddingTop: mpx(18),
-        paddingBottom: mpx(38),
+        paddingTop: mpx(28),
+        paddingBottom: mpx(16),
         paddingLeft: mpx(24),
         paddingRight: mpx(24),
       }}
@@ -39,11 +39,11 @@ export function TOCMobileSlide() {
       {/* No room for the year next to the label on mobile the way desktop
           has it — logo and label just anchor opposite ends of the row. */}
       <div className="flex items-center justify-between">
-        <BifluxLogo height={mfont(11.3)} />
+        <BifluxLogo height={mfont(13.3)} />
         <div
           style={{
             fontFamily: neueHaas,
-            fontSize: mfont(11.5),
+            fontSize: mfont(13.7),
             color: "#938F8A",
             letterSpacing: "-0.006em",
             lineHeight: "131%",
@@ -53,20 +53,20 @@ export function TOCMobileSlide() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col justify-center" style={{ gap: mpx(22) }}>
+      <div className="flex flex-1 flex-col justify-center" style={{ gap: mpx(29) }}>
         {SECTIONS.map((title, i) => (
           <button
             key={title}
             type="button"
             onClick={() => scrollToSection(SECTION_TARGETS[i])}
             className="flex cursor-pointer flex-col border-0 bg-transparent p-0 text-left transition-opacity active:opacity-60"
-            style={{ gap: mpx(2) }}
+            style={{ gap: mpx(11) }}
           >
             <span
               style={{
                 fontFamily: instrumentSerif,
                 fontWeight: 400,
-                fontSize: mfont(24),
+                fontSize: mfont(31.6),
                 letterSpacing: "-0.025em",
                 lineHeight: "97%",
               }}
@@ -77,9 +77,9 @@ export function TOCMobileSlide() {
               style={{
                 fontFamily: neueHaas,
                 fontWeight: 400,
-                fontSize: mfont(21),
-                letterSpacing: "0.003em",
-                lineHeight: "112%",
+                fontSize: mfont(31.7),
+                letterSpacing: "0.008em",
+                lineHeight: "119%",
               }}
             >
               {title}
