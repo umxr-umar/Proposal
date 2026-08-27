@@ -115,8 +115,6 @@ function ScrollHint() {
 export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) {
   const screenRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [hintDismissed, setHintDismissed] = useState(false);
-
   useEffect(() => {
     const root = screenRef.current;
     if (!root) return;
@@ -128,7 +126,6 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
           if (entry.isIntersecting && entry.intersectionRatio > 0.55) {
             const idx = Number(entry.target.getAttribute("data-mobile-section"));
             setActiveIndex(idx);
-            if (idx > 0) setHintDismissed(true);
           }
         }
       },
@@ -174,7 +171,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
           }}
         >
           {section.content}
-          {i === 0 && !hintDismissed && <ScrollHint />}
+          {i === 0 && activeIndex === 0 && <ScrollHint />}
         </section>
       ))}
 
