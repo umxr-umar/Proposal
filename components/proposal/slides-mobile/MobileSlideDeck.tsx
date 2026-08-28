@@ -157,15 +157,27 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
   // tall sections for the same reason as the observer approach was: it
   // never looks at a ratio of any section's own height, only literal edge
   // positions.
+  //
+  // activeIndex only updates once scrolling has SETTLED (debounced ~100ms
+  // after the last scroll event), not on every scroll frame while still in
+  // motion. This matters because mouse-wheel and trackpad input fire very
+  // different scroll event patterns: a wheel tick resolves to a snap
+  // almost instantly (one or two events, done), while a trackpad delivers
+  // a continuous stream of tiny-delta events for the whole gesture. Without
+  // debouncing, activeIndex — and therefore the arrival animation — was
+  // re-triggering repeatedly WHILE a trackpad gesture was still in
+  // progress, showing extra motion mid-scroll that a wheel-driven scroll
+  // never produced (its "motion" is over before the next frame). Waiting
+  // for settle makes both input types resolve to the same single, clean
+  // reveal after motion actually stops.
   useEffect(() => {
     const root = screenRef.current;
     if (!root) return;
 
     const items = Array.from(root.querySelectorAll<HTMLElement>("[data-mobile-section]"));
-    let ticking = false;
+    let settleTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const updateActive = () => {
-      ticking = false;
+    const computeActive = () => {
       const rootTop = root.getBoundingClientRect().top;
       let current = 0;
       for (const el of items) {
@@ -173,18 +185,20 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
           current = Number(el.getAttribute("data-mobile-section"));
         }
       }
-      setActiveIndex(current);
+      return current;
     };
 
     const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(updateActive);
+      if (settleTimer) clearTimeout(settleTimer);
+      settleTimer = setTimeout(() => setActiveIndex(computeActive()), 100);
     };
 
-    updateActive();
+    setActiveIndex(computeActive());
     root.addEventListener("scroll", onScroll, { passive: true });
-    return () => root.removeEventListener("scroll", onScroll);
+    return () => {
+      root.removeEventListener("scroll", onScroll);
+      if (settleTimer) clearTimeout(settleTimer);
+    };
   }, []);
 
   const activeTheme = sections[activeIndex]?.theme ?? "dark";
