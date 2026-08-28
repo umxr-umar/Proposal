@@ -159,6 +159,16 @@ long-content sections — read the "Known open risk" note on `mandatory`
 scroll-snap below before building either.
 
 **Building a new mobile slide — the recipe every workspace should follow:**
+0. **Sync with `origin/main` before doing anything else** (`git fetch origin
+   && git merge origin/main`, or Conductor's own "sync with main" action).
+   A workspace's worktree is a snapshot frozen at whenever it was created —
+   it does not auto-update. Building on a stale snapshot means missing
+   whatever landed on `main` since (a previous bug fix to the shared shell,
+   a newly-built slide, a doc update) without any signal that anything is
+   wrong — the code still compiles, it's just working from outdated
+   assumptions. This has actually happened (two workspaces built slides on
+   a `main` that predated the TOC slide and the scroll-snap fix) — treat
+   this step as non-optional, not a "when convenient" nicety.
 1. Read the matching desktop slide component (`components/proposal/slides/`)
    for the real content/data it renders — the mobile version carries the
    same data, just re-laid-out for a single scrolling column.
@@ -186,6 +196,16 @@ scroll-snap below before building either.
    (mobile, separate array, same index convention) — see "SECTION_TARGETS
    must stay in sync" above; the same staleness risk applies to the mobile
    copy.
+
+**One slide at a time, even inside a multi-slide workspace.** When a
+workspace covers more than one slide (e.g. Problem/Solution/Impact
+together, since they share a layout), do NOT build all of them back-to-back
+with first-pass estimated values before stopping. Finish and verify one
+slide completely (steps 1-6 above, including a visual check) before
+starting the next — the user reviews and approves each slide individually,
+same as the established one-screenshot-at-a-time rhythm from the rest of
+this project. Building three at once means three slides are in an unproven,
+unreviewed state simultaneously instead of one.
 
 **Merge-conflict risk across parallel mobile workspaces:** every new slide
 touches the same two shared files — `app/p/[slug]/page.tsx`'s mobile
