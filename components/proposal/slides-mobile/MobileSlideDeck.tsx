@@ -38,16 +38,19 @@ import { mfont, mpx } from "@/lib/fluidMobile";
  *    on a new one) — that lives in each section's own content, not here.
  * 4. The ambient position dots below — ORIENTATION, not navigation; they
  *    are not buttons and must not become tap targets. Tracking which dot
- *    is active watches a 0px-tall band pinned to the viewport's top edge
- *    (via `rootMargin`), not a ratio of each section's own height — a
- *    ratio threshold (the original approach) silently breaks the moment a
- *    section is taller than the viewport (max achievable ratio =
+ *    is active is scroll-position-based (see the effect below) — a plain
+ *    scroll listener that recomputes "which section's top is currently at
+ *    or above the viewport top," not IntersectionObserver. Two earlier
+ *    IntersectionObserver approaches were both tried and both broke:
+ *    a ratio threshold (`intersectionRatio > 0.55`) silently stops working
+ *    once a section is taller than the viewport (max achievable ratio =
  *    viewportHeight / sectionHeight, which drops below any fixed
- *    threshold), which is exactly the shape of Scope and Deliverables and
- *    Terms and Conditions. `scroll-snap-align: start` guarantees the
- *    active section's top sits exactly at the viewport top at rest, so
- *    the pinned line always intersects exactly one section regardless of
- *    height.
+ *    threshold — exactly the shape of Scope and Deliverables and Terms and
+ *    Conditions); a rootMargin-pinned-line variant fixed that but only
+ *    updated reliably scrolling downward, not upward (confirmed on
+ *    device — scrolling up left the arrival animation never triggering).
+ *    A continuously recomputed scroll-position check has no notion of
+ *    "direction" or "crossing event" to get backwards in the first place.
  *
  * Sections keep their own fixed theme (dark `#000000` / light `#E8E8E3`,
  * same as desktop) — never tie this to anything dynamic.
@@ -137,35 +140,51 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
   const screenRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Scroll-position-based, not IntersectionObserver-based — an earlier
+  // rootMargin/pinned-line IntersectionObserver version fixed the tall-
+  // section ratio bug (see below) but had its own real bug: it only
+  // reliably updated activeIndex scrolling downward, not upward — crossing
+  // the same pinned line in reverse didn't consistently fire an
+  // intersecting:true entry for the section being entered, presumably due
+  // to how the browser batches/orders crossing events at a snap boundary.
+  // Confirmed directly on device: scrolling up left the incoming section's
+  // content invisible (arrival animation never triggered because
+  // activeIndex never changed), scrolling down worked fine. A continuously
+  // recomputed scroll-position check has no notion of "direction" at all —
+  // it just asks "right now, which section's top is the last one at or
+  // above the viewport top" — so it can't have a direction-dependent bug
+  // the same way a crossing-event-based observer can. Still correct for
+  // tall sections for the same reason as the observer approach was: it
+  // never looks at a ratio of any section's own height, only literal edge
+  // positions.
   useEffect(() => {
     const root = screenRef.current;
     if (!root) return;
 
     const items = Array.from(root.querySelectorAll<HTMLElement>("[data-mobile-section]"));
-    // Watch a 0px-tall band pinned to the viewport's top edge (rootMargin's
-    // -100% bottom collapses the observed area down to just that line)
-    // instead of a % of each section's OWN height. A ratio-based threshold
-    // (e.g. "> 0.55 of the target") breaks the moment a section is taller
-    // than the viewport — minHeight: 100dvh sections grow past that with
-    // real content (Problem/Solution/Impact's paragraphs, Scope's long
-    // list), so the max achievable ratio (viewportHeight / sectionHeight)
-    // drops below the threshold and activeIndex silently stops updating.
-    // scroll-snap-align: start guarantees the current section's top edge
-    // sits exactly at the viewport top at rest, so this line always
-    // intersects exactly one section regardless of its height.
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const idx = Number(entry.target.getAttribute("data-mobile-section"));
-            setActiveIndex(idx);
-          }
+    let ticking = false;
+
+    const updateActive = () => {
+      ticking = false;
+      const rootTop = root.getBoundingClientRect().top;
+      let current = 0;
+      for (const el of items) {
+        if (el.getBoundingClientRect().top - rootTop <= 1) {
+          current = Number(el.getAttribute("data-mobile-section"));
         }
-      },
-      { root, rootMargin: "0px 0px -100% 0px", threshold: 0 }
-    );
-    items.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+      }
+      setActiveIndex(current);
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateActive);
+    };
+
+    updateActive();
+    root.addEventListener("scroll", onScroll, { passive: true });
+    return () => root.removeEventListener("scroll", onScroll);
   }, []);
 
   const activeTheme = sections[activeIndex]?.theme ?? "dark";
