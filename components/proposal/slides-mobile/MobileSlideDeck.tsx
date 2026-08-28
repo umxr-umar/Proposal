@@ -226,10 +226,17 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
               section is the real scroll-snap target, and animating its own
               transform would fight the browser's snap physics. Ties to
               activeIndex, not scroll progress, so it plays once on arrival
-              rather than dragging with the scroll gesture. Fast + a real
-              scale move (not just a fade) so arriving at a new section reads
-              as a distinct, deliberate beat — not scroll position quietly
-              updating in the background. */}
+              rather than dragging with the scroll gesture. A real scale
+              move (not just a fade) so arriving at a new section reads as a
+              distinct, deliberate beat. Entry and exit use the SAME
+              duration/easing — an earlier version had a fast 160ms exit vs
+              a slower 320ms entry, which left a brief gap where neither
+              section was visible; that gap read as an abrupt "pop" rather
+              than a smooth motion (reported specifically on downward
+              scrolling — the mismatch is the same in both directions, but
+              apparently more perceptible on the down/exit side). One
+              matched, gentler duration front-to-back reads as one
+              continuous cross-fade instead. */}
           <div
             style={{
               opacity: activeIndex === i ? 1 : 0,
@@ -238,9 +245,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
                   ? "translateY(0) scale(1)"
                   : "translateY(34px) scale(0.94)",
               transition:
-                activeIndex === i
-                  ? "opacity 320ms cubic-bezier(0.22, 1, 0.36, 1), transform 320ms cubic-bezier(0.22, 1, 0.36, 1)"
-                  : "opacity 160ms ease-in, transform 160ms ease-in",
+                "opacity 420ms cubic-bezier(0.33, 1, 0.68, 1), transform 420ms cubic-bezier(0.33, 1, 0.68, 1)",
             }}
           >
             {section.content}
