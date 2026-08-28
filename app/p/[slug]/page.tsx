@@ -16,6 +16,9 @@ import { ContractAgreementSlide } from "@/components/proposal/slides/ContractAgr
 import { MobileSlideDeck } from "@/components/proposal/slides-mobile/MobileSlideDeck";
 import { CoverMobileSlide } from "@/components/proposal/slides-mobile/CoverMobileSlide";
 import { TOCMobileSlide } from "@/components/proposal/slides-mobile/TOCMobileSlide";
+import { ProblemMobileSlide } from "@/components/proposal/slides-mobile/ProblemMobileSlide";
+import { SolutionMobileSlide } from "@/components/proposal/slides-mobile/SolutionMobileSlide";
+import { ImpactMobileSlide } from "@/components/proposal/slides-mobile/ImpactMobileSlide";
 import { ScopeDeliverablesMobileSlide } from "@/components/proposal/slides-mobile/ScopeDeliverablesMobileSlide";
 
 // Proposals live in Notion. Re-fetch at most once per 60s so edits (or a
@@ -74,16 +77,16 @@ export default async function ProposalPage({
         />
       </div>
 
-      {/* Mobile — in progress; Cover, TOC, Scope and Deliverables exist so far.
-          NOTE: Scope is desktop index 5 — this array only has it at index 2
-          because Problem/Solution/Impact (indices 2-4) haven't merged into
-          this branch yet. Fix this ordering when actually merging to main —
-          see AGENTS.md's merge-order guidance. */}
+      {/* Mobile — in progress; Cover, TOC, Problem, Solution, Impact, and
+          Scope and Deliverables exist so far, see AGENTS.md */}
       <div className="md:hidden">
         <MobileSlideDeck
           sections={[
             { theme: "dark", content: <CoverMobileSlide proposal={proposal} /> },
             { theme: "dark", content: <TOCMobileSlide /> },
+            { theme: "light", content: <ProblemMobileSlide proposal={proposal} /> },
+            { theme: "light", content: <SolutionMobileSlide proposal={proposal} /> },
+            { theme: "light", content: <ImpactMobileSlide proposal={proposal} /> },
             {
               theme: "light",
               content: <ScopeDeliverablesMobileSlide proposal={proposal} />,
