@@ -190,6 +190,44 @@
     height: calc(var(--mc-logo-h) * var(--mscale));
   }
 
+  /* ---- Mobile TOC stage — mirrors components/proposal/slides-mobile/
+     TOCMobileSlide.tsx; every calc() uses --mscale (402px reference). ---- */
+  #stage-mobile-toc {
+    display: flex; flex-direction: column;
+    min-height: 100%; color: #DDDDD5;
+    padding-top: calc(var(--mt-pad-top) * var(--mscale));
+    padding-bottom: calc(var(--mt-pad-bottom) * var(--mscale));
+    padding-left: calc(var(--mt-pad-left) * var(--mscale));
+    padding-right: calc(var(--mt-pad-right) * var(--mscale));
+  }
+  #stage-mobile-toc .mt-header { display: flex; align-items: center; justify-content: space-between; }
+  #stage-mobile-toc .mt-logo svg {
+    display: block; width: auto; aspect-ratio: 87 / 20.594;
+    height: calc(var(--mt-logo-h) * var(--mscale));
+  }
+  #stage-mobile-toc .mt-label {
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif; color: #938F8A;
+    font-size: calc(var(--mt-fs-label) * var(--mscale)); font-weight: var(--mt-fw-label);
+    letter-spacing: calc(var(--mt-ls-label) * 1em); line-height: var(--mt-lh-label);
+  }
+  #stage-mobile-toc .mt-list {
+    display: flex; flex: 1; flex-direction: column; justify-content: center;
+    gap: calc(var(--mt-list-gap) * var(--mscale));
+  }
+  #stage-mobile-toc .mt-row {
+    display: flex; flex-direction: column;
+    gap: calc(var(--mt-row-gap) * var(--mscale));
+  }
+  #stage-mobile-toc .mt-number {
+    font-family: 'Instrument Serif', serif; font-weight: 400; flex-shrink: 0;
+    font-size: calc(var(--mt-fs-number) * var(--mscale));
+    letter-spacing: calc(var(--mt-ls-number) * 1em); line-height: var(--mt-lh-number);
+  }
+  #stage-mobile-toc .mt-title {
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--mt-fs-title) * var(--mscale)); font-weight: var(--mt-fw-title);
+    letter-spacing: calc(var(--mt-ls-title) * 1em); line-height: var(--mt-lh-title);
+  }
   /* ---- Mobile Problem/Solution/Impact stages — mirror
      components/proposal/slides-mobile/OverviewTextMobileSlide.tsx (the
      shared layout behind ProblemMobileSlide/SolutionMobileSlide/
@@ -946,6 +984,7 @@
 
 <div class="slide-tabs" id="mobileTabs" style="display:none">
   <button type="button" class="active" data-mslide="cover">Cover</button>
+  <button type="button" data-mslide="toc">Table of Contents</button>
   <button type="button" data-mslide="problem">Problem</button>
   <button type="button" data-mslide="solution">Solution</button>
   <button type="button" data-mslide="impact">Impact</button>
@@ -1391,6 +1430,20 @@
         </div>
       </div>
 
+      <div class="stage-mobile-content" id="stage-mobile-toc">
+        <div class="mt-header">
+          <div class="mt-logo">
+            <svg viewBox="1455 172.109 87 20.594" xmlns="http://www.w3.org/2000/svg"><path d="M1455.014 172.061H1463.503C1465.605 172.061 1467.202 172.657 1468.323 173.821 1468.715 174.276 1469.051 174.787 1469.275 175.354 1469.5 175.922 1469.612 176.575 1469.612 177.284 1469.612 178.42 1469.303 179.357 1468.743 180.038 1468.183 180.72 1467.398 181.23 1466.389 181.543V181.628C1466.95 181.769 1467.455 181.969 1467.959 182.252 1468.463 182.537 1468.883 182.878 1469.248 183.274 1469.612 183.672 1469.892 184.155 1470.116 184.694 1470.313 185.262 1470.425 185.858 1470.425 186.539 1470.425 187.335 1470.284 188.072 1470.032 188.725 1469.78 189.378 1469.415 189.945 1468.968 190.428 1468.407 191.053 1467.679 191.507 1466.838 191.848 1465.997 192.188 1465.016 192.358 1463.952 192.358H1455.014V172.061ZM1463.84 190.059C1465.213 190.059 1466.249 189.719 1466.978 189.038 1467.258 188.753 1467.455 188.412 1467.622 188.016 1467.791 187.618 1467.874 187.192 1467.874 186.681 1467.874 185.432 1467.455 184.468 1466.669 183.842 1465.885 183.218 1464.876 182.906 1463.672 182.906H1457.535V190.059H1463.84ZM1463.195 180.749C1464.429 180.749 1465.38 180.464 1466.054 179.896 1466.726 179.329 1467.09 178.506 1467.09 177.427 1467.09 176.462 1466.754 175.694 1466.137 175.128 1465.52 174.559 1464.652 174.276 1463.532 174.276H1457.535V180.749H1463.195ZM1471.14 172.061H1473.662V192.358H1471.14V172.061ZM1474.686 183.474H1482.195V185.574H1474.686V183.474ZM1499.482 171.88L1498.092 176.668H1497.36C1497.992 174.03 1497.79 173.032 1495.996 173.032H1491.574C1490.993 173.032 1490.613 173.314 1490.436 173.877L1488.111 181.581H1491.649C1493.115 181.581 1493.721 181.069 1494.277 179.457H1494.884L1493.165 185.549H1492.508C1492.963 183.475 1492.762 182.606 1491.372 182.606H1487.809L1485.635 189.824C1485.181 191.334 1485.282 191.744 1487.96 191.744L1487.758 192.358H1479.647L1479.825 191.744C1481.744 191.744 1482.377 191.334 1482.831 189.824L1487.481 174.415C1487.935 172.903 1487.91 172.494 1485.662 172.494L1485.838 171.88H1499.482ZM1506.253 171.88L1506.076 172.494C1504.156 172.494 1503.524 172.903 1503.07 174.415L1498.522 189.542C1498.091 190.977 1498.345 191.207 1499.482 191.207H1502.488C1504.409 191.207 1505.344 190.438 1507.138 187.111L1507.871 187.341 1505.293 192.358H1492.382L1492.559 191.744C1494.504 191.744 1495.136 191.334 1495.591 189.824L1500.24 174.415C1500.695 172.903 1500.643 172.494 1498.395 172.494L1498.573 171.88H1506.253ZM1512.432 192.743C1507.807 192.743 1506.419 189.747 1507.757 185.344L1511.067 174.415C1511.523 172.903 1511.497 172.494 1509.324 172.494L1509.501 171.88H1517.031L1516.854 172.494C1514.958 172.494 1514.327 172.903 1513.872 174.415L1510.462 185.626C1509.4 189.133 1510.133 191.539 1513.089 191.539 1515.994 191.539 1518.091 189.465 1519.431 185.038L1522.666 174.415C1523.094 172.903 1523.044 172.494 1520.644 172.494L1520.821 171.88H1526.557L1526.404 172.494C1524.838 172.494 1524.283 172.903 1523.827 174.415L1520.594 185.14C1519.356 189.338 1517.385 192.743 1512.432 192.743ZM1535.974 172.494L1536.127 171.88H1541.913L1541.761 172.468C1540.523 172.468 1539.791 172.827 1538.274 174.491L1531.982 181.428 1534.08 189.799C1534.484 191.412 1535.117 191.744 1536.784 191.744L1536.582 192.358H1529.027L1529.228 191.744C1531.426 191.744 1531.553 191.309 1531.174 189.799L1529.556 183.322 1523.973 189.927C1522.811 191.257 1523.088 191.744 1525.033 191.744L1524.882 192.358H1518.819L1518.995 191.77C1520.41 191.77 1521.295 191.283 1522.987 189.363L1529.254 182.171 1527.333 174.44C1526.93 172.827 1526.373 172.494 1525.033 172.494L1525.211 171.88H1532.133L1531.932 172.494C1529.936 172.494 1529.86 172.929 1530.24 174.44L1531.705 180.276 1536.884 174.363C1538.148 172.929 1537.82 172.494 1535.974 172.494ZM1540.105 192.682C1539.358 192.682 1538.825 192.17 1538.825 191.468 1538.825 190.496 1539.705 189.497 1540.744 189.497 1541.517 189.497 1541.996 190.01 1541.996 190.711 1541.996 191.656 1541.144 192.682 1540.105 192.682Z" fill="#DDDDD5"/></svg>
+          </div>
+          <div class="mt-label">Table of content(s)</div>
+        </div>
+        <div class="mt-list">
+          <div class="mt-row"><span class="mt-number">/01.</span><span class="mt-title">Project Overview</span></div>
+          <div class="mt-row"><span class="mt-number">/02.</span><span class="mt-title">Scope and Deliverables</span></div>
+          <div class="mt-row"><span class="mt-number">/03.</span><span class="mt-title">Project Timeline</span></div>
+          <div class="mt-row"><span class="mt-number">/04.</span><span class="mt-title">Executive Summary</span></div>
+          <div class="mt-row"><span class="mt-number">/05.</span><span class="mt-title">Terms and Conditions</span></div>
+          <div class="mt-row"><span class="mt-number">/06.</span><span class="mt-title">Contract Agreement</span></div>
       <div class="stage-mobile-content" id="stage-mobile-problem">
         <div class="mp-header">
           <div class="mp-logo">
@@ -1477,6 +1530,7 @@
     <div id="panel-ca" class="panel-slide" style="display:none"></div>
 
     <div id="panel-mobile-cover" class="panel-slide" style="display:none"></div>
+    <div id="panel-mobile-toc" class="panel-slide" style="display:none"></div>
     <div id="panel-mobile-problem" class="panel-slide" style="display:none"></div>
     <div id="panel-mobile-solution" class="panel-slide" style="display:none"></div>
     <div id="panel-mobile-impact" class="panel-slide" style="display:none"></div>
@@ -1983,6 +2037,36 @@
     { key: 'title', name: 'Section Title', font: 'Neue Haas Grotesk Roman', defaults: { fs: 75.8, lh: 1.04, ls: 0.003, fw: 400 }, fsRange: [30, 120, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: null },
     { key: 'label', name: 'Header / Year / Page Label', font: 'Neue Haas Grotesk Roman', defaults: { fs: 30.3, lh: 1.31, ls: -0.006, fw: 400 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
   ], document.createElement('div'));
+
+  // ---------------------------------------------------------------------
+  // Mobile TOC slide module — mirrors components/proposal/slides-mobile/
+  // TOCMobileSlide.tsx. Values are on the 402px mobile reference width
+  // (--mscale), not desktop's 1920px (--scale) — see lib/fluidMobile.ts.
+  // ---------------------------------------------------------------------
+  const mtPanel = document.getElementById('panel-mobile-toc');
+  const mtLayoutState = {};
+  const mtLayoutRefs = {};
+  buildLayoutSliders(mtPanel, 'mt-pad', [
+    { key: 'top', label: 'Padding Top', min: 0, max: 100, default: 28 },
+    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 100, default: 16 },
+    { key: 'left', label: 'Padding Left', min: 0, max: 60, default: 24 },
+    { key: 'right', label: 'Padding Right', min: 0, max: 60, default: 24 },
+  ], updateMobileScale, mtLayoutState, mtLayoutRefs, stageMobile);
+  buildLayoutSliders(mtPanel, 'mt-list', [
+    { key: 'gap', label: 'Row Gap (vertical)', min: 0, max: 60, default: 29 },
+  ], updateMobileScale, mtLayoutState, mtLayoutRefs, stageMobile);
+  buildLayoutSliders(mtPanel, 'mt-row', [
+    { key: 'gap', label: 'Number → Title Gap (vertical, within a row)', min: 0, max: 30, default: 11 },
+  ], updateMobileScale, mtLayoutState, mtLayoutRefs, stageMobile);
+  buildLayoutSliders(mtPanel, 'mt-logo', [
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 40, step: 0.1, default: 13.3 },
+  ], updateMobileScale, mtLayoutState, mtLayoutRefs, stageMobile);
+  buildLayoutOutputBox(mtPanel, mtLayoutState, mtLayoutRefs);
+  buildTypographyPanels(mtPanel, 'mt', [
+    { key: 'number', name: 'Row Number ("/01.")', font: 'Instrument Serif', defaults: { fs: 31.6, lh: 0.97, ls: -0.025, fw: 400 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: null },
+    { key: 'title', name: 'Section Title', font: 'Neue Haas Grotesk Roman', defaults: { fs: 31.7, lh: 1.19, ls: 0.008, fw: 400 }, fsRange: [12, 40, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: null },
+    { key: 'label', name: 'Header Label ("Table of content(s)")', font: 'Neue Haas Grotesk Roman', defaults: { fs: 13.7, lh: 1.31, ls: -0.006, fw: 400 }, fsRange: [6, 24, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
+  ], document.createElement('div'), stageMobile);
 
   // ---------------------------------------------------------------------
   // Problem slide module (first of three Project Overview sub-slides)

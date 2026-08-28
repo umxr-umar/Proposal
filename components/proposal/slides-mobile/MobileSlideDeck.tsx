@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { mfont, mpx } from "@/lib/fluidMobile";
 
 /**
@@ -9,8 +16,13 @@ import { mfont, mpx } from "@/lib/fluidMobile";
  * menu: sections are scroll-snapped pages, and orientation comes from
  * three passive signals instead of one active control:
  *
- * 1. The scroll-snap settle motion itself (`proximity`, not `mandatory` —
- *    never fights a user mid-read on a long section).
+ * 1. The scroll-snap settle motion itself (`mandatory` + `scrollSnapStop:
+ *    "always"` — a resting scroll position is always exactly one section,
+ *    never a torn view with two sections' content both partially visible.
+ *    An earlier `proximity` version was rejected after testing on device:
+ *    on short sections like Cover/TOC it let scroll rest mid-transition,
+ *    showing both sections' chrome overlapping, which read as broken
+ *    rather than "scrollable." `mandatory` always resolves to one section).
  * 2. Each section's own header label (different text the instant you land
  *    on a new one) — that lives in each section's own content, not here.
  * 3. The ambient position dots below — ORIENTATION, not navigation; they
@@ -33,6 +45,25 @@ const THEME_TEXT: Record<"dark" | "light", string> = {
   dark: "#DDDDD5",
   light: "#131310",
 };
+
+// Lets a section's own content (e.g. TOC's rows) jump to another section —
+// scrollIntoView, not desktop's index-swap goToSlide, since mobile sections
+// are real scrollable DOM nodes, not a translateX carousel. A target index
+// past the last real section clamps to the last one, same as desktop's
+// goToSlide, so TOC rows can point ahead of slides that don't exist yet.
+type MobileSlideDeckContextValue = {
+  sectionCount: number;
+  scrollToSection: (index: number) => void;
+};
+const MobileSlideDeckContext = createContext<MobileSlideDeckContextValue | null>(null);
+
+export function useMobileSlideDeck(): MobileSlideDeckContextValue {
+  const ctx = useContext(MobileSlideDeckContext);
+  if (!ctx) {
+    throw new Error("useMobileSlideDeck must be used within a MobileSlideDeck");
+  }
+  return ctx;
+}
 
 // Same pill treatment as desktop's nav pill (SlideDeck.tsx) — dark
 // gradient, hairline border, layered inset+drop shadow — not a plain
@@ -84,8 +115,6 @@ function ScrollHint() {
 export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) {
   const screenRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [hintDismissed, setHintDismissed] = useState(false);
-
   useEffect(() => {
     const root = screenRef.current;
     if (!root) return;
@@ -97,7 +126,6 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
           if (entry.isIntersecting && entry.intersectionRatio > 0.55) {
             const idx = Number(entry.target.getAttribute("data-mobile-section"));
             setActiveIndex(idx);
-            if (idx > 0) setHintDismissed(true);
           }
         }
       },
@@ -109,7 +137,16 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
 
   const activeTheme = sections[activeIndex]?.theme ?? "dark";
 
+  const scrollToSection = (index: number) => {
+    const root = screenRef.current;
+    if (!root) return;
+    const clamped = Math.max(0, Math.min(index, sections.length - 1));
+    const target = root.querySelector<HTMLElement>(`[data-mobile-section="${clamped}"]`);
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
+    <MobileSlideDeckContext.Provider value={{ sectionCount: sections.length, scrollToSection }}>
     <div
       ref={screenRef}
       className="relative w-full"
@@ -117,7 +154,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
         height: "100dvh",
         overflowY: "scroll",
         overflowX: "hidden",
-        scrollSnapType: "y proximity",
+        scrollSnapType: "y mandatory",
       }}
     >
       {sections.map((section, i) => (
@@ -127,13 +164,14 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
           className="relative w-full"
           style={{
             scrollSnapAlign: "start",
+            scrollSnapStop: "always",
             minHeight: "100dvh",
             backgroundColor: THEME_BG[section.theme],
             color: THEME_TEXT[section.theme],
           }}
         >
           {section.content}
-          {i === 0 && !hintDismissed && <ScrollHint />}
+          {i === 0 && activeIndex === 0 && <ScrollHint />}
         </section>
       ))}
 
@@ -164,5 +202,6 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
         ))}
       </div>
     </div>
+    </MobileSlideDeckContext.Provider>
   );
 }

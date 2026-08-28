@@ -15,6 +15,7 @@ import { TermsAndConditionsSlide } from "@/components/proposal/slides/TermsAndCo
 import { ContractAgreementSlide } from "@/components/proposal/slides/ContractAgreementSlide";
 import { MobileSlideDeck } from "@/components/proposal/slides-mobile/MobileSlideDeck";
 import { CoverMobileSlide } from "@/components/proposal/slides-mobile/CoverMobileSlide";
+import { TOCMobileSlide } from "@/components/proposal/slides-mobile/TOCMobileSlide";
 import { ProblemMobileSlide } from "@/components/proposal/slides-mobile/ProblemMobileSlide";
 import { SolutionMobileSlide } from "@/components/proposal/slides-mobile/SolutionMobileSlide";
 import { ImpactMobileSlide } from "@/components/proposal/slides-mobile/ImpactMobileSlide";
@@ -75,11 +76,12 @@ export default async function ProposalPage({
         />
       </div>
 
-      {/* Mobile — in progress; Cover, Problem, Solution, Impact exist so far, see AGENTS.md */}
+      {/* Mobile — in progress; Cover, TOC, Problem, Solution, Impact exist so far, see AGENTS.md */}
       <div className="md:hidden">
         <MobileSlideDeck
           sections={[
             { theme: "dark", content: <CoverMobileSlide proposal={proposal} /> },
+            { theme: "dark", content: <TOCMobileSlide /> },
             { theme: "light", content: <ProblemMobileSlide proposal={proposal} /> },
             { theme: "light", content: <SolutionMobileSlide proposal={proposal} /> },
             { theme: "light", content: <ImpactMobileSlide proposal={proposal} /> },
