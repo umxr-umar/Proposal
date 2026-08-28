@@ -100,12 +100,12 @@ export function ScopeDeliverablesMobileSlide({ proposal }: { proposal: Proposal 
       }}
     >
       <div className="flex items-center justify-between">
-        <BifluxLogo height={mfont(11.3)} color="#000000" />
+        <BifluxLogo height={mfont(13.2)} color="#000000" />
         <div
           style={{
             fontFamily: inter,
             fontWeight: 500,
-            fontSize: mfont(11.5),
+            fontSize: mfont(12),
             lineHeight: "135%",
             letterSpacing: "-0.020em",
           }}
