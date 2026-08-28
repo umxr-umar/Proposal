@@ -229,14 +229,15 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
               rather than dragging with the scroll gesture. A real scale
               move (not just a fade) so arriving at a new section reads as a
               distinct, deliberate beat. Entry and exit use the SAME
-              duration/easing — an earlier version had a fast 160ms exit vs
-              a slower 320ms entry, which left a brief gap where neither
-              section was visible; that gap read as an abrupt "pop" rather
-              than a smooth motion (reported specifically on downward
-              scrolling — the mismatch is the same in both directions, but
-              apparently more perceptible on the down/exit side). One
-              matched, gentler duration front-to-back reads as one
-              continuous cross-fade instead. */}
+              duration/easing (a mismatched 160ms exit vs 320ms entry used
+              to leave a visible gap, read as an abrupt "pop"). Duration
+              tuned down from 420ms after 420 read as sluggish/laggy on
+              device — 260ms is the current landing point: fast enough to
+              feel immediate, still long enough to read as a cross-fade
+              rather than an instant cut. If this needs adjusting again,
+              move in ~40-60ms steps rather than swinging to another
+              extreme — this value has already overshot in both directions
+              once. */}
           <div
             style={{
               opacity: activeIndex === i ? 1 : 0,
@@ -245,7 +246,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
                   ? "translateY(0) scale(1)"
                   : "translateY(34px) scale(0.94)",
               transition:
-                "opacity 420ms cubic-bezier(0.33, 1, 0.68, 1), transform 420ms cubic-bezier(0.33, 1, 0.68, 1)",
+                "opacity 260ms cubic-bezier(0.33, 1, 0.68, 1), transform 260ms cubic-bezier(0.33, 1, 0.68, 1)",
             }}
           >
             {section.content}
