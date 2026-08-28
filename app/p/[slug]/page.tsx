@@ -15,6 +15,7 @@ import { TermsAndConditionsSlide } from "@/components/proposal/slides/TermsAndCo
 import { ContractAgreementSlide } from "@/components/proposal/slides/ContractAgreementSlide";
 import { MobileSlideDeck } from "@/components/proposal/slides-mobile/MobileSlideDeck";
 import { CoverMobileSlide } from "@/components/proposal/slides-mobile/CoverMobileSlide";
+import { TOCMobileSlide } from "@/components/proposal/slides-mobile/TOCMobileSlide";
 import { ScopeDeliverablesMobileSlide } from "@/components/proposal/slides-mobile/ScopeDeliverablesMobileSlide";
 
 // Proposals live in Notion. Re-fetch at most once per 60s so edits (or a
@@ -73,11 +74,16 @@ export default async function ProposalPage({
         />
       </div>
 
-      {/* Mobile — in progress; see AGENTS.md */}
+      {/* Mobile — in progress; Cover, TOC, Scope and Deliverables exist so far.
+          NOTE: Scope is desktop index 5 — this array only has it at index 2
+          because Problem/Solution/Impact (indices 2-4) haven't merged into
+          this branch yet. Fix this ordering when actually merging to main —
+          see AGENTS.md's merge-order guidance. */}
       <div className="md:hidden">
         <MobileSlideDeck
           sections={[
             { theme: "dark", content: <CoverMobileSlide proposal={proposal} /> },
+            { theme: "dark", content: <TOCMobileSlide /> },
             {
               theme: "light",
               content: <ScopeDeliverablesMobileSlide proposal={proposal} />,
