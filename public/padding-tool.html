@@ -1931,78 +1931,78 @@
   const mpLayoutState = {};
   const mpLayoutRefs = {};
   buildLayoutSliders(mpPanel, 'mp-pad', [
-    { key: 'top', label: 'Padding Top', min: 0, max: 100, default: 24 },
-    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 150, default: 48 },
+    { key: 'top', label: 'Padding Top', min: 0, max: 100, default: 30 },
+    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 150, default: 46 },
     { key: 'left', label: 'Padding Left', min: 0, max: 60, default: 24 },
     { key: 'right', label: 'Padding Right', min: 0, max: 60, default: 24 },
   ], updateMobileScale, mpLayoutState, mpLayoutRefs, stageMobile);
   buildLayoutSliders(mpPanel, 'mp-gap', [
-    { key: 'heading', label: 'Header → Heading Gap', min: 0, max: 150, default: 64 },
-    { key: 'body', label: 'Heading → Body Gap', min: 0, max: 100, default: 28 },
+    { key: 'heading', label: 'Header → Heading Gap', min: 0, max: 150, default: 45 },
+    { key: 'body', label: 'Heading → Body Gap', min: 0, max: 100, default: 16 },
   ], updateMobileScale, mpLayoutState, mpLayoutRefs, stageMobile);
   buildLayoutSliders(mpPanel, 'mp-para', [
-    { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 36 },
+    { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 40 },
   ], updateMobileScale, mpLayoutState, mpLayoutRefs, stageMobile);
   buildLayoutSliders(mpPanel, 'mp-logo', [
-    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 40, step: 0.1, default: 11 },
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 40, step: 0.1, default: 13.3 },
   ], updateMobileScale, mpLayoutState, mpLayoutRefs, stageMobile);
   buildLayoutOutputBox(mpPanel, mpLayoutState, mpLayoutRefs);
   buildTypographyPanels(mpPanel, 'mp', [
-    { key: 'heading', name: 'Heading ("Problem")', font: 'Helvetica Neue', defaults: { fs: 30, lh: 1.05, ls: -0.02, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
-    { key: 'body', name: 'Body Text', font: 'Neue Haas Grotesk Roman', defaults: { fs: 19, lh: 1.5, ls: -0.01, fw: 400 }, fsRange: [12, 32, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
-    { key: 'label', name: 'Breadcrumb', font: 'Inter', defaults: { fs: 11, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [6, 24, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'heading', name: 'Heading ("Problem")', font: 'Helvetica Neue', defaults: { fs: 35.9, lh: 1.04, ls: -0.020, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'body', name: 'Body Text', font: 'Neue Haas Grotesk Roman', defaults: { fs: 19.1, lh: 1.5, ls: 0.003, fw: 400 }, fsRange: [12, 32, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
+    { key: 'label', name: 'Breadcrumb', font: 'Inter', defaults: { fs: 13, lh: 1.35, ls: -0.030, fw: 500 }, fsRange: [6, 24, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
   ], document.createElement('div'), stageMobile);
 
   const msoPanel = document.getElementById('panel-mobile-solution');
   const msoLayoutState = {};
   const msoLayoutRefs = {};
   buildLayoutSliders(msoPanel, 'mso-pad', [
-    { key: 'top', label: 'Padding Top', min: 0, max: 100, default: 24 },
-    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 150, default: 48 },
+    { key: 'top', label: 'Padding Top', min: 0, max: 100, default: 30 },
+    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 150, default: 46 },
     { key: 'left', label: 'Padding Left', min: 0, max: 60, default: 24 },
     { key: 'right', label: 'Padding Right', min: 0, max: 60, default: 24 },
   ], updateMobileScale, msoLayoutState, msoLayoutRefs, stageMobile);
   buildLayoutSliders(msoPanel, 'mso-gap', [
-    { key: 'heading', label: 'Header → Heading Gap', min: 0, max: 150, default: 64 },
-    { key: 'body', label: 'Heading → Body Gap', min: 0, max: 100, default: 28 },
+    { key: 'heading', label: 'Header → Heading Gap', min: 0, max: 150, default: 45 },
+    { key: 'body', label: 'Heading → Body Gap', min: 0, max: 100, default: 16 },
   ], updateMobileScale, msoLayoutState, msoLayoutRefs, stageMobile);
   buildLayoutSliders(msoPanel, 'mso-para', [
-    { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 36 },
+    { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 40 },
   ], updateMobileScale, msoLayoutState, msoLayoutRefs, stageMobile);
   buildLayoutSliders(msoPanel, 'mso-logo', [
-    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 40, step: 0.1, default: 11 },
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 40, step: 0.1, default: 13.3 },
   ], updateMobileScale, msoLayoutState, msoLayoutRefs, stageMobile);
   buildLayoutOutputBox(msoPanel, msoLayoutState, msoLayoutRefs);
   buildTypographyPanels(msoPanel, 'mso', [
-    { key: 'heading', name: 'Heading ("Solution")', font: 'Helvetica Neue', defaults: { fs: 30, lh: 1.05, ls: -0.02, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
-    { key: 'body', name: 'Body Text', font: 'Neue Haas Grotesk Roman', defaults: { fs: 19, lh: 1.5, ls: -0.01, fw: 400 }, fsRange: [12, 32, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
-    { key: 'label', name: 'Breadcrumb', font: 'Inter', defaults: { fs: 11, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [6, 24, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'heading', name: 'Heading ("Solution")', font: 'Helvetica Neue', defaults: { fs: 35.9, lh: 1.04, ls: -0.020, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'body', name: 'Body Text', font: 'Neue Haas Grotesk Roman', defaults: { fs: 19.1, lh: 1.5, ls: 0.003, fw: 400 }, fsRange: [12, 32, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
+    { key: 'label', name: 'Breadcrumb', font: 'Inter', defaults: { fs: 13, lh: 1.35, ls: -0.030, fw: 500 }, fsRange: [6, 24, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
   ], document.createElement('div'), stageMobile);
 
   const mimPanel = document.getElementById('panel-mobile-impact');
   const mimLayoutState = {};
   const mimLayoutRefs = {};
   buildLayoutSliders(mimPanel, 'mim-pad', [
-    { key: 'top', label: 'Padding Top', min: 0, max: 100, default: 24 },
-    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 150, default: 48 },
+    { key: 'top', label: 'Padding Top', min: 0, max: 100, default: 30 },
+    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 150, default: 46 },
     { key: 'left', label: 'Padding Left', min: 0, max: 60, default: 24 },
     { key: 'right', label: 'Padding Right', min: 0, max: 60, default: 24 },
   ], updateMobileScale, mimLayoutState, mimLayoutRefs, stageMobile);
   buildLayoutSliders(mimPanel, 'mim-gap', [
-    { key: 'heading', label: 'Header → Heading Gap', min: 0, max: 150, default: 64 },
-    { key: 'body', label: 'Heading → Body Gap', min: 0, max: 100, default: 28 },
+    { key: 'heading', label: 'Header → Heading Gap', min: 0, max: 150, default: 45 },
+    { key: 'body', label: 'Heading → Body Gap', min: 0, max: 100, default: 16 },
   ], updateMobileScale, mimLayoutState, mimLayoutRefs, stageMobile);
   buildLayoutSliders(mimPanel, 'mim-para', [
-    { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 36 },
+    { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 40 },
   ], updateMobileScale, mimLayoutState, mimLayoutRefs, stageMobile);
   buildLayoutSliders(mimPanel, 'mim-logo', [
-    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 40, step: 0.1, default: 11 },
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 40, step: 0.1, default: 13.3 },
   ], updateMobileScale, mimLayoutState, mimLayoutRefs, stageMobile);
   buildLayoutOutputBox(mimPanel, mimLayoutState, mimLayoutRefs);
   buildTypographyPanels(mimPanel, 'mim', [
-    { key: 'heading', name: 'Heading ("Impact")', font: 'Helvetica Neue', defaults: { fs: 30, lh: 1.05, ls: -0.02, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
-    { key: 'body', name: 'Body Text', font: 'Neue Haas Grotesk Roman', defaults: { fs: 19, lh: 1.5, ls: -0.01, fw: 400 }, fsRange: [12, 32, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
-    { key: 'label', name: 'Breadcrumb', font: 'Inter', defaults: { fs: 11, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [6, 24, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'heading', name: 'Heading ("Impact")', font: 'Helvetica Neue', defaults: { fs: 35.9, lh: 1.04, ls: -0.020, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'body', name: 'Body Text', font: 'Neue Haas Grotesk Roman', defaults: { fs: 19.1, lh: 1.5, ls: 0.003, fw: 400 }, fsRange: [12, 32, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
+    { key: 'label', name: 'Breadcrumb', font: 'Inter', defaults: { fs: 13, lh: 1.35, ls: -0.030, fw: 500 }, fsRange: [6, 24, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
   ], document.createElement('div'), stageMobile);
 
   // ---------------------------------------------------------------------

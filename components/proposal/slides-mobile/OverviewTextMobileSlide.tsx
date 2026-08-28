@@ -28,21 +28,21 @@ export function OverviewTextMobileSlide({
     <div
       style={{
         minHeight: "100dvh",
-        paddingTop: mpx(24),
-        paddingBottom: mpx(48),
+        paddingTop: mpx(30),
+        paddingBottom: mpx(46),
         paddingLeft: mpx(24),
         paddingRight: mpx(24),
       }}
     >
       <div className="flex items-center justify-between">
-        <BifluxLogo height={mfont(11)} color="#000000" />
+        <BifluxLogo height={mfont(13.3)} color="#000000" />
         <div
           style={{
             fontFamily: inter,
             fontWeight: 500,
-            fontSize: mfont(11),
+            fontSize: mfont(13),
             lineHeight: "135%",
-            letterSpacing: "-0.03em",
+            letterSpacing: "-0.030em",
           }}
         >
           01. Project Overview
@@ -51,12 +51,12 @@ export function OverviewTextMobileSlide({
 
       <div
         style={{
-          marginTop: mpx(64),
+          marginTop: mpx(45),
           fontFamily: helveticaNeue,
           fontWeight: 700,
-          fontSize: mfont(30),
-          lineHeight: "105%",
-          letterSpacing: "-0.02em",
+          fontSize: mfont(35.9),
+          lineHeight: "104%",
+          letterSpacing: "-0.020em",
         }}
       >
         {label}
@@ -64,18 +64,18 @@ export function OverviewTextMobileSlide({
 
       <div
         style={{
-          marginTop: mpx(28),
+          marginTop: mpx(16),
           fontFamily: neueHaas,
           fontWeight: 400,
-          fontSize: mfont(19),
+          fontSize: mfont(19.1),
           lineHeight: "150%",
-          letterSpacing: "-0.01em",
+          letterSpacing: "0.003em",
         }}
       >
         {paragraphs.map((p, i) => (
           <p
             key={i}
-            style={{ margin: 0, marginBottom: i < paragraphs.length - 1 ? mpx(36) : 0 }}
+            style={{ margin: 0, marginBottom: i < paragraphs.length - 1 ? mpx(40) : 0 }}
           >
             {p}
           </p>
