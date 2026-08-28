@@ -120,16 +120,27 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
     if (!root) return;
 
     const items = Array.from(root.querySelectorAll<HTMLElement>("[data-mobile-section]"));
+    // Watch a 0px-tall band pinned to the viewport's top edge (rootMargin's
+    // -100% bottom collapses the observed area down to just that line)
+    // instead of a % of each section's OWN height. A ratio-based threshold
+    // (e.g. "> 0.55 of the target") breaks the moment a section is taller
+    // than the viewport — minHeight: 100dvh sections grow past that with
+    // real content (Problem/Solution/Impact's paragraphs, Scope's long
+    // list), so the max achievable ratio (viewportHeight / sectionHeight)
+    // drops below the threshold and activeIndex silently stops updating.
+    // scroll-snap-align: start guarantees the current section's top edge
+    // sits exactly at the viewport top at rest, so this line always
+    // intersects exactly one section regardless of its height.
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.55) {
+          if (entry.isIntersecting) {
             const idx = Number(entry.target.getAttribute("data-mobile-section"));
             setActiveIndex(idx);
           }
         }
       },
-      { root, threshold: [0, 0.55, 1] }
+      { root, rootMargin: "0px 0px -100% 0px", threshold: 0 }
     );
     items.forEach((el) => io.observe(el));
     return () => io.disconnect();
