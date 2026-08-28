@@ -18,15 +18,36 @@ import { mfont, mpx } from "@/lib/fluidMobile";
  *
  * 1. The scroll-snap settle motion itself (`mandatory` + `scrollSnapStop:
  *    "always"` — a resting scroll position is always exactly one section,
- *    never a torn view with two sections' content both partially visible.
- *    An earlier `proximity` version was rejected after testing on device:
- *    on short sections like Cover/TOC it let scroll rest mid-transition,
- *    showing both sections' chrome overlapping, which read as broken
- *    rather than "scrollable." `mandatory` always resolves to one section).
- * 2. Each section's own header label (different text the instant you land
+ *    never a torn view with two sections' content both partially visible).
+ *    `proximity` was tried again (briefly) to fix a real bug on long
+ *    sections (mandatory traps you at the top of any section taller than
+ *    the viewport, since it has no other internal snap point) — but
+ *    proximity made short-section scrolling itself feel wrong/laggy on a
+ *    real device, worse than the long-section bug it was meant to fix.
+ *    Reverted to `mandatory`. **The long-section trap is a known,
+ *    currently-unfixed bug** — don't re-attempt the `proximity` swap as
+ *    the fix without a different approach (e.g. scoping snap type
+ *    per-section instead of on the whole container, so only long sections
+ *    get different behavior instead of changing the feel everywhere).
+ * 2. A short arrival animation on each section's own content (not the
+ *    section element itself, which must stay untouched for scroll-snap
+ *    to behave predictably) — fades and slides in the instant a section
+ *    becomes active, giving a deliberate "you've arrived here" beat
+ *    instead of scroll position just quietly updating in the background.
+ * 3. Each section's own header label (different text the instant you land
  *    on a new one) — that lives in each section's own content, not here.
- * 3. The ambient position dots below — ORIENTATION, not navigation; they
- *    are not buttons and must not become tap targets.
+ * 4. The ambient position dots below — ORIENTATION, not navigation; they
+ *    are not buttons and must not become tap targets. Tracking which dot
+ *    is active watches a 0px-tall band pinned to the viewport's top edge
+ *    (via `rootMargin`), not a ratio of each section's own height — a
+ *    ratio threshold (the original approach) silently breaks the moment a
+ *    section is taller than the viewport (max achievable ratio =
+ *    viewportHeight / sectionHeight, which drops below any fixed
+ *    threshold), which is exactly the shape of Scope and Deliverables and
+ *    Terms and Conditions. `scroll-snap-align: start` guarantees the
+ *    active section's top sits exactly at the viewport top at rest, so
+ *    the pinned line always intersects exactly one section regardless of
+ *    height.
  *
  * Sections keep their own fixed theme (dark `#000000` / light `#E8E8E3`,
  * same as desktop) — never tie this to anything dynamic.
@@ -115,21 +136,33 @@ function ScrollHint() {
 export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) {
   const screenRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+
   useEffect(() => {
     const root = screenRef.current;
     if (!root) return;
 
     const items = Array.from(root.querySelectorAll<HTMLElement>("[data-mobile-section]"));
+    // Watch a 0px-tall band pinned to the viewport's top edge (rootMargin's
+    // -100% bottom collapses the observed area down to just that line)
+    // instead of a % of each section's OWN height. A ratio-based threshold
+    // (e.g. "> 0.55 of the target") breaks the moment a section is taller
+    // than the viewport — minHeight: 100dvh sections grow past that with
+    // real content (Problem/Solution/Impact's paragraphs, Scope's long
+    // list), so the max achievable ratio (viewportHeight / sectionHeight)
+    // drops below the threshold and activeIndex silently stops updating.
+    // scroll-snap-align: start guarantees the current section's top edge
+    // sits exactly at the viewport top at rest, so this line always
+    // intersects exactly one section regardless of its height.
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.55) {
+          if (entry.isIntersecting) {
             const idx = Number(entry.target.getAttribute("data-mobile-section"));
             setActiveIndex(idx);
           }
         }
       },
-      { root, threshold: [0, 0.55, 1] }
+      { root, rootMargin: "0px 0px -100% 0px", threshold: 0 }
     );
     items.forEach((el) => io.observe(el));
     return () => io.disconnect();
@@ -170,7 +203,29 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
             color: THEME_TEXT[section.theme],
           }}
         >
-          {section.content}
+          {/* Animates the CONTENT, never the section element itself — the
+              section is the real scroll-snap target, and animating its own
+              transform would fight the browser's snap physics. Ties to
+              activeIndex, not scroll progress, so it plays once on arrival
+              rather than dragging with the scroll gesture. Fast + a real
+              scale move (not just a fade) so arriving at a new section reads
+              as a distinct, deliberate beat — not scroll position quietly
+              updating in the background. */}
+          <div
+            style={{
+              opacity: activeIndex === i ? 1 : 0,
+              transform:
+                activeIndex === i
+                  ? "translateY(0) scale(1)"
+                  : "translateY(34px) scale(0.94)",
+              transition:
+                activeIndex === i
+                  ? "opacity 320ms cubic-bezier(0.22, 1, 0.36, 1), transform 320ms cubic-bezier(0.22, 1, 0.36, 1)"
+                  : "opacity 160ms ease-in, transform 160ms ease-in",
+            }}
+          >
+            {section.content}
+          </div>
           {i === 0 && activeIndex === 0 && <ScrollHint />}
         </section>
       ))}
