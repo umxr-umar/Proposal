@@ -158,20 +158,24 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
   // never looks at a ratio of any section's own height, only literal edge
   // positions.
   //
-  // activeIndex only updates once scrolling has SETTLED (debounced ~60ms
-  // after the last scroll event — cut down from 100ms after the combined
-  // debounce+animation delay read as too slow), not on every scroll frame
-  // while still in motion. This matters because mouse-wheel and trackpad
-  // input fire very different scroll event patterns: a wheel tick resolves
-  // to a snap almost instantly (one or two events, done), while a trackpad
-  // delivers a continuous stream of tiny-delta events for the whole
-  // gesture. Without debouncing, activeIndex — and therefore the arrival
-  // animation — was re-triggering repeatedly WHILE a trackpad gesture was
-  // still in progress, showing extra motion mid-scroll that a wheel-driven
-  // scroll never produced (its "motion" is over before the next frame).
-  // Waiting for settle makes both input types resolve to the same single,
-  // clean reveal after motion actually stops — don't drop this to 0, that
-  // reintroduces the mid-gesture flicker this was built to fix.
+  // activeIndex only updates once scrolling has SETTLED (debounced ~20ms
+  // after the last scroll event — cut down from 60ms, then 100ms before
+  // that, after real-phone testing read the pre-animation wait as
+  // sluggish), not on every scroll frame while still in motion. This
+  // matters because mouse-wheel and trackpad input fire very different
+  // scroll event patterns: a wheel tick resolves to a snap almost
+  // instantly (one or two events, done), while a trackpad delivers a
+  // continuous stream of tiny-delta events for the whole gesture. Without
+  // debouncing, activeIndex — and therefore the arrival animation — was
+  // re-triggering repeatedly WHILE a trackpad gesture was still in
+  // progress, showing extra motion mid-scroll that a wheel-driven scroll
+  // never produced. 20ms is a deliberately thin margin, not zero — it
+  // still exists to prevent that same mid-gesture flicker, but real touch
+  // scrolling under `mandatory` snap settles fast and decisively (much
+  // closer to wheel behavior than to trackpad), so it needs far less
+  // margin than the original desktop-trackpad case this was built for.
+  // If trackpad flicker resurfaces, that's the tradeoff to revisit — don't
+  // just push this back up blindly.
   useEffect(() => {
     const root = screenRef.current;
     if (!root) return;
@@ -192,7 +196,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
 
     const onScroll = () => {
       if (settleTimer) clearTimeout(settleTimer);
-      settleTimer = setTimeout(() => setActiveIndex(computeActive()), 60);
+      settleTimer = setTimeout(() => setActiveIndex(computeActive()), 20);
     };
 
     setActiveIndex(computeActive());
