@@ -62,6 +62,32 @@ import { mfont, mpx } from "@/lib/fluidMobile";
 export type MobileSectionDef = {
   theme: "dark" | "light";
   content: ReactNode;
+  // Defaults to false (a normal section: min-height: 100dvh, grows to fit
+  // its own content, part of the outer scroll-snap flow). Set true for a
+  // section whose real content is taller than the viewport (Scope and
+  // Deliverables today, Terms and Conditions eventually).
+  //
+  // First attempt at this got it wrong: just removing scroll-snap-align
+  // from the long section (so it's not a declared snap point) doesn't give
+  // free scrolling through it — `scroll-snap-type: mandatory` still
+  // guarantees SOME snap resolution on every rest, so with no snap point of
+  // its own, any scroll landing inside that section's range got yanked back
+  // to the nearest section that still had one (confirmed: scrolling into
+  // Scope bounced back to Impact, making Scope's content unreachable).
+  //
+  // The actual fix: a tall section still participates in the outer snap
+  // flow completely normally (keeps scroll-snap-align/stop, is still
+  // exactly one "page" from the outer scroll's perspective) — but its own
+  // height is CAPPED at exactly 100dvh with its own internal overflow-y:
+  // auto, instead of min-height: 100dvh letting its real content spill into
+  // and stretch the outer scroll flow (which is what created a section
+  // taller than one screen for `mandatory` to get trapped inside of in the
+  // first place). Scrolling into it snaps cleanly like any other section;
+  // once inside, further scrolling moves the section's OWN scrollbar
+  // (standard browser scroll-chaining hands it to the nested scrollable
+  // region), and only resumes moving the outer deck once that inner
+  // scroll is exhausted.
+  tall?: boolean;
 };
 
 const THEME_BG: Record<"dark" | "light", string> = {
@@ -161,28 +187,29 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
   // positions.
   //
   // Live, not settle-debounced — updates as motion happens, only throttled
-  // to one read per animation frame (~16ms, imperceptible — a performance
-  // guard against layout thrashing on a rapid stream of scroll events, not
-  // a "wait for scrolling to stop" delay the way the old settle debounce
-  // was). Dots tracking live during a scroll gesture isn't a bug the way
-  // content flicker was — it's just the orientation indicator staying
-  // current in real time, which is what an "ambient position indicator"
-  // should do.
+  // to one read per animation frame. Section top offsets are read ONCE on
+  // mount (offsetTop, relative to the scroll container, doesn't change
+  // after layout settles) instead of calling getBoundingClientRect() on
+  // every section on every scroll frame — that forces a synchronous layout
+  // recalculation each time, on every item, every frame, which is real,
+  // measurable jank on a slower real device even though it's invisible on
+  // a fast desktop test. Comparing cached offsets against root.scrollTop
+  // (already-known, no forced layout) does the same job for a fraction of
+  // the cost.
   useEffect(() => {
     const root = screenRef.current;
     if (!root) return;
 
     const items = Array.from(root.querySelectorAll<HTMLElement>("[data-mobile-section]"));
+    const offsets = items.map((el) => el.offsetTop);
     let ticking = false;
 
     const updateActive = () => {
       ticking = false;
-      const rootTop = root.getBoundingClientRect().top;
+      const top = root.scrollTop;
       let current = 0;
-      for (const el of items) {
-        if (el.getBoundingClientRect().top - rootTop <= 1) {
-          current = Number(el.getAttribute("data-mobile-section"));
-        }
+      for (let i = 0; i < offsets.length; i++) {
+        if (offsets[i] - top <= 1) current = i;
       }
       setActiveIndex(current);
     };
@@ -236,7 +263,14 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
           style={{
             scrollSnapAlign: "start",
             scrollSnapStop: "always",
-            minHeight: "100dvh",
+            // A tall section is capped at exactly 100dvh with its own
+            // scrollbar instead of min-height: 100dvh letting real content
+            // grow it past one screen — see MobileSectionDef's `tall` doc
+            // comment for why min-height was the actual root cause of the
+            // mandatory-snap trap, not scroll-snap-align itself.
+            ...(section.tall
+              ? { height: "100dvh", overflowY: "auto" }
+              : { minHeight: "100dvh" }),
             backgroundColor: THEME_BG[section.theme],
             color: THEME_TEXT[section.theme],
           }}

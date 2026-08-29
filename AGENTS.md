@@ -231,15 +231,44 @@ carousel.
 sections' chrome visible and overlapping at once — read as broken, not
 "scrollable." `mandatory` always resolves to exactly one section at rest.
 
-Known open risk: this reintroduces the exact problem `proximity` was
-originally chosen to avoid — on a long section (Terms and Conditions, Scope
-and Deliverables), `mandatory` snaps to the nearest boundary regardless of
-where the user paused mid-read, which tested as "actively hostile" in the
-original prototype comparison. Only Cover/TOC exist today, both short, so
-this hasn't bitten yet. Revisit when a long section is built — options
-include scoping snap behavior per-section rather than globally, or testing
-`proximity` again now that `scroll-snap-stop: always` is in place (untested
-combination). Don't assume `mandatory` is settled for the whole deck.
+**Resolved: a tall section is capped at 100dvh with its own internal
+scroll, not left to grow taller than the viewport.** `mandatory` traps
+scrolling at the top of any section taller than the viewport (no other
+internal snap point to resolve to) — confirmed on device as a real,
+multi-second tug-of-war between the user's scroll and the browser
+repeatedly re-snapping, not just a quick correction.
+
+First attempt got this wrong: just removing `scroll-snap-align` from the
+long section (so it's not a declared snap point) does NOT give free
+scrolling through it — `mandatory` still guarantees some snap resolution
+on every rest, so with no snap point of its own, scrolling into that
+section got yanked straight back to the nearest section that still had
+one (confirmed: scrolling toward Scope bounced back to Impact, making
+Scope's content completely unreachable).
+
+The actual fix: `MobileSectionDef` has an optional `tall?: boolean`
+(default false). A tall section KEEPS `scroll-snap-align`/`scroll-snap-
+stop` — it's still exactly one normal "page" from the outer scroll's
+perspective, snapping in and out cleanly like anything else — but its
+height is capped at exactly `100dvh` with its own `overflow-y: auto`,
+instead of `min-height: 100dvh` letting its real content stretch it past
+one screen (which is what created the too-tall section for `mandatory` to
+get trapped inside of in the first place). Once you're inside it, further
+scrolling moves its own internal scrollbar via normal browser scroll-
+chaining; the outer deck only resumes moving once that inner scroll is
+exhausted. Scope and Deliverables uses `tall: true` today; Terms and
+Conditions will need it too. `proximity` was tried as a global fix instead
+and made short-section scrolling itself feel wrong/laggy on a real device —
+don't revisit that as the fix, this per-section height cap is the one that
+actually worked.
+
+One side effect worth knowing: while `mandatory` was fighting a long
+section, the ambient-dot tracking looked badly laggy too, even though the
+tracking code itself was fine — it was accurately reporting a genuinely
+unstable scroll position during that tug-of-war. If dot lag reappears
+after this fix, look for a real performance issue in the tracking effect
+(e.g. forced layout in a scroll handler) rather than assuming it's the
+same root cause again.
 
 **Sections keep their own fixed background/theme — do not tie it to
 anything dynamic.** Same content-owned theming as desktop (Cover/TOC/Client
