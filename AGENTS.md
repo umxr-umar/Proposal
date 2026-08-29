@@ -150,14 +150,18 @@ Contents), so a new workspace building the next slide isn't re-deciding the
 shell — it's just following the recipe below and reusing what's already
 proven, not still-in-flux.
 
-Still to build: Problem/Solution/Impact (share one desktop layout — a
-single workspace covering all three, back to back, is more efficient than
-splitting them across separate workspaces), Scope and Deliverables, Project
+**Built so far:** Cover, Table of Contents, Problem/Solution/Impact (share
+`OverviewTextMobileSlide.tsx`), Scope and Deliverables — six slides live in
+`app/p/[slug]/page.tsx`'s mobile `sections` array today.
+
+**Still to build (5 remaining, one Conductor workspace each):** Project
 Timeline, Executive Summary, Client Testimonials, Terms and Conditions,
-Contract Agreement. Scope and Deliverables and Terms and Conditions are
-long-content sections — read the "CSS scroll-snap" note below (the
-`proximity` vs `mandatory` history) before touching snap behavior for
-either.
+Contract Agreement. Terms and Conditions is a long-content section (like
+Scope and Deliverables) — read the "CSS scroll-snap" note below, especially
+step 3 (the known Scope trap) and step 7 (how Scope's own overflow was
+fixed at the reference size) before assuming Terms and Conditions is
+automatically fine; check its actual rendered height the same way TOC's
+was checked, don't assume.
 
 **Building a new mobile slide — the recipe every workspace should follow:**
 0. **Sync with `origin/main` before doing anything else** (`git fetch origin
@@ -178,6 +182,15 @@ either.
    never a raw `px`/`vw` value (same rule as desktop's `fx()`/`fy()`/
    `ffont()`, see "Fluid sizing" above). Start from reasonable estimated
    values against the reference screenshot; exact tuning happens in step 4.
+   The component's own top-level wrapper needs full-viewport height — give
+   it the `mobile-deck-section` class (defined in `app/globals.css`), never
+   an inline `minHeight: "100dvh"`. Inline React style objects can't
+   express a CSS fallback (the same property twice just collapses to one
+   value in a JS object), and some Android browsers don't support `dvh` at
+   all — the declaration gets silently dropped, leaving height unbounded,
+   which broke scroll-snap entirely on a real Android device once already.
+   `mobile-deck-section` declares `min-height: 100vh` then `100dvh`, so an
+   unsupported browser falls back instead of losing the rule.
 3. Register the new slide as the next entry in the mobile `sections` array
    in `app/p/[slug]/page.tsx` (`{ theme: "dark" | "light", content: <... /> }`)
    — **this file is shared across every mobile slide**, see the merge-conflict
@@ -299,11 +312,13 @@ One side effect worth knowing: while `mandatory` was fighting the long
 section (step 3), the ambient-dot tracking looked badly laggy too, even
 though the tracking code itself was fine — it was accurately reporting a
 genuinely unstable scroll position during that tug-of-war, not lagging on
-its own. Separately, the dot-tracking effect was also optimized to read
-section offsets once on mount instead of calling `getBoundingClientRect()`
-on every section on every scroll frame (real, measurable jank on a slower
-device, invisible on a fast desktop test) — that improvement is real and
-independent of whatever `scroll-snap-type` ends up being.
+its own. Separately, the dot-tracking effect reads section offsets once on
+mount instead of calling `getBoundingClientRect()` on every section on
+every scroll frame (real, measurable jank on a slower device, invisible on
+a fast desktop test) — that improvement is real and independent of
+whatever `scroll-snap-type` ends up being. See point 3 under "three
+signals, not one" above for the current (rAF-polled, midpoint-threshold)
+implementation.
 
 **Sections keep their own fixed background/theme — do not tie it to
 anything dynamic.** Same content-owned theming as desktop (Cover/TOC/Client
@@ -318,10 +333,23 @@ Testimonials→Contract Agreement are both dark-to-dark):
 2. Each section's own header label, which is already different text the
    instant you land on a new section
 3. An ambient position indicator (small dots, one per section, fixed to the
-   screen edge) that updates via `IntersectionObserver` and is a passive
-   *orientation* aid, not a clickable nav control — don't wire it up to
-   accept taps/jumps, that reintroduces the discoverability problem a menu
-   had
+   screen edge) that is a passive *orientation* aid, not a clickable nav
+   control — don't wire it up to accept taps/jumps, that reintroduces the
+   discoverability problem a menu had. **Not `IntersectionObserver`** — two
+   earlier `IntersectionObserver` attempts were both tried and both broke
+   (a ratio threshold fails on any section taller than the viewport; a
+   rootMargin/pinned-line variant only updated reliably in one scroll
+   direction). Current implementation: a `requestAnimationFrame` loop in
+   `MobileSlideDeck.tsx` polls `root.scrollTop` directly every frame
+   (sidesteps the browser throttling scroll-*event* dispatch during
+   momentum scrolling) and flips `activeIndex` at the **midpoint** between
+   each pair of adjacent sections' cached `offsetTop` values — not at
+   either section's own edge. The midpoint choice matters: an edge-based
+   threshold is technically correct once scroll has settled, but during a
+   slow drag it only flips at the very last instant of the gesture, which
+   reads as the dot "lagging" even though it's tracking accurately. A fast
+   flick crosses either threshold almost instantly, so this only shows up
+   on a slow, deliberate drag — don't revert to an edge-based threshold.
 
 **Scroll discoverability, Cover only:** a small animated "Scroll ↓" hint,
 rendered only inside the Cover section and shown whenever Cover is the
