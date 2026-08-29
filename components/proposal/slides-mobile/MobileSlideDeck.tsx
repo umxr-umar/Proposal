@@ -178,47 +178,45 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
   // a fast desktop test. Comparing cached offsets against root.scrollTop
   // (already-known, no forced layout) does the same job for a fraction of
   // the cost.
+  // Polls scrollTop every animation frame instead of listening for the
+  // browser's own "scroll" event. Safari (and others) throttle how often
+  // that event actually fires during momentum/inertial scrolling — the
+  // screen still repaints every frame, but the JS event dispatch rate
+  // drops, and drops harder the longer the momentum phase runs. A full
+  // flick down to the next section coasts longer than a short corrective
+  // nudge back up, so it gets throttled more: fewer "scroll" events fire
+  // while the dot tries to keep up, and it only catches up once the next
+  // event lands — this is what read as "up is perfect, down lags/isn't
+  // syncing." Reading root.scrollTop directly on every rAF sidesteps
+  // event-dispatch throttling entirely: it asks the real, current
+  // position up to 60x/sec regardless of how many "scroll" events the
+  // browser chose to fire, so it can't be asymmetric by direction. Only
+  // calls setActiveIndex when the position actually changed, so it's a
+  // no-op re-render while at rest.
   useEffect(() => {
     const root = screenRef.current;
     if (!root) return;
 
     const items = Array.from(root.querySelectorAll<HTMLElement>("[data-mobile-section]"));
     const offsets = items.map((el) => el.offsetTop);
-    let ticking = false;
+    let rafId: number;
+    let lastTop = -1;
 
-    const updateActive = () => {
-      ticking = false;
+    const tick = () => {
       const top = root.scrollTop;
-      let current = 0;
-      for (let i = 0; i < offsets.length; i++) {
-        if (offsets[i] - top <= 1) current = i;
+      if (top !== lastTop) {
+        lastTop = top;
+        let current = 0;
+        for (let i = 0; i < offsets.length; i++) {
+          if (offsets[i] - top <= 1) current = i;
+        }
+        setActiveIndex(current);
       }
-      setActiveIndex(current);
+      rafId = requestAnimationFrame(tick);
     };
 
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(updateActive);
-    };
-
-    updateActive();
-    root.addEventListener("scroll", onScroll, { passive: true });
-    // Safety net on top of the rAF-throttled scroll listener above: once
-    // native momentum scrolling has fully settled, force one more read
-    // regardless of whether every intermediate scroll event was caught.
-    // A faster/harder flick (very plausibly more common scrolling down a
-    // long deck than braking scrolling back up) can under real-device
-    // conditions coalesce or skip scroll events during the glide — the
-    // rAF throttle only reads once per frame, and a dropped frame under
-    // load drops that read. Direction-agnostic, standards-based, and a
-    // no-op in browsers that don't support it yet (older Safari) since it
-    // simply never fires there, leaving the existing behavior unchanged.
-    root.addEventListener("scrollend", updateActive, { passive: true });
-    return () => {
-      root.removeEventListener("scroll", onScroll);
-      root.removeEventListener("scrollend", updateActive);
-    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, []);
 
   const activeTheme = sections[activeIndex]?.theme ?? "dark";
