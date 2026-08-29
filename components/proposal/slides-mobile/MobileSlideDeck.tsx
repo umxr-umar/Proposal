@@ -19,38 +19,41 @@ import { mfont, mpx } from "@/lib/fluidMobile";
  * 1. The scroll-snap settle motion itself (`mandatory` + `scrollSnapStop:
  *    "always"` — a resting scroll position is always exactly one section,
  *    never a torn view with two sections' content both partially visible).
- *    `proximity` was tried again (briefly) to fix a real bug on long
- *    sections (mandatory traps you at the top of any section taller than
- *    the viewport, since it has no other internal snap point) — but
- *    proximity made short-section scrolling itself feel wrong/laggy on a
- *    real device, worse than the long-section bug it was meant to fix.
- *    Reverted to `mandatory`. **The long-section trap is a known,
- *    currently-unfixed bug** — don't re-attempt the `proximity` swap as
- *    the fix without a different approach (e.g. scoping snap type
- *    per-section instead of on the whole container, so only long sections
- *    get different behavior instead of changing the feel everywhere).
- * 2. A short arrival animation on each section's own content (not the
- *    section element itself, which must stay untouched for scroll-snap
- *    to behave predictably) — fades and slides in the instant a section
- *    becomes active, giving a deliberate "you've arrived here" beat
- *    instead of scroll position just quietly updating in the background.
- * 3. Each section's own header label (different text the instant you land
+ *    This IS the "you've moved" feedback — it's real physical motion, native
+ *    to the browser, with zero JS involved and therefore zero possible
+ *    delay. `proximity` was tried to fix a real bug on long sections
+ *    (mandatory traps you at the top of any section taller than the
+ *    viewport, since it has no other internal snap point) — but proximity
+ *    made short-section scrolling itself feel wrong/laggy on a real device,
+ *    worse than the long-section bug it was meant to fix. Reverted to
+ *    `mandatory`. **The long-section trap is a known, currently-unfixed
+ *    bug** — don't re-attempt the `proximity` swap as the fix without a
+ *    different approach (e.g. scoping snap type per-section instead of on
+ *    the whole container).
+ * 2. Each section's own header label (different text the instant you land
  *    on a new one) — that lives in each section's own content, not here.
- * 4. The ambient position dots below — ORIENTATION, not navigation; they
+ * 3. The ambient position dots below — ORIENTATION, not navigation; they
  *    are not buttons and must not become tap targets. Tracking which dot
- *    is active is scroll-position-based (see the effect below) — a plain
- *    scroll listener that recomputes "which section's top is currently at
- *    or above the viewport top," not IntersectionObserver. Two earlier
- *    IntersectionObserver approaches were both tried and both broke:
- *    a ratio threshold (`intersectionRatio > 0.55`) silently stops working
- *    once a section is taller than the viewport (max achievable ratio =
- *    viewportHeight / sectionHeight, which drops below any fixed
- *    threshold — exactly the shape of Scope and Deliverables and Terms and
- *    Conditions); a rootMargin-pinned-line variant fixed that but only
- *    updated reliably scrolling downward, not upward (confirmed on
- *    device — scrolling up left the arrival animation never triggering).
- *    A continuously recomputed scroll-position check has no notion of
- *    "direction" or "crossing event" to get backwards in the first place.
+ *    is active is a plain, undebounced scroll listener that recomputes
+ *    "which section's top is currently at or above the viewport top" on
+ *    every scroll frame — correct for any section height (never a ratio of
+ *    a section's own size, so it doesn't break on a section taller than the
+ *    viewport, unlike two earlier IntersectionObserver attempts both did).
+ *
+ * A per-section content fade/scale animation, gated behind a settle
+ * debounce, used to exist here too — removed. It went through several
+ * rounds of duration/debounce tuning (a full history is in git blame on
+ * this file) and never stopped generating "feels delayed" or "not smooth"
+ * complaints on a real device, because ANY JS-driven animation gated on a
+ * debounced state update has an unavoidable floor on how immediate it can
+ * feel — there's always at least one animation frame of lag between the
+ * physical scroll stopping and the JS noticing and starting a transition.
+ * The scroll-snap motion itself has no such floor. Don't reintroduce a
+ * content-level arrival animation without a real justification beyond
+ * "make it feel more like Instagram" — that was the original ask, and it
+ * cost more in bugs (direction-dependent tracking failures, trackpad vs.
+ * mouse-wheel inconsistency, multiple rounds of timing complaints) than it
+ * ever delivered in feel.
  *
  * Sections keep their own fixed theme (dark `#000000` / light `#E8E8E3`,
  * same as desktop) — never tie this to anything dynamic.
@@ -147,9 +150,8 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
   // the same pinned line in reverse didn't consistently fire an
   // intersecting:true entry for the section being entered, presumably due
   // to how the browser batches/orders crossing events at a snap boundary.
-  // Confirmed directly on device: scrolling up left the incoming section's
-  // content invisible (arrival animation never triggered because
-  // activeIndex never changed), scrolling down worked fine. A continuously
+  // Confirmed directly on device: scrolling up left activeIndex stuck on
+  // the previous section, scrolling down worked fine. A continuously
   // recomputed scroll-position check has no notion of "direction" at all —
   // it just asks "right now, which section's top is the last one at or
   // above the viewport top" — so it can't have a direction-dependent bug
@@ -158,32 +160,23 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
   // never looks at a ratio of any section's own height, only literal edge
   // positions.
   //
-  // activeIndex only updates once scrolling has SETTLED (debounced ~20ms
-  // after the last scroll event — cut down from 60ms, then 100ms before
-  // that, after real-phone testing read the pre-animation wait as
-  // sluggish), not on every scroll frame while still in motion. This
-  // matters because mouse-wheel and trackpad input fire very different
-  // scroll event patterns: a wheel tick resolves to a snap almost
-  // instantly (one or two events, done), while a trackpad delivers a
-  // continuous stream of tiny-delta events for the whole gesture. Without
-  // debouncing, activeIndex — and therefore the arrival animation — was
-  // re-triggering repeatedly WHILE a trackpad gesture was still in
-  // progress, showing extra motion mid-scroll that a wheel-driven scroll
-  // never produced. 20ms is a deliberately thin margin, not zero — it
-  // still exists to prevent that same mid-gesture flicker, but real touch
-  // scrolling under `mandatory` snap settles fast and decisively (much
-  // closer to wheel behavior than to trackpad), so it needs far less
-  // margin than the original desktop-trackpad case this was built for.
-  // If trackpad flicker resurfaces, that's the tradeoff to revisit — don't
-  // just push this back up blindly.
+  // Live, not settle-debounced — updates as motion happens, only throttled
+  // to one read per animation frame (~16ms, imperceptible — a performance
+  // guard against layout thrashing on a rapid stream of scroll events, not
+  // a "wait for scrolling to stop" delay the way the old settle debounce
+  // was). Dots tracking live during a scroll gesture isn't a bug the way
+  // content flicker was — it's just the orientation indicator staying
+  // current in real time, which is what an "ambient position indicator"
+  // should do.
   useEffect(() => {
     const root = screenRef.current;
     if (!root) return;
 
     const items = Array.from(root.querySelectorAll<HTMLElement>("[data-mobile-section]"));
-    let settleTimer: ReturnType<typeof setTimeout> | undefined;
+    let ticking = false;
 
-    const computeActive = () => {
+    const updateActive = () => {
+      ticking = false;
       const rootTop = root.getBoundingClientRect().top;
       let current = 0;
       for (const el of items) {
@@ -191,20 +184,18 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
           current = Number(el.getAttribute("data-mobile-section"));
         }
       }
-      return current;
+      setActiveIndex(current);
     };
 
     const onScroll = () => {
-      if (settleTimer) clearTimeout(settleTimer);
-      settleTimer = setTimeout(() => setActiveIndex(computeActive()), 20);
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateActive);
     };
 
-    setActiveIndex(computeActive());
+    updateActive();
     root.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      root.removeEventListener("scroll", onScroll);
-      if (settleTimer) clearTimeout(settleTimer);
-    };
+    return () => root.removeEventListener("scroll", onScroll);
   }, []);
 
   const activeTheme = sections[activeIndex]?.theme ?? "dark";
@@ -250,38 +241,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
             color: THEME_TEXT[section.theme],
           }}
         >
-          {/* Animates the CONTENT, never the section element itself — the
-              section is the real scroll-snap target, and animating its own
-              transform would fight the browser's snap physics. Ties to
-              activeIndex, not scroll progress, so it plays once on arrival
-              rather than dragging with the scroll gesture. A real scale
-              move (not just a fade) so arriving at a new section reads as a
-              distinct, deliberate beat. Entry and exit use the SAME
-              duration/easing (a mismatched 160ms exit vs 320ms entry used
-              to leave a visible gap, read as an abrupt "pop").
-              Duration history: 420ms read as sluggish → 260ms still read as
-              too much total delay once stacked with the 100ms settle
-              debounce (~360ms combined) → 180ms read as too instant, lost
-              the "smooth" feel → 240ms now (settle debounce left at 60ms
-              this round — only moving one number per adjustment, see the
-              settle-timer comment above for why). If this needs adjusting
-              again, keep moving ONE of these two numbers at a time, not
-              both — changing both together makes it impossible to tell
-              which one needs the next nudge, and this value has already
-              overshot more than once from doing that. */}
-          <div
-            style={{
-              opacity: activeIndex === i ? 1 : 0,
-              transform:
-                activeIndex === i
-                  ? "translateY(0) scale(1)"
-                  : "translateY(34px) scale(0.94)",
-              transition:
-                "opacity 240ms cubic-bezier(0.33, 1, 0.68, 1), transform 240ms cubic-bezier(0.33, 1, 0.68, 1)",
-            }}
-          >
-            {section.content}
-          </div>
+          {section.content}
           {i === 0 && activeIndex === 0 && <ScrollHint />}
         </section>
       ))}
