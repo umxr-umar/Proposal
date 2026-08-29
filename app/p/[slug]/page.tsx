@@ -20,6 +20,7 @@ import { ProblemMobileSlide } from "@/components/proposal/slides-mobile/ProblemM
 import { SolutionMobileSlide } from "@/components/proposal/slides-mobile/SolutionMobileSlide";
 import { ImpactMobileSlide } from "@/components/proposal/slides-mobile/ImpactMobileSlide";
 import { ScopeDeliverablesMobileSlide } from "@/components/proposal/slides-mobile/ScopeDeliverablesMobileSlide";
+import { ClientTestimonialsMobileSlide } from "@/components/proposal/slides-mobile/ClientTestimonialsMobileSlide";
 
 // Proposals live in Notion. Re-fetch at most once per 60s so edits (or a
 // brand-new client's row) show up without a redeploy — generateStaticParams
@@ -77,8 +78,9 @@ export default async function ProposalPage({
         />
       </div>
 
-      {/* Mobile — in progress; Cover, TOC, Problem, Solution, Impact, and
-          Scope and Deliverables exist so far, see AGENTS.md */}
+      {/* Mobile — in progress; Cover, TOC, Problem, Solution, Impact, Scope
+          and Deliverables, and Client Testimonials exist so far, see
+          AGENTS.md */}
       <div className="md:hidden">
         <MobileSlideDeck
           sections={[
@@ -90,6 +92,10 @@ export default async function ProposalPage({
             {
               theme: "light",
               content: <ScopeDeliverablesMobileSlide proposal={proposal} />,
+            },
+            {
+              theme: "dark",
+              content: <ClientTestimonialsMobileSlide proposal={proposal} />,
             },
           ]}
         />
