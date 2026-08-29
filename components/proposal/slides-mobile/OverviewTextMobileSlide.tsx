@@ -26,7 +26,17 @@ export function OverviewTextMobileSlide({
 
   return (
     <div
+      className="flex flex-col justify-center"
       style={{
+        // min-height (a floor, not a fixed height) + justify-center means
+        // this is a no-op when real content already exceeds 100dvh (no
+        // slack to center within — same as before), but on a viewport
+        // taller than the content needs, it distributes the leftover
+        // space evenly instead of dumping it all below the last
+        // paragraph. Content used to be plain top-anchored block flow —
+        // fine on the reference screenshot's height, but any taller real
+        // device left a dead gap at the bottom that read as "not
+        // loading."
         minHeight: "100dvh",
         paddingTop: mpx(30),
         paddingBottom: mpx(46),

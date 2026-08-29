@@ -90,8 +90,13 @@ export function ScopeDeliverablesMobileSlide({ proposal }: { proposal: Proposal 
 
   return (
     <div
-      className="flex flex-col"
+      className="flex flex-col justify-center"
       style={{
+        // See OverviewTextMobileSlide.tsx for why justify-center: a no-op
+        // when real content already exceeds 100dvh (Scope's real content
+        // almost always does), but distributes leftover space evenly on a
+        // viewport taller than the content needs instead of leaving a
+        // dead gap below the last bullet.
         minHeight: "100dvh",
         paddingTop: mpx(18),
         paddingBottom: mpx(48),

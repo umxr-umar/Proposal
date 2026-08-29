@@ -249,12 +249,14 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
               to leave a visible gap, read as an abrupt "pop").
               Duration history: 420ms read as sluggish → 260ms still read as
               too much total delay once stacked with the 100ms settle
-              debounce (~360ms combined) → 180ms now, with the debounce also
-              cut to 60ms (~240ms combined). If this needs adjusting again,
-              move in ~40-60ms steps on ONE of these two numbers at a time,
-              not both — this value has overshot in both directions more
-              than once already, and changing both makes it hard to tell
-              which one needs the next nudge. */}
+              debounce (~360ms combined) → 180ms read as too instant, lost
+              the "smooth" feel → 240ms now (settle debounce left at 60ms
+              this round — only moving one number per adjustment, see the
+              settle-timer comment above for why). If this needs adjusting
+              again, keep moving ONE of these two numbers at a time, not
+              both — changing both together makes it impossible to tell
+              which one needs the next nudge, and this value has already
+              overshot more than once from doing that. */}
           <div
             style={{
               opacity: activeIndex === i ? 1 : 0,
@@ -263,7 +265,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
                   ? "translateY(0) scale(1)"
                   : "translateY(34px) scale(0.94)",
               transition:
-                "opacity 180ms cubic-bezier(0.33, 1, 0.68, 1), transform 180ms cubic-bezier(0.33, 1, 0.68, 1)",
+                "opacity 240ms cubic-bezier(0.33, 1, 0.68, 1), transform 240ms cubic-bezier(0.33, 1, 0.68, 1)",
             }}
           >
             {section.content}
