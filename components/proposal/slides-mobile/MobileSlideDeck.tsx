@@ -213,9 +213,21 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
       const top = root.scrollTop;
       if (top !== lastTop) {
         lastTop = top;
+        // Midpoint between each adjacent pair of sections, not each
+        // section's own top edge. Reported: during a SLOW drag, the dot
+        // stayed on the old section for nearly the whole gesture before
+        // flipping right at the very end — because a top-edge threshold
+        // only flips once the incoming section's top has fully reached
+        // the viewport top, which is the last possible moment during a
+        // drag. A fast flick crosses that same threshold almost
+        // instantly either way, so it never showed up there — only on a
+        // slow, deliberate drag where you can feel the dot "waiting."
+        // Flipping at the midpoint between two sections instead matches
+        // when it actually starts feeling like you've moved on.
         let current = 0;
-        for (let i = 0; i < offsets.length; i++) {
-          if (offsets[i] - top <= 1) current = i;
+        for (let i = 0; i < offsets.length - 1; i++) {
+          const midpoint = (offsets[i] + offsets[i + 1]) / 2;
+          if (top >= midpoint) current = i + 1;
         }
         setActiveIndex(current);
       }
