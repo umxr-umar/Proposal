@@ -204,7 +204,21 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
 
     updateActive();
     root.addEventListener("scroll", onScroll, { passive: true });
-    return () => root.removeEventListener("scroll", onScroll);
+    // Safety net on top of the rAF-throttled scroll listener above: once
+    // native momentum scrolling has fully settled, force one more read
+    // regardless of whether every intermediate scroll event was caught.
+    // A faster/harder flick (very plausibly more common scrolling down a
+    // long deck than braking scrolling back up) can under real-device
+    // conditions coalesce or skip scroll events during the glide — the
+    // rAF throttle only reads once per frame, and a dropped frame under
+    // load drops that read. Direction-agnostic, standards-based, and a
+    // no-op in browsers that don't support it yet (older Safari) since it
+    // simply never fires there, leaving the existing behavior unchanged.
+    root.addEventListener("scrollend", updateActive, { passive: true });
+    return () => {
+      root.removeEventListener("scroll", onScroll);
+      root.removeEventListener("scrollend", updateActive);
+    };
   }, []);
 
   const activeTheme = sections[activeIndex]?.theme ?? "dark";
