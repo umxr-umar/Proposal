@@ -16,32 +16,28 @@ import { mfont, mpx } from "@/lib/fluidMobile";
  * menu: sections are scroll-snapped pages, and orientation comes from
  * three passive signals instead of one active control:
  *
- * 1. The scroll-snap settle motion itself (`proximity` + `scrollSnapStop:
- *    "always"`). Settled here after real back-and-forth, documented in
- *    full so it isn't re-litigated:
- *    - `mandatory` gives the firmest, most decisive settle on short
- *      sections, but traps scrolling at the top of any section taller
- *      than the viewport (no other internal snap point to resolve to) —
- *      confirmed on device as a genuine multi-second tug-of-war, not a
- *      quick correction.
- *    - Tried capping the tall section at 100dvh with its own nested
- *      `overflow-y: auto` instead, keeping `mandatory` everywhere. Traded
- *      one bug for a worse one: a nested independently-scrollable region
- *      inside a `mandatory`-snapping parent is a genuinely fragile
- *      cross-browser combination, and it produced a real dead end —
- *      scrolling back UP out of the tall section from a real device
- *      stopped working entirely. Reverted.
- *    - `proximity` globally (no nested scroll regions, no per-section
- *      special-casing) was tried once before and rejected as feeling
- *      "wrong/laggy" on short sections — but that test ran while the
- *      custom per-section arrival animation (see below, since removed)
- *      was still active and gated behind its own debounce; the two were
- *      never cleanly isolated. With that animation gone entirely, this is
- *      pure native scroll-snap physics with zero JS in the loop, and it
- *      resolved the long-section trap AND the "stuck, can't scroll back
- *      up" dead end with no special-casing anywhere. If short-section
- *      feel is ever challenged again, isolate that claim specifically —
- *      don't assume it's still true from the old test.
+ * 1. The scroll-snap settle motion itself (`mandatory` + `scrollSnapStop:
+ *    "always"`) — the firm, decisive settle the user explicitly wants and
+ *    confirmed as correct. **Known, deliberately deferred limitation:**
+ *    `mandatory` traps scrolling at the top of any section taller than the
+ *    viewport (Scope and Deliverables today — no other internal snap point
+ *    for it to resolve to). Two fixes were tried and both made things
+ *    worse, not better — DO NOT retry either without a real breakthrough:
+ *      - Capping the tall section at 100dvh with its own nested
+ *        `overflow-y: auto`: fixed the trap, but a nested independently-
+ *        scrollable region inside a `mandatory`-snapping parent is a
+ *        fragile cross-browser combination, and it broke scrolling back UP
+ *        out of the section entirely on a real device — a worse bug than
+ *        the one it fixed.
+ *      - `proximity` globally instead of `mandatory`: fixed the trap, but
+ *        cost the firm/decisive snap feel across the whole deck, which the
+ *        user explicitly does not want to give up — rejected even though
+ *        it was technically correct.
+ *    The Scope trap is real and still unfixed. Any future fix needs to
+ *    preserve `mandatory`'s exact feel on every OTHER section while only
+ *    changing behavior for sections taller than the viewport — that's a
+ *    real constraint, not a suggestion, given how firmly both alternatives
+ *    were rejected.
  * 2. Each section's own header label (different text the instant you land
  *    on a new one) — that lives in each section's own content, not here.
  * 3. The ambient position dots below — ORIENTATION, not navigation; they
@@ -230,7 +226,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
         height: "100dvh",
         overflowY: "scroll",
         overflowX: "hidden",
-        scrollSnapType: "y proximity",
+        scrollSnapType: "y mandatory",
         // Long-standing iOS Safari requirement for a nested scrollable
         // container (this div, inside the page) to respond to touch
         // swipes reliably — without it, a real device can render the
