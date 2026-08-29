@@ -155,8 +155,9 @@ single workspace covering all three, back to back, is more efficient than
 splitting them across separate workspaces), Scope and Deliverables, Project
 Timeline, Executive Summary, Client Testimonials, Terms and Conditions,
 Contract Agreement. Scope and Deliverables and Terms and Conditions are
-long-content sections — read the "Known open risk" note on `mandatory`
-scroll-snap below before building either.
+long-content sections — read the "CSS scroll-snap" note below (the
+`proximity` vs `mandatory` history) before touching snap behavior for
+either.
 
 **Building a new mobile slide — the recipe every workspace should follow:**
 0. **Sync with `origin/main` before doing anything else** (`git fetch origin
@@ -223,52 +224,55 @@ between sections is scroll/swipe, matching native mobile app conventions
 (nothing to tap, nothing to discover) rather than desktop's click-driven
 carousel.
 
-**CSS scroll-snap, `mandatory` not `proximity`.** Each section gets
+**CSS scroll-snap: `proximity`, not `mandatory`. Settled, after several
+reversals — read this before touching it again.** Each section gets
 `scroll-snap-align: start` + `scroll-snap-stop: always` inside a
-`scroll-snap-type: y mandatory` container. Originally built with `proximity`
-(see below for why), but rejected after testing Cover→TOC on a real device:
-`proximity` let scroll rest mid-transition on short sections, leaving both
-sections' chrome visible and overlapping at once — read as broken, not
-"scrollable." `mandatory` always resolves to exactly one section at rest.
+`scroll-snap-type: y proximity` container. The full history, because this
+setting has flipped multiple times and each reversal looked locally
+correct in isolation:
 
-**Resolved: a tall section is capped at 100dvh with its own internal
-scroll, not left to grow taller than the viewport.** `mandatory` traps
-scrolling at the top of any section taller than the viewport (no other
-internal snap point to resolve to) — confirmed on device as a real,
-multi-second tug-of-war between the user's scroll and the browser
-repeatedly re-snapping, not just a quick correction.
+1. Built with `proximity` first. Rejected after testing Cover→TOC on a
+   real device: it let scroll rest mid-transition on short sections,
+   showing both sections' chrome overlapping — read as broken, not
+   "scrollable."
+2. Switched to `mandatory` — fixed that, but it traps scrolling at the top
+   of any section taller than the viewport (no other internal snap point
+   to resolve to). Confirmed on device as a genuine multi-second tug-of-
+   war once Scope and Deliverables (a long section) existed to trigger it.
+3. Tried excluding the long section from `scroll-snap-align` entirely
+   (still `mandatory` everywhere else). Wrong: `mandatory` still forces
+   some snap resolution on every rest, so with no snap point of its own,
+   scrolling toward Scope just bounced back to Impact — made Scope
+   completely unreachable.
+4. Tried capping the long section at exactly `100dvh` with its own nested
+   `overflow-y: auto`, keeping `mandatory` on the outer container. This
+   traded one bug for a worse one: a nested independently-scrollable
+   region inside a `mandatory`-snapping parent is a genuinely fragile
+   cross-browser combination, and it produced a real dead end on a real
+   device — scrolling back UP out of the long section stopped working.
+5. Back to `proximity`, globally, no per-section special-casing at all —
+   this time with the custom per-section arrival animation (see below)
+   already fully removed. Step 1's "proximity feels broken" test and
+   every subsequent decision were made while that animation (and its
+   settle-debounce) was still active and entangled with the snap feel;
+   they were never cleanly isolated. With zero JS animation in the loop,
+   `proximity` resolved both the long-section trap AND the nested-scroll
+   dead end, with no special-casing anywhere.
 
-First attempt got this wrong: just removing `scroll-snap-align` from the
-long section (so it's not a declared snap point) does NOT give free
-scrolling through it — `mandatory` still guarantees some snap resolution
-on every rest, so with no snap point of its own, scrolling into that
-section got yanked straight back to the nearest section that still had
-one (confirmed: scrolling toward Scope bounced back to Impact, making
-Scope's content completely unreachable).
-
-The actual fix: `MobileSectionDef` has an optional `tall?: boolean`
-(default false). A tall section KEEPS `scroll-snap-align`/`scroll-snap-
-stop` — it's still exactly one normal "page" from the outer scroll's
-perspective, snapping in and out cleanly like anything else — but its
-height is capped at exactly `100dvh` with its own `overflow-y: auto`,
-instead of `min-height: 100dvh` letting its real content stretch it past
-one screen (which is what created the too-tall section for `mandatory` to
-get trapped inside of in the first place). Once you're inside it, further
-scrolling moves its own internal scrollbar via normal browser scroll-
-chaining; the outer deck only resumes moving once that inner scroll is
-exhausted. Scope and Deliverables uses `tall: true` today; Terms and
-Conditions will need it too. `proximity` was tried as a global fix instead
-and made short-section scrolling itself feel wrong/laggy on a real device —
-don't revisit that as the fix, this per-section height cap is the one that
-actually worked.
+If short-section feel is ever challenged again, isolate that claim
+specifically against the CURRENT (animation-free) baseline — don't reuse
+the old "proximity felt laggy" finding, it was measured under different,
+no-longer-true conditions.
 
 One side effect worth knowing: while `mandatory` was fighting a long
-section, the ambient-dot tracking looked badly laggy too, even though the
-tracking code itself was fine — it was accurately reporting a genuinely
-unstable scroll position during that tug-of-war. If dot lag reappears
-after this fix, look for a real performance issue in the tracking effect
-(e.g. forced layout in a scroll handler) rather than assuming it's the
-same root cause again.
+section (steps 2-4 above), the ambient-dot tracking looked badly laggy
+too, even though the tracking code itself was fine — it was accurately
+reporting a genuinely unstable scroll position during that tug-of-war.
+Separately, the dot-tracking effect was also optimized to read section
+offsets once on mount instead of calling `getBoundingClientRect()` on
+every section on every scroll frame (real, measurable jank on a slower
+device, invisible on a fast desktop test) — that's a real, independent
+improvement, not just a side effect of the snap fix.
 
 **Sections keep their own fixed background/theme — do not tie it to
 anything dynamic.** Same content-owned theming as desktop (Cover/TOC/Client

@@ -16,20 +16,32 @@ import { mfont, mpx } from "@/lib/fluidMobile";
  * menu: sections are scroll-snapped pages, and orientation comes from
  * three passive signals instead of one active control:
  *
- * 1. The scroll-snap settle motion itself (`mandatory` + `scrollSnapStop:
- *    "always"` — a resting scroll position is always exactly one section,
- *    never a torn view with two sections' content both partially visible).
- *    This IS the "you've moved" feedback — it's real physical motion, native
- *    to the browser, with zero JS involved and therefore zero possible
- *    delay. `proximity` was tried to fix a real bug on long sections
- *    (mandatory traps you at the top of any section taller than the
- *    viewport, since it has no other internal snap point) — but proximity
- *    made short-section scrolling itself feel wrong/laggy on a real device,
- *    worse than the long-section bug it was meant to fix. Reverted to
- *    `mandatory`. **The long-section trap is a known, currently-unfixed
- *    bug** — don't re-attempt the `proximity` swap as the fix without a
- *    different approach (e.g. scoping snap type per-section instead of on
- *    the whole container).
+ * 1. The scroll-snap settle motion itself (`proximity` + `scrollSnapStop:
+ *    "always"`). Settled here after real back-and-forth, documented in
+ *    full so it isn't re-litigated:
+ *    - `mandatory` gives the firmest, most decisive settle on short
+ *      sections, but traps scrolling at the top of any section taller
+ *      than the viewport (no other internal snap point to resolve to) —
+ *      confirmed on device as a genuine multi-second tug-of-war, not a
+ *      quick correction.
+ *    - Tried capping the tall section at 100dvh with its own nested
+ *      `overflow-y: auto` instead, keeping `mandatory` everywhere. Traded
+ *      one bug for a worse one: a nested independently-scrollable region
+ *      inside a `mandatory`-snapping parent is a genuinely fragile
+ *      cross-browser combination, and it produced a real dead end —
+ *      scrolling back UP out of the tall section from a real device
+ *      stopped working entirely. Reverted.
+ *    - `proximity` globally (no nested scroll regions, no per-section
+ *      special-casing) was tried once before and rejected as feeling
+ *      "wrong/laggy" on short sections — but that test ran while the
+ *      custom per-section arrival animation (see below, since removed)
+ *      was still active and gated behind its own debounce; the two were
+ *      never cleanly isolated. With that animation gone entirely, this is
+ *      pure native scroll-snap physics with zero JS in the loop, and it
+ *      resolved the long-section trap AND the "stuck, can't scroll back
+ *      up" dead end with no special-casing anywhere. If short-section
+ *      feel is ever challenged again, isolate that claim specifically —
+ *      don't assume it's still true from the old test.
  * 2. Each section's own header label (different text the instant you land
  *    on a new one) — that lives in each section's own content, not here.
  * 3. The ambient position dots below — ORIENTATION, not navigation; they
@@ -62,32 +74,6 @@ import { mfont, mpx } from "@/lib/fluidMobile";
 export type MobileSectionDef = {
   theme: "dark" | "light";
   content: ReactNode;
-  // Defaults to false (a normal section: min-height: 100dvh, grows to fit
-  // its own content, part of the outer scroll-snap flow). Set true for a
-  // section whose real content is taller than the viewport (Scope and
-  // Deliverables today, Terms and Conditions eventually).
-  //
-  // First attempt at this got it wrong: just removing scroll-snap-align
-  // from the long section (so it's not a declared snap point) doesn't give
-  // free scrolling through it — `scroll-snap-type: mandatory` still
-  // guarantees SOME snap resolution on every rest, so with no snap point of
-  // its own, any scroll landing inside that section's range got yanked back
-  // to the nearest section that still had one (confirmed: scrolling into
-  // Scope bounced back to Impact, making Scope's content unreachable).
-  //
-  // The actual fix: a tall section still participates in the outer snap
-  // flow completely normally (keeps scroll-snap-align/stop, is still
-  // exactly one "page" from the outer scroll's perspective) — but its own
-  // height is CAPPED at exactly 100dvh with its own internal overflow-y:
-  // auto, instead of min-height: 100dvh letting its real content spill into
-  // and stretch the outer scroll flow (which is what created a section
-  // taller than one screen for `mandatory` to get trapped inside of in the
-  // first place). Scrolling into it snaps cleanly like any other section;
-  // once inside, further scrolling moves the section's OWN scrollbar
-  // (standard browser scroll-chaining hands it to the nested scrollable
-  // region), and only resumes moving the outer deck once that inner
-  // scroll is exhausted.
-  tall?: boolean;
 };
 
 const THEME_BG: Record<"dark" | "light", string> = {
@@ -244,7 +230,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
         height: "100dvh",
         overflowY: "scroll",
         overflowX: "hidden",
-        scrollSnapType: "y mandatory",
+        scrollSnapType: "y proximity",
         // Long-standing iOS Safari requirement for a nested scrollable
         // container (this div, inside the page) to respond to touch
         // swipes reliably — without it, a real device can render the
@@ -263,14 +249,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
           style={{
             scrollSnapAlign: "start",
             scrollSnapStop: "always",
-            // A tall section is capped at exactly 100dvh with its own
-            // scrollbar instead of min-height: 100dvh letting real content
-            // grow it past one screen — see MobileSectionDef's `tall` doc
-            // comment for why min-height was the actual root cause of the
-            // mandatory-snap trap, not scroll-snap-align itself.
-            ...(section.tall
-              ? { height: "100dvh", overflowY: "auto" }
-              : { minHeight: "100dvh" }),
+            minHeight: "100dvh",
             backgroundColor: THEME_BG[section.theme],
             color: THEME_TEXT[section.theme],
           }}

@@ -89,12 +89,6 @@ export default async function ProposalPage({
             { theme: "light", content: <ImpactMobileSlide proposal={proposal} /> },
             {
               theme: "light",
-              // tall: true — Scope's real content is taller than the
-              // viewport; caps it at 100dvh with its own internal scroll
-              // instead of letting it grow past one screen and trap
-              // mandatory snap at its own top. See MobileSlideDeck.tsx's
-              // MobileSectionDef comment.
-              tall: true,
               content: <ScopeDeliverablesMobileSlide proposal={proposal} />,
             },
           ]}
