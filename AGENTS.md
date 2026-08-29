@@ -226,13 +226,10 @@ carousel.
 
 **CSS scroll-snap: `mandatory`, not `proximity`. This is a firm product
 requirement, not a technical preference — read this before touching it
-again.** Each section gets `scroll-snap-align: start` inside a
-`scroll-snap-type: y mandatory` container. (`scroll-snap-stop: always` was
-also on every section until it was identified as the cause of a separate
-bug — see step 7 below — and removed; don't re-add it without being
-asked.) The full history, because this setting has flipped multiple times
-and each reversal looked locally correct in isolation right up until it
-wasn't:
+again.** Each section gets `scroll-snap-align: start` + `scroll-snap-stop:
+always` inside a `scroll-snap-type: y mandatory` container. The full
+history, because this setting has flipped multiple times and each
+reversal looked locally correct in isolation right up until it wasn't:
 
 1. Built with `proximity` first. Rejected after testing Cover→TOC on a
    real device: it let scroll rest mid-transition on short sections,
@@ -271,17 +268,19 @@ wasn't:
    on short viewports (`mfontShrink`/`mpxShrink` in `lib/fluidMobile.ts`)
    instead of touching snap behavior — verified in-browser down to a
    320x568 viewport with margin to spare.
-8. Also separately: `scroll-snap-stop: always` (present on every section
-   since the beginning) forces the browser to physically stop at every
-   section in sequence even mid-fling. A single fast downward swipe
-   crossing several sections had to visibly step through each one,
-   reported as "delay between the 3, 4, 5 dots" scrolling down — while
-   short upward corrections (usually one section) never triggered it,
-   reading as direction-specific lag that wasn't really about direction.
-   Removed (default `normal`); `mandatory` alone still snaps decisively
-   to exactly one section on release, it just no longer forces a stop at
-   every section a fast flick passes through first. Don't re-add
-   `scroll-snap-stop: always` without being asked.
+8. Also separately: `scroll-snap-stop: always` was suspected of causing a
+   forced multi-stop delay on fast downward flicks (reported as "delay
+   between the 3, 4, 5 dots") and was removed for a short window.
+   **Reverted back to `always`** on explicit request — removing it did not
+   actually resolve what the user was seeing, and restoring the original
+   `mandatory` + `scrollSnapStop: "always"` combination was a deliberate
+   choice to get back to a known-good state rather than keep chasing this
+   setting. Don't remove it again without being asked.
+9. The ambient dots' `transition: "opacity 250ms ease, transform 250ms
+   ease"` was removed for the same short window (suspected as unnecessary
+   added delay) and also **reverted back** alongside step 8, for the same
+   reason — restoring the exact starting condition was the explicit ask,
+   not an improvement in isolation.
 
 **The Scope trap is real and still unfixed, on purpose, for now.** Any
 future fix attempt has one hard constraint: `mandatory`'s exact feel on
