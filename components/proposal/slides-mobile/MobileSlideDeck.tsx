@@ -223,6 +223,14 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
         overflowY: "scroll",
         overflowX: "hidden",
         scrollSnapType: "y mandatory",
+        // Long-standing iOS Safari requirement for a nested scrollable
+        // container (this div, inside the page) to respond to touch
+        // swipes reliably — without it, a real device can render the
+        // first section fine but never actually scroll into the rest,
+        // while desktop DevTools' mouse-driven device emulation shows no
+        // problem at all (it doesn't reproduce real touch-scroll
+        // behavior). Purely additive, no effect on non-WebKit browsers.
+        WebkitOverflowScrolling: "touch",
       }}
     >
       {sections.map((section, i) => (
