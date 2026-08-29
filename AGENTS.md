@@ -277,10 +277,15 @@ reversal looked locally correct in isolation right up until it wasn't:
    choice to get back to a known-good state rather than keep chasing this
    setting. Don't remove it again without being asked.
 9. The ambient dots' `transition: "opacity 250ms ease, transform 250ms
-   ease"` was removed for the same short window (suspected as unnecessary
-   added delay) and also **reverted back** alongside step 8, for the same
-   reason — restoring the exact starting condition was the explicit ask,
-   not an improvement in isolation.
+   ease"` went back and forth alongside step 8 (removed, reverted back
+   with it), then **removed again and left removed** — the user drew a
+   clear line between "the dots' own fade delay" (this transition — a
+   real, deliberate 250ms animation applied identically in both
+   directions) and "the snap feel" (scroll-snap-type/scroll-snap-stop,
+   which stayed untouched this time). Don't re-add this transition
+   without being asked; don't read a future "remove the delay" request as
+   license to also touch scroll-snap-stop again — they're two separate
+   settings now, and only this one is meant to be gone.
 
 **The Scope trap is real and still unfixed, on purpose, for now.** Any
 future fix attempt has one hard constraint: `mandatory`'s exact feel on
