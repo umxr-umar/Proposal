@@ -298,7 +298,6 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
               backgroundColor: "currentColor",
               opacity: i === activeIndex ? 1 : 0.32,
               transform: i === activeIndex ? "scale(1.35)" : "scale(1)",
-              transition: "opacity 250ms ease, transform 250ms ease",
             }}
           />
         ))}
