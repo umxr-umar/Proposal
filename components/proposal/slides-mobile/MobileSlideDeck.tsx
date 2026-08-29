@@ -257,6 +257,19 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
         // problem at all (it doesn't reproduce real touch-scroll
         // behavior). Purely additive, no effect on non-WebKit browsers.
         WebkitOverflowScrolling: "touch",
+        // Reported: on an Android phone, this container scrolled freely
+        // without ever snapping — worked correctly on iPhone Safari the
+        // whole time. touch-action tells the browser up front that THIS
+        // element owns vertical panning, instead of letting it resolve
+        // ambiguously against sibling/ancestor elements — a known source
+        // of inconsistent scroll-snap behavior on Chrome for Android in
+        // particular. overscroll-behor-y: contain stops this container's
+        // scroll from chaining to the page behind it once it hits either
+        // end, so a touch gesture can't partially move the document
+        // instead of (or in addition to) this element, which would feel
+        // exactly like "free scrolling, not snapping."
+        touchAction: "pan-y",
+        overscrollBehaviorY: "contain",
       }}
     >
       {sections.map((section, i) => (
