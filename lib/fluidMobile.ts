@@ -75,6 +75,42 @@ export function mfontGrow(px: number, opts?: { min?: number; max?: number }): st
   return `max(${mclamp(px, opts)}, ${mclampH(px, opts)})`;
 }
 
+// ---------------------------------------------------------------------
+// Height-aware shrinking — the mirror of mfontGrow/mpxGrow above, for
+// FIXED-length content (the TOC's 6 links: always the same text, never
+// client-supplied like Scope and Deliverables' bullets) whose
+// min-height: 100dvh wrapper can be shorter than the content needs on a
+// real device below MOBILE_REF_HEIGHT. Confirmed on a real device
+// recording: TOC's last item sat right at the very bottom edge, and
+// scrolling slightly further revealed the next section's header already
+// peeking in while the dot still showed TOC as active — scroll-snap-
+// type: mandatory has no other point to resolve to inside that sliver
+// of overflow, so it could snap "wrong" depending on which side of the
+// boundary a gesture landed on (same root cause as the known Scope
+// trap, just a few px instead of a full screen). Because TOC's content
+// is fixed-length, it can be reliably shrunk to fit one viewport — Scope
+// can't be, which is why this approach doesn't apply there.
+// mfontShrink/mpxShrink take the SMALLER of the normal width-based
+// value and a height-based clamp, so a device at/above reference height
+// is identical to plain mfont()/mpx() (the width-based value wins,
+// never grows past it); only a shorter viewport shrinks further,
+// floored at 70% of the reference size so text stays legible.
+function mclampHShrink(px: number, opts?: { min?: number; max?: number }): string {
+  const minPx = opts?.min ?? px * 0.7;
+  const vh = (px / MOBILE_REF_HEIGHT) * 100;
+  return `clamp(${minPx}px, ${vh.toFixed(4)}vh, ${px}px)`;
+}
+
+/** Spacing/sizing that should shrink on a shorter-than-reference viewport, not just narrower. */
+export function mpxShrink(px: number, opts?: { min?: number; max?: number }): string {
+  return `min(${mclamp(px, opts)}, ${mclampHShrink(px, opts)})`;
+}
+
+/** Font size that should shrink on a shorter-than-reference viewport, not just narrower. */
+export function mfontShrink(px: number, opts?: { min?: number; max?: number }): string {
+  return `min(${mclamp(px, opts)}, ${mclampHShrink(px, opts)})`;
+}
+
 // Real screen px (not scaled — mirrors desktop's NAV_GUTTER_PX constant in
 // SlideDeck.tsx exactly) that the Cover-only scroll hint occupies from the
 // bottom edge. Lives here (a plain module, no "use client") rather than in

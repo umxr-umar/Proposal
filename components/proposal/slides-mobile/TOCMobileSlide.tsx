@@ -1,7 +1,7 @@
 "use client";
 
 import { BifluxLogo } from "../slides/BifluxLogo";
-import { mfont, mpx } from "@/lib/fluidMobile";
+import { mfont, mfontShrink, mpx, mpxShrink } from "@/lib/fluidMobile";
 import { useMobileSlideDeck } from "./MobileSlideDeck";
 
 const SECTIONS = [
@@ -30,8 +30,8 @@ export function TOCMobileSlide() {
       className="flex h-full flex-col"
       style={{
         minHeight: "100dvh",
-        paddingTop: mpx(28),
-        paddingBottom: mpx(16),
+        paddingTop: mpxShrink(28),
+        paddingBottom: mpxShrink(16),
         paddingLeft: mpx(24),
         paddingRight: mpx(24),
       }}
@@ -53,20 +53,20 @@ export function TOCMobileSlide() {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col justify-center" style={{ gap: mpx(29) }}>
+      <div className="flex flex-1 flex-col justify-center" style={{ gap: mpxShrink(29) }}>
         {SECTIONS.map((title, i) => (
           <button
             key={title}
             type="button"
             onClick={() => scrollToSection(SECTION_TARGETS[i])}
             className="flex cursor-pointer flex-col border-0 bg-transparent p-0 text-left transition-opacity active:opacity-60"
-            style={{ gap: mpx(11) }}
+            style={{ gap: mpxShrink(11) }}
           >
             <span
               style={{
                 fontFamily: instrumentSerif,
                 fontWeight: 400,
-                fontSize: mfont(31.6),
+                fontSize: mfontShrink(31.6),
                 letterSpacing: "-0.025em",
                 lineHeight: "97%",
               }}
@@ -77,7 +77,7 @@ export function TOCMobileSlide() {
               style={{
                 fontFamily: neueHaas,
                 fontWeight: 400,
-                fontSize: mfont(31.7),
+                fontSize: mfontShrink(31.7),
                 letterSpacing: "0.008em",
                 lineHeight: "119%",
               }}
