@@ -16,9 +16,20 @@ import { mfont, mpx } from "@/lib/fluidMobile";
  * menu: sections are scroll-snapped pages, and orientation comes from
  * three passive signals instead of one active control:
  *
- * 1. The scroll-snap settle motion itself (`mandatory` + `scrollSnapStop:
- *    "always"`) — the firm, decisive settle the user explicitly wants and
- *    confirmed as correct. **Known, deliberately deferred limitation:**
+ * 1. The scroll-snap settle motion itself (`mandatory`) — the firm,
+ *    decisive settle the user explicitly wants and confirmed as correct.
+ *    `scrollSnapStop: "always"` was removed (was on every section): it
+ *    forces the browser to physically stop at EVERY section in sequence
+ *    even mid-fling, so one fast downward swipe crossing several sections
+ *    had to visibly step through each one — reported as "delay between
+ *    the 3, 4, 5 dots" scrolling down, while short upward corrections
+ *    (usually one section) never triggered it, reading as direction-
+ *    specific lag that wasn't really about direction at all. Removing it
+ *    (default `normal`) still snaps decisively to exactly one section on
+ *    release — `mandatory` alone guarantees that — it just no longer
+ *    forces a full stop at every section a fast flick passes through
+ *    first. Do not re-add `scrollSnapStop: "always"` without being asked.
+ *    **Known, deliberately deferred limitation:**
  *    `mandatory` traps scrolling at the top of any section taller than the
  *    viewport (Scope and Deliverables today — no other internal snap point
  *    for it to resolve to). Two fixes were tried and both made things
@@ -256,7 +267,6 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
           className="relative w-full"
           style={{
             scrollSnapAlign: "start",
-            scrollSnapStop: "always",
             minHeight: "100dvh",
             backgroundColor: THEME_BG[section.theme],
             color: THEME_TEXT[section.theme],

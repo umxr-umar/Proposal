@@ -226,10 +226,13 @@ carousel.
 
 **CSS scroll-snap: `mandatory`, not `proximity`. This is a firm product
 requirement, not a technical preference — read this before touching it
-again.** Each section gets `scroll-snap-align: start` + `scroll-snap-stop:
-always` inside a `scroll-snap-type: y mandatory` container. The full
-history, because this setting has flipped multiple times and each
-reversal looked locally correct in isolation right up until it wasn't:
+again.** Each section gets `scroll-snap-align: start` inside a
+`scroll-snap-type: y mandatory` container. (`scroll-snap-stop: always` was
+also on every section until it was identified as the cause of a separate
+bug — see step 7 below — and removed; don't re-add it without being
+asked.) The full history, because this setting has flipped multiple times
+and each reversal looked locally correct in isolation right up until it
+wasn't:
 
 1. Built with `proximity` first. Rejected after testing Cover→TOC on a
    real device: it let scroll rest mid-transition on short sections,
@@ -258,6 +261,27 @@ reversal looked locally correct in isolation right up until it wasn't:
    decisive snap feel on every other section, which matters more to the
    user than fixing Scope's known issue. Do not reintroduce this without
    being asked — "technically correct" was not enough to keep it.
+
+7. Separately: TOC's list (heading + 6 fixed links) turned out to be a
+   few px taller than `100dvh` on a real device — the same class of
+   problem as the Scope trap (step 3), just small enough to look fine at
+   reference size. Confirmed by frame-by-frame analysis of a real device
+   recording. Unlike Scope's client-supplied bullets, TOC's content is
+   fixed-length, so it was fixed directly by shrinking its text slightly
+   on short viewports (`mfontShrink`/`mpxShrink` in `lib/fluidMobile.ts`)
+   instead of touching snap behavior — verified in-browser down to a
+   320x568 viewport with margin to spare.
+8. Also separately: `scroll-snap-stop: always` (present on every section
+   since the beginning) forces the browser to physically stop at every
+   section in sequence even mid-fling. A single fast downward swipe
+   crossing several sections had to visibly step through each one,
+   reported as "delay between the 3, 4, 5 dots" scrolling down — while
+   short upward corrections (usually one section) never triggered it,
+   reading as direction-specific lag that wasn't really about direction.
+   Removed (default `normal`); `mandatory` alone still snaps decisively
+   to exactly one section on release, it just no longer forces a stop at
+   every section a fast flick passes through first. Don't re-add
+   `scroll-snap-stop: always` without being asked.
 
 **The Scope trap is real and still unfixed, on purpose, for now.** Any
 future fix attempt has one hard constraint: `mandatory`'s exact feel on
