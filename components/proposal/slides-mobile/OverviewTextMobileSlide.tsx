@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { BifluxLogo } from "../slides/BifluxLogo";
-import { mfont, mpx } from "@/lib/fluidMobile";
+import { mfont, mfontGrow, mpx, mpxGrow } from "@/lib/fluidMobile";
 
 /**
  * Shared mobile layout for the "01. Project Overview" sub-slides (Problem,
@@ -26,17 +26,7 @@ export function OverviewTextMobileSlide({
 
   return (
     <div
-      className="flex flex-col justify-center"
       style={{
-        // min-height (a floor, not a fixed height) + justify-center means
-        // this is a no-op when real content already exceeds 100dvh (no
-        // slack to center within — same as before), but on a viewport
-        // taller than the content needs, it distributes the leftover
-        // space evenly instead of dumping it all below the last
-        // paragraph. Content used to be plain top-anchored block flow —
-        // fine on the reference screenshot's height, but any taller real
-        // device left a dead gap at the bottom that read as "not
-        // loading."
         minHeight: "100dvh",
         paddingTop: mpx(30),
         paddingBottom: mpx(46),
@@ -59,12 +49,17 @@ export function OverviewTextMobileSlide({
         </div>
       </div>
 
+      {/* Header above stays plain mfont/mpx (width-only, position never
+          moves). Heading + body below use the *Grow variants — same idea
+          as "increase text size to cover more screen" the user asked for
+          directly, instead of repositioning content within the section.
+          See lib/fluidMobile.ts's mfontGrow/mpxGrow doc comment. */}
       <div
         style={{
-          marginTop: mpx(45),
+          marginTop: mpxGrow(45),
           fontFamily: helveticaNeue,
           fontWeight: 700,
-          fontSize: mfont(35.9),
+          fontSize: mfontGrow(35.9),
           lineHeight: "104%",
           letterSpacing: "-0.020em",
         }}
@@ -74,10 +69,10 @@ export function OverviewTextMobileSlide({
 
       <div
         style={{
-          marginTop: mpx(16),
+          marginTop: mpxGrow(16),
           fontFamily: neueHaas,
           fontWeight: 400,
-          fontSize: mfont(19.1),
+          fontSize: mfontGrow(19.1),
           lineHeight: "150%",
           letterSpacing: "0.003em",
         }}
@@ -85,7 +80,7 @@ export function OverviewTextMobileSlide({
         {paragraphs.map((p, i) => (
           <p
             key={i}
-            style={{ margin: 0, marginBottom: i < paragraphs.length - 1 ? mpx(40) : 0 }}
+            style={{ margin: 0, marginBottom: i < paragraphs.length - 1 ? mpxGrow(40) : 0 }}
           >
             {p}
           </p>

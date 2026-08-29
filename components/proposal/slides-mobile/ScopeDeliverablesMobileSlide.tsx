@@ -1,6 +1,6 @@
 import type { Proposal, ScopeSection } from "@/lib/types";
 import { BifluxLogo } from "../slides/BifluxLogo";
-import { mfont, mpx } from "@/lib/fluidMobile";
+import { mfont, mfontGrow, mpx, mpxGrow } from "@/lib/fluidMobile";
 
 /**
  * Mobile "Scope and Deliverables" — same data as desktop's
@@ -21,7 +21,7 @@ function ColumnList({ sections }: { sections: ScopeSection[] }) {
   const neueHaas = "var(--font-neue-haas), system-ui, sans-serif";
 
   return (
-    <div className="flex flex-col" style={{ gap: mpx(16) }}>
+    <div className="flex flex-col" style={{ gap: mpxGrow(16) }}>
       {sections.map((s) => (
         <div key={s.number}>
           <div
@@ -29,10 +29,10 @@ function ColumnList({ sections }: { sections: ScopeSection[] }) {
             style={{
               fontFamily: helveticaNeue,
               fontWeight: 700,
-              fontSize: mfont(16.5),
+              fontSize: mfontGrow(16.5),
               lineHeight: "128%",
               letterSpacing: "-0.015em",
-              gap: mpx(6),
+              gap: mpxGrow(6),
             }}
           >
             <span>{s.number}.</span>
@@ -41,9 +41,9 @@ function ColumnList({ sections }: { sections: ScopeSection[] }) {
           <div
             className="flex flex-col"
             style={{
-              marginTop: mpx(6),
-              paddingLeft: mpx(18),
-              gap: mpx(8),
+              marginTop: mpxGrow(6),
+              paddingLeft: mpxGrow(18),
+              gap: mpxGrow(8),
             }}
           >
             {s.bullets.map((b, i) => (
@@ -53,10 +53,10 @@ function ColumnList({ sections }: { sections: ScopeSection[] }) {
                 style={{
                   fontFamily: neueHaas,
                   fontWeight: 500,
-                  fontSize: mfont(14),
+                  fontSize: mfontGrow(14),
                   lineHeight: "148%",
                   letterSpacing: "-0.010em",
-                  gap: mpx(8),
+                  gap: mpxGrow(8),
                 }}
               >
                 <span>&bull;</span>
@@ -90,13 +90,8 @@ export function ScopeDeliverablesMobileSlide({ proposal }: { proposal: Proposal 
 
   return (
     <div
-      className="flex flex-col justify-center"
+      className="flex flex-col"
       style={{
-        // See OverviewTextMobileSlide.tsx for why justify-center: a no-op
-        // when real content already exceeds 100dvh (Scope's real content
-        // almost always does), but distributes leftover space evenly on a
-        // viewport taller than the content needs instead of leaving a
-        // dead gap below the last bullet.
         minHeight: "100dvh",
         paddingTop: mpx(18),
         paddingBottom: mpx(48),
@@ -119,15 +114,19 @@ export function ScopeDeliverablesMobileSlide({ proposal }: { proposal: Proposal 
         </div>
       </div>
 
-      <div style={{ marginTop: mpx(28) }}>
+      {/* Header above stays plain mfont/mpx (width-only, position never
+          moves). Everything below uses the *Grow variants so text/spacing
+          grows to fill a taller-than-reference viewport instead of leaving
+          dead space — see lib/fluidMobile.ts's mfontGrow/mpxGrow. */}
+      <div style={{ marginTop: mpxGrow(28) }}>
         <div
           style={{
             fontFamily: helveticaNeue,
             fontWeight: 700,
-            fontSize: mfont(21.5),
+            fontSize: mfontGrow(21.5),
             lineHeight: "138%",
             letterSpacing: "-0.015em",
-            marginBottom: mpx(16),
+            marginBottom: mpxGrow(16),
           }}
         >
           {proposal.scopeDesignHeading}
@@ -135,15 +134,15 @@ export function ScopeDeliverablesMobileSlide({ proposal }: { proposal: Proposal 
         <ColumnList sections={designSections} />
       </div>
 
-      <div style={{ marginTop: mpx(40) }}>
+      <div style={{ marginTop: mpxGrow(40) }}>
         <div
           style={{
             fontFamily: helveticaNeue,
             fontWeight: 700,
-            fontSize: mfont(21.5),
+            fontSize: mfontGrow(21.5),
             lineHeight: "138%",
             letterSpacing: "-0.015em",
-            marginBottom: mpx(16),
+            marginBottom: mpxGrow(16),
           }}
         >
           {proposal.scopeDevHeading}

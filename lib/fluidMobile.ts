@@ -39,6 +39,42 @@ export function mfont(px: number, opts?: { min?: number; max?: number }): string
   return mclamp(px, opts);
 }
 
+// ---------------------------------------------------------------------
+// Height-aware growth — opt-in, NOT the default (see file header: mobile
+// scales by width only, deliberately). This exists for text-heavy content
+// sections (Problem/Solution/Impact, Scope and Deliverables) whose real
+// text volume is fixed but whose min-height: 100dvh wrapper can be taller
+// than the content on some devices, leaving dead space below the last
+// paragraph on a tall screen. The fix the user asked for explicitly:
+// don't reposition content to fill that space (broke the header's
+// always-pinned-to-top position when tried) — instead let the text/
+// spacing itself grow with viewport height, same physical idea as
+// "increase font size to cover more screen." mfontGrow/mpxGrow take the
+// LARGER of the normal width-based value and a separate height-based
+// clamp, so a device at/near the reference height behaves identically to
+// plain mfont()/mpx() (the width-based value wins), and only a genuinely
+// taller viewport grows further. Bounded so an extreme edge case (a very
+// narrow desktop browser window stretched very tall while emulating
+// mobile width) can't produce absurdly large text.
+const MOBILE_REF_HEIGHT = 874; // iPhone 14/15/16 standard height
+
+function mclampH(px: number, opts?: { min?: number; max?: number }): string {
+  const minPx = opts?.min ?? px;
+  const maxPx = opts?.max ?? px * 1.6;
+  const vh = (px / MOBILE_REF_HEIGHT) * 100;
+  return `clamp(${minPx}px, ${vh.toFixed(4)}vh, ${maxPx}px)`;
+}
+
+/** Spacing/sizing that should grow on a taller-than-reference viewport, not just a wider one. */
+export function mpxGrow(px: number, opts?: { min?: number; max?: number }): string {
+  return `max(${mclamp(px, opts)}, ${mclampH(px, opts)})`;
+}
+
+/** Font size that should grow on a taller-than-reference viewport, not just a wider one. */
+export function mfontGrow(px: number, opts?: { min?: number; max?: number }): string {
+  return `max(${mclamp(px, opts)}, ${mclampH(px, opts)})`;
+}
+
 // Real screen px (not scaled — mirrors desktop's NAV_GUTTER_PX constant in
 // SlideDeck.tsx exactly) that the Cover-only scroll hint occupies from the
 // bottom edge. Lives here (a plain module, no "use client") rather than in
