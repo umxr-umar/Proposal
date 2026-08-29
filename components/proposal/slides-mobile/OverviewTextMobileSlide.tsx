@@ -26,8 +26,8 @@ export function OverviewTextMobileSlide({
 
   return (
     <div
+      className="mobile-deck-section"
       style={{
-        minHeight: "100dvh",
         paddingTop: mpx(30),
         paddingBottom: mpx(46),
         paddingLeft: mpx(24),

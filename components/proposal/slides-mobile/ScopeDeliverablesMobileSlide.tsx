@@ -90,9 +90,8 @@ export function ScopeDeliverablesMobileSlide({ proposal }: { proposal: Proposal 
 
   return (
     <div
-      className="flex flex-col"
+      className="flex flex-col mobile-deck-section"
       style={{
-        minHeight: "100dvh",
         paddingTop: mpx(18),
         paddingBottom: mpx(48),
         paddingLeft: mpx(24),

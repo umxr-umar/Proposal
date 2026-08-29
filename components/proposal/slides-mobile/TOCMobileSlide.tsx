@@ -27,9 +27,8 @@ export function TOCMobileSlide() {
 
   return (
     <div
-      className="flex h-full flex-col"
+      className="flex h-full flex-col mobile-deck-section"
       style={{
-        minHeight: "100dvh",
         paddingTop: mpxShrink(28),
         paddingBottom: mpxShrink(16),
         paddingLeft: mpx(24),

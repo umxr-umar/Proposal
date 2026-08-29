@@ -244,9 +244,8 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
     <MobileSlideDeckContext.Provider value={{ sectionCount: sections.length, scrollToSection }}>
     <div
       ref={screenRef}
-      className="relative w-full"
+      className="relative w-full mobile-deck-root"
       style={{
-        height: "100dvh",
         overflowY: "scroll",
         overflowX: "hidden",
         scrollSnapType: "y mandatory",
@@ -264,10 +263,9 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
         <section
           key={i}
           data-mobile-section={i}
-          className="relative w-full"
+          className="relative w-full mobile-deck-section"
           style={{
             scrollSnapAlign: "start",
-            minHeight: "100dvh",
             backgroundColor: THEME_BG[section.theme],
             color: THEME_TEXT[section.theme],
           }}

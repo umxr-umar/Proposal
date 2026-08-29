@@ -89,3 +89,25 @@ body {
     transform: none;
   }
 }
+
+/* Mobile slide deck: 100dvh with a 100vh fallback. Inline React style
+   objects can't express a CSS fallback (the same property twice just
+   collapses to one value in a JS object), and some Android browsers/
+   WebViews don't support dvh at all — they treat the declaration as
+   invalid and the height rule is dropped entirely, leaving the scroll
+   container unbounded. Without a bounded height, scroll-snap has
+   nothing to snap within, which reads as "not snapping, frozen scroll"
+   on that device. Declaring vh first and dvh second in a real
+   stylesheet lets a browser that doesn't understand dvh fall back to vh
+   via normal CSS cascade (an unknown value is ignored, not applied as
+   0), while a browser that does understand dvh still overrides with the
+   dynamic value. */
+.mobile-deck-root {
+  height: 100vh;
+  height: 100dvh;
+}
+
+.mobile-deck-section {
+  min-height: 100vh;
+  min-height: 100dvh;
+}

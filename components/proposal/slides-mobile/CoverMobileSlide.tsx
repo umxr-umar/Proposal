@@ -30,9 +30,8 @@ export function CoverMobileSlide({ proposal }: { proposal: Proposal }) {
 
   return (
     <div
-      className="flex h-full flex-col justify-between"
+      className="flex h-full flex-col justify-between mobile-deck-section"
       style={{
-        minHeight: "100dvh",
         paddingTop: mpx(18),
         // Tuned padding (design intent) + SCROLL_HINT_SAFE_BOTTOM_PX (hard
         // guarantee, real px not mpx()-scaled — same pattern as desktop's
