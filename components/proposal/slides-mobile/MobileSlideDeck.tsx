@@ -158,18 +158,20 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
   // never looks at a ratio of any section's own height, only literal edge
   // positions.
   //
-  // activeIndex only updates once scrolling has SETTLED (debounced ~100ms
-  // after the last scroll event), not on every scroll frame while still in
-  // motion. This matters because mouse-wheel and trackpad input fire very
-  // different scroll event patterns: a wheel tick resolves to a snap
-  // almost instantly (one or two events, done), while a trackpad delivers
-  // a continuous stream of tiny-delta events for the whole gesture. Without
-  // debouncing, activeIndex — and therefore the arrival animation — was
-  // re-triggering repeatedly WHILE a trackpad gesture was still in
-  // progress, showing extra motion mid-scroll that a wheel-driven scroll
-  // never produced (its "motion" is over before the next frame). Waiting
-  // for settle makes both input types resolve to the same single, clean
-  // reveal after motion actually stops.
+  // activeIndex only updates once scrolling has SETTLED (debounced ~60ms
+  // after the last scroll event — cut down from 100ms after the combined
+  // debounce+animation delay read as too slow), not on every scroll frame
+  // while still in motion. This matters because mouse-wheel and trackpad
+  // input fire very different scroll event patterns: a wheel tick resolves
+  // to a snap almost instantly (one or two events, done), while a trackpad
+  // delivers a continuous stream of tiny-delta events for the whole
+  // gesture. Without debouncing, activeIndex — and therefore the arrival
+  // animation — was re-triggering repeatedly WHILE a trackpad gesture was
+  // still in progress, showing extra motion mid-scroll that a wheel-driven
+  // scroll never produced (its "motion" is over before the next frame).
+  // Waiting for settle makes both input types resolve to the same single,
+  // clean reveal after motion actually stops — don't drop this to 0, that
+  // reintroduces the mid-gesture flicker this was built to fix.
   useEffect(() => {
     const root = screenRef.current;
     if (!root) return;
@@ -190,7 +192,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
 
     const onScroll = () => {
       if (settleTimer) clearTimeout(settleTimer);
-      settleTimer = setTimeout(() => setActiveIndex(computeActive()), 100);
+      settleTimer = setTimeout(() => setActiveIndex(computeActive()), 60);
     };
 
     setActiveIndex(computeActive());
@@ -244,14 +246,15 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
               move (not just a fade) so arriving at a new section reads as a
               distinct, deliberate beat. Entry and exit use the SAME
               duration/easing (a mismatched 160ms exit vs 320ms entry used
-              to leave a visible gap, read as an abrupt "pop"). Duration
-              tuned down from 420ms after 420 read as sluggish/laggy on
-              device — 260ms is the current landing point: fast enough to
-              feel immediate, still long enough to read as a cross-fade
-              rather than an instant cut. If this needs adjusting again,
-              move in ~40-60ms steps rather than swinging to another
-              extreme — this value has already overshot in both directions
-              once. */}
+              to leave a visible gap, read as an abrupt "pop").
+              Duration history: 420ms read as sluggish → 260ms still read as
+              too much total delay once stacked with the 100ms settle
+              debounce (~360ms combined) → 180ms now, with the debounce also
+              cut to 60ms (~240ms combined). If this needs adjusting again,
+              move in ~40-60ms steps on ONE of these two numbers at a time,
+              not both — this value has overshot in both directions more
+              than once already, and changing both makes it hard to tell
+              which one needs the next nudge. */}
           <div
             style={{
               opacity: activeIndex === i ? 1 : 0,
@@ -260,7 +263,7 @@ export function MobileSlideDeck({ sections }: { sections: MobileSectionDef[] }) 
                   ? "translateY(0) scale(1)"
                   : "translateY(34px) scale(0.94)",
               transition:
-                "opacity 260ms cubic-bezier(0.33, 1, 0.68, 1), transform 260ms cubic-bezier(0.33, 1, 0.68, 1)",
+                "opacity 180ms cubic-bezier(0.33, 1, 0.68, 1), transform 180ms cubic-bezier(0.33, 1, 0.68, 1)",
             }}
           >
             {section.content}
