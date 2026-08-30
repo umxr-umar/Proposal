@@ -13,12 +13,15 @@ const SECTIONS = [
   "Contract Agreement",
 ];
 
-// Mirrors desktop TableOfContentsSlide.tsx's SECTION_TARGETS exactly — mobile
-// is following the same 11-section breakdown as desktop, one screenshot per
-// slide, so these indices line up 1:1 with desktop's. Indices ahead of the
-// last built mobile section just clamp there (scrollToSection's own
-// behavior), same as desktop's goToSlide clamping.
-const SECTION_TARGETS = [2, 5, 6, 7, 9, 10];
+// Mirrors desktop TableOfContentsSlide.tsx's SECTION_TARGETS in spirit, but
+// indices here point at positions in the MOBILE sections array: Cover(0),
+// TOC(1), Problem(2), Solution(3), Impact(4), Scope(5), Timeline(6),
+// Executive Summary(7), Terms and Conditions(8) — one less than desktop's
+// index for it, since desktop's Client Testimonials(8) has no mobile TOC
+// row and no mobile slide built yet. Contract Agreement isn't built yet
+// either; its target clamps to the last built mobile section
+// (scrollToSection's own behavior), same as desktop's goToSlide clamping.
+const SECTION_TARGETS = [2, 5, 6, 7, 8, 10];
 
 export function TOCMobileSlide() {
   const { scrollToSection } = useMobileSlideDeck();
