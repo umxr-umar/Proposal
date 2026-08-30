@@ -499,6 +499,85 @@
     padding-top: calc(var(--mpt-gap-rowpad) * var(--mscale));
   }
 
+  /* ---- Mobile Client Testimonials stage — mirrors
+     components/proposal/slides-mobile/ClientTestimonialsMobileSlide.tsx.
+     Dark theme (like Cover/TOC), cards stacked in a single column instead
+     of desktop's three side-by-side cards. ---- */
+  #stage-mobile-testimonials {
+    background: #000000; color: #DDDDD5; min-height: 100%;
+    padding-top: calc(var(--mtm-pad-top) * var(--mscale));
+    padding-bottom: calc(var(--mtm-pad-bottom) * var(--mscale));
+    padding-left: calc(var(--mtm-pad-left) * var(--mscale));
+    padding-right: calc(var(--mtm-pad-right) * var(--mscale));
+  }
+  #stage-mobile-testimonials .mtm-header { display: flex; align-items: center; justify-content: space-between; }
+  #stage-mobile-testimonials .mtm-logo svg {
+    display: block; width: auto; aspect-ratio: 87 / 20.594;
+    height: calc(var(--mtm-logo-h) * var(--mscale));
+  }
+  #stage-mobile-testimonials .mtm-breadcrumb {
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif;
+    font-size: calc(var(--mtm-fs-label) * var(--mscale)); font-weight: var(--mtm-fw-label);
+    letter-spacing: calc(var(--mtm-ls-label) * 1em); line-height: var(--mtm-lh-label);
+    color: #938F8A;
+  }
+  #stage-mobile-testimonials .mtm-cards {
+    display: flex; flex-direction: column;
+    margin-top: calc(var(--mtm-gap-header) * var(--mscale));
+    gap: calc(var(--mtm-gap-card) * var(--mscale));
+  }
+  #stage-mobile-testimonials .mtm-card {
+    background: #FFFFFF;
+    border-radius: calc(var(--mtm-box-radius) * var(--mscale));
+    padding: calc(var(--mtm-card-pad) * var(--mscale));
+  }
+  #stage-mobile-testimonials .mtm-photo {
+    position: relative; width: 100%; aspect-ratio: 1 / 0.8; overflow: hidden;
+    border-radius: calc(var(--mtm-inner-radius) * var(--mscale));
+    background: linear-gradient(180deg, #E8E8E3 0%, #4FA8A8 100%);
+  }
+  #stage-mobile-testimonials .mtm-play {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    bottom: calc(var(--mtm-play-bottom) * var(--mscale));
+    display: flex; align-items: center;
+    gap: calc(var(--mtm-play-gap) * var(--mscale));
+    background: #FFFFFF; border-radius: calc(var(--mtm-play-radius) * var(--mscale));
+    padding: calc(var(--mtm-play-pady) * var(--mscale)) calc(var(--mtm-play-padx) * var(--mscale));
+  }
+  #stage-mobile-testimonials .mtm-play-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: calc(var(--mtm-play-iconw) * var(--mscale)); height: calc(var(--mtm-fs-playicon) * var(--mscale));
+    border-radius: calc(var(--mtm-play-iconradius) * var(--mscale)); background: #000000; color: #FFFFFF;
+  }
+  #stage-mobile-testimonials .mtm-play-label {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 700; color: #000000;
+    font-size: calc(var(--mtm-fs-playicon) * var(--mscale) * 0.55);
+  }
+  #stage-mobile-testimonials .mtm-quote-box {
+    margin-top: calc(var(--mtm-card-gap) * var(--mscale));
+    background: #000000;
+    border-radius: calc(var(--mtm-inner-radius) * var(--mscale));
+    padding: calc(var(--mtm-quote-pad) * var(--mscale));
+  }
+  #stage-mobile-testimonials .mtm-quote {
+    margin: 0; color: #FFFFFF; text-transform: capitalize;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: calc(var(--mtm-fs-quote) * var(--mscale)); font-weight: var(--mtm-fw-quote);
+    letter-spacing: calc(var(--mtm-ls-quote) * 1em); line-height: var(--mtm-lh-quote);
+  }
+  #stage-mobile-testimonials .mtm-attribution {
+    margin-top: calc(var(--mtm-attr-gap) * var(--mscale));
+    text-transform: capitalize;
+    font-size: calc(var(--mtm-fs-attr) * var(--mscale));
+    line-height: var(--mtm-lh-attr);
+  }
+  #stage-mobile-testimonials .mtm-attribution .name {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: 700; color: #FFFFFF;
+  }
+  #stage-mobile-testimonials .mtm-attribution .role {
+    font-family: 'Neue Haas Grotesk Roman', system-ui, sans-serif; font-weight: 500; color: #938F8A;
+  }
+
   /* ---- Mobile Terms and Conditions stage — mirrors
      components/proposal/slides-mobile/TermsAndConditionsMobileSlide.tsx.
      All eight clauses stack in one reading-order column (no side-by-side
@@ -1288,6 +1367,7 @@
   <button type="button" data-mslide="scope">Scope and Deliverables</button>
   <button type="button" data-mslide="timeline">Project Timeline</button>
   <button type="button" data-mslide="execsummary">Executive Summary</button>
+  <button type="button" data-mslide="testimonials">Client Testimonials</button>
   <button type="button" data-mslide="tc">Terms and Conditions</button>
   <button type="button" data-mslide="ca">Contract Agreement</button>
 </div>
@@ -1943,6 +2023,56 @@
         </div>
       </div>
 
+      <div class="stage-mobile-content" id="stage-mobile-testimonials">
+        <div class="mtm-header">
+          <div class="mtm-logo">
+            <svg viewBox="1455 172.109 87 20.594" xmlns="http://www.w3.org/2000/svg"><path d="M1455.014 172.061H1463.503C1465.605 172.061 1467.202 172.657 1468.323 173.821 1468.715 174.276 1469.051 174.787 1469.275 175.354 1469.5 175.922 1469.612 176.575 1469.612 177.284 1469.612 178.42 1469.303 179.357 1468.743 180.038 1468.183 180.72 1467.398 181.23 1466.389 181.543V181.628C1466.95 181.769 1467.455 181.969 1467.959 182.252 1468.463 182.537 1468.883 182.878 1469.248 183.274 1469.612 183.672 1469.892 184.155 1470.116 184.694 1470.313 185.262 1470.425 185.858 1470.425 186.539 1470.425 187.335 1470.284 188.072 1470.032 188.725 1469.78 189.378 1469.415 189.945 1468.968 190.428 1468.407 191.053 1467.679 191.507 1466.838 191.848 1465.997 192.188 1465.016 192.358 1463.952 192.358H1455.014V172.061ZM1463.84 190.059C1465.213 190.059 1466.249 189.719 1466.978 189.038 1467.258 188.753 1467.455 188.412 1467.622 188.016 1467.791 187.618 1467.874 187.192 1467.874 186.681 1467.874 185.432 1467.455 184.468 1466.669 183.842 1465.885 183.218 1464.876 182.906 1463.672 182.906H1457.535V190.059H1463.84ZM1463.195 180.749C1464.429 180.749 1465.38 180.464 1466.054 179.896 1466.726 179.329 1467.09 178.506 1467.09 177.427 1467.09 176.462 1466.754 175.694 1466.137 175.128 1465.52 174.559 1464.652 174.276 1463.532 174.276H1457.535V180.749H1463.195ZM1471.14 172.061H1473.662V192.358H1471.14V172.061ZM1474.686 183.474H1482.195V185.574H1474.686V183.474ZM1499.482 171.88L1498.092 176.668H1497.36C1497.992 174.03 1497.79 173.032 1495.996 173.032H1491.574C1490.993 173.032 1490.613 173.314 1490.436 173.877L1488.111 181.581H1491.649C1493.115 181.581 1493.721 181.069 1494.277 179.457H1494.884L1493.165 185.549H1492.508C1492.963 183.475 1492.762 182.606 1491.372 182.606H1487.809L1485.635 189.824C1485.181 191.334 1485.282 191.744 1487.96 191.744L1487.758 192.358H1479.647L1479.825 191.744C1481.744 191.744 1482.377 191.334 1482.831 189.824L1487.481 174.415C1487.935 172.903 1487.91 172.494 1485.662 172.494L1485.838 171.88H1499.482ZM1506.253 171.88L1506.076 172.494C1504.156 172.494 1503.524 172.903 1503.07 174.415L1498.522 189.542C1498.091 190.977 1498.345 191.207 1499.482 191.207H1502.488C1504.409 191.207 1505.344 190.438 1507.138 187.111L1507.871 187.341 1505.293 192.358H1492.382L1492.559 191.744C1494.504 191.744 1495.136 191.334 1495.591 189.824L1500.24 174.415C1500.695 172.903 1500.643 172.494 1498.395 172.494L1498.573 171.88H1506.253ZM1512.432 192.743C1507.807 192.743 1506.419 189.747 1507.757 185.344L1511.067 174.415C1511.523 172.903 1511.497 172.494 1509.324 172.494L1509.501 171.88H1517.031L1516.854 172.494C1514.958 172.494 1514.327 172.903 1513.872 174.415L1510.462 185.626C1509.4 189.133 1510.133 191.539 1513.089 191.539 1515.994 191.539 1518.091 189.465 1519.431 185.038L1522.666 174.415C1523.094 172.903 1523.044 172.494 1520.644 172.494L1520.821 171.88H1526.557L1526.404 172.494C1524.838 172.494 1524.283 172.903 1523.827 174.415L1520.594 185.14C1519.356 189.338 1517.385 192.743 1512.432 192.743ZM1535.974 172.494L1536.127 171.88H1541.913L1541.761 172.468C1540.523 172.468 1539.791 172.827 1538.274 174.491L1531.982 181.428 1534.08 189.799C1534.484 191.412 1535.117 191.744 1536.784 191.744L1536.582 192.358H1529.027L1529.228 191.744C1531.426 191.744 1531.553 191.309 1531.174 189.799L1529.556 183.322 1523.973 189.927C1522.811 191.257 1523.088 191.744 1525.033 191.744L1524.882 192.358H1518.819L1518.995 191.77C1520.41 191.77 1521.295 191.283 1522.987 189.363L1529.254 182.171 1527.333 174.44C1526.93 172.827 1526.373 172.494 1525.033 172.494L1525.211 171.88H1532.133L1531.932 172.494C1529.936 172.494 1529.86 172.929 1530.24 174.44L1531.705 180.276 1536.884 174.363C1538.148 172.929 1537.82 172.494 1535.974 172.494ZM1540.105 192.682C1539.358 192.682 1538.825 192.17 1538.825 191.468 1538.825 190.496 1539.705 189.497 1540.744 189.497 1541.517 189.497 1541.996 190.01 1541.996 190.711 1541.996 191.656 1541.144 192.682 1540.105 192.682Z" fill="#DDDDD5"/></svg>
+          </div>
+          <div class="mtm-breadcrumb">Client Testimonials</div>
+        </div>
+
+        <div class="mtm-cards">
+          <div class="mtm-card">
+            <div class="mtm-photo">
+              <div class="mtm-play">
+                <span class="mtm-play-icon">&#9654;</span>
+                <span class="mtm-play-label">Play</span>
+              </div>
+            </div>
+            <div class="mtm-quote-box">
+              <p class="mtm-quote">Umar rebuilt our website in two weeks, and every decision had real thought behind it. He spotted problems we hadn't even noticed ourselves and helped us see our business completely differently.</p>
+              <div class="mtm-attribution"><span class="name">Sam Wayne</span><span class="role"> | Founder of Leadgeneration.com</span></div>
+            </div>
+          </div>
+
+          <div class="mtm-card">
+            <div class="mtm-photo">
+              <div class="mtm-play">
+                <span class="mtm-play-icon">&#9654;</span>
+                <span class="mtm-play-label">Play</span>
+              </div>
+            </div>
+            <div class="mtm-quote-box">
+              <p class="mtm-quote">Before working with Umar, I thought our website was good enough. He completely changed how I looked at it, pointing out things I'd never considered. Years later, he still replies whenever I reach out..</p>
+              <div class="mtm-attribution"><span class="name">Sam Wayne</span><span class="role"> | Founder of Leadgeneration.com</span></div>
+            </div>
+          </div>
+
+          <div class="mtm-card">
+            <div class="mtm-photo">
+              <div class="mtm-play">
+                <span class="mtm-play-icon">&#9654;</span>
+                <span class="mtm-play-label">Play</span>
+              </div>
+            </div>
+            <div class="mtm-quote-box">
+              <p class="mtm-quote">Umar rebuilt our website in two weeks, and every decision had real thought behind it. He spotted problems we hadn't even noticed ourselves and helped us see our business completely differently.</p>
+              <div class="mtm-attribution"><span class="name">Sam Wayne</span><span class="role"> | Founder of Leadgeneration.com</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="stage-mobile-content" id="stage-mobile-tc">
         <div class="mtc-header">
           <div class="mtc-logo">
@@ -2064,6 +2194,7 @@
     <div id="panel-mobile-scope" class="panel-slide" style="display:none"></div>
     <div id="panel-mobile-timeline" class="panel-slide" style="display:none"></div>
     <div id="panel-mobile-execsummary" class="panel-slide" style="display:none"></div>
+    <div id="panel-mobile-testimonials" class="panel-slide" style="display:none"></div>
     <div id="panel-mobile-tc" class="panel-slide" style="display:none"></div>
     <div id="panel-mobile-ca" class="panel-slide" style="display:none"></div>
   </div>
@@ -2630,6 +2761,61 @@
     { key: 'tablebody', name: 'Table Row Labels/Values — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 12.4, lh: 1.57, ls: -0.010, fw: 500 }, fsRange: [8, 22, 0.1], lhRange: [0.8, 1.9, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: null },
     { key: 'tablebold', name: 'Table Bold Values (Total/TOTAL/Timeline) — Helvetica Neue Bold', font: 'Helvetica Neue (system)', defaults: { fs: 16.3, lh: 1.30, ls: -0.010, fw: 700 }, fsRange: [8, 24, 0.1], lhRange: [0.8, 1.9, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: [400, 500, 600, 700] },
     { key: 'label', name: 'Breadcrumb — Inter', font: 'Inter', defaults: { fs: 12.7, lh: 1.45, ls: -0.020, fw: 500 }, fsRange: [8, 24, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
+  ], document.createElement('div'), stageMobile);
+
+  // ---------------------------------------------------------------------
+  // Mobile Client Testimonials slide module — mirrors
+  // components/proposal/slides-mobile/ClientTestimonialsMobileSlide.tsx.
+  // Cards stack full-width in a single column (no per-card width slider,
+  // unlike desktop's tm-card-w) — only the shared card chrome is tunable.
+  // ---------------------------------------------------------------------
+  const mtmPanel = document.getElementById('panel-mobile-testimonials');
+  const mtmLayoutState = {};
+  const mtmLayoutRefs = {};
+  buildLayoutSliders(mtmPanel, 'mtm-pad', [
+    { key: 'top', label: 'Padding Top', min: 0, max: 100, default: 23 },
+    { key: 'bottom', label: 'Padding Bottom', min: 0, max: 150, default: 50 },
+    { key: 'left', label: 'Padding Left', min: 0, max: 60, default: 20 },
+    { key: 'right', label: 'Padding Right', min: 0, max: 60, default: 20 },
+  ], updateMobileScale, mtmLayoutState, mtmLayoutRefs, stageMobile);
+  buildLayoutSliders(mtmPanel, 'mtm-gap', [
+    { key: 'header', label: 'Header → First Card Gap', min: 0, max: 100, default: 33 },
+    { key: 'card', label: 'Gap Between Cards', min: 0, max: 100, default: 25 },
+  ], updateMobileScale, mtmLayoutState, mtmLayoutRefs, stageMobile);
+  buildLayoutSliders(mtmPanel, 'mtm-card', [
+    { key: 'pad', label: 'Card Outer Padding (white border thickness)', min: 0, max: 30, default: 8 },
+    { key: 'gap', label: 'Gap Between Photo And Quote Box', min: 0, max: 30, default: 9 },
+  ], updateMobileScale, mtmLayoutState, mtmLayoutRefs, stageMobile);
+  buildLayoutSliders(mtmPanel, 'mtm-box', [
+    { key: 'radius', label: 'Outer Card Corner Radius', min: 0, max: 30, default: 19 },
+  ], updateMobileScale, mtmLayoutState, mtmLayoutRefs, stageMobile);
+  buildLayoutSliders(mtmPanel, 'mtm-inner', [
+    { key: 'radius', label: 'Photo / Quote Box Corner Radius', min: 0, max: 30, default: 16 },
+  ], updateMobileScale, mtmLayoutState, mtmLayoutRefs, stageMobile);
+  buildLayoutSliders(mtmPanel, 'mtm-quote', [
+    { key: 'pad', label: 'Quote Box Inner Padding', min: 0, max: 40, default: 17 },
+  ], updateMobileScale, mtmLayoutState, mtmLayoutRefs, stageMobile);
+  buildLayoutSliders(mtmPanel, 'mtm-attr', [
+    { key: 'gap', label: 'Quote ↔ Name/Role Gap', min: 0, max: 30, default: 13 },
+  ], updateMobileScale, mtmLayoutState, mtmLayoutRefs, stageMobile);
+  buildLayoutSliders(mtmPanel, 'mtm-play', [
+    { key: 'bottom', label: 'Play Button — Distance From Photo Bottom', min: 0, max: 60, default: 13 },
+    { key: 'padx', label: 'Play Button — Horizontal Padding', min: 0, max: 40, default: 12 },
+    { key: 'pady', label: 'Play Button — Vertical Padding', min: 0, max: 30, default: 10 },
+    { key: 'gap', label: 'Play Button — Icon ↔ Text Gap', min: 0, max: 30, default: 8 },
+    { key: 'radius', label: 'Play Button — Corner Radius', min: 0, max: 40, default: 7 },
+    { key: 'iconw', label: 'Play Button — Icon Width (independent of icon height)', min: 8, max: 60, default: 28 },
+    { key: 'iconradius', label: 'Play Button — Icon Corner Radius', min: 0, max: 20, default: 4 },
+  ], updateMobileScale, mtmLayoutState, mtmLayoutRefs, stageMobile);
+  buildLayoutSliders(mtmPanel, 'mtm-logo', [
+    { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 40, step: 0.1, default: 13.3 },
+  ], updateMobileScale, mtmLayoutState, mtmLayoutRefs, stageMobile);
+  buildLayoutOutputBox(mtmPanel, mtmLayoutState, mtmLayoutRefs);
+  buildTypographyPanels(mtmPanel, 'mtm', [
+    { key: 'quote', name: 'Quote Text — Helvetica Neue Bold', font: 'Helvetica Neue (system)', defaults: { fs: 15.3, lh: 1.25, ls: 0.027, fw: 700 }, fsRange: [9, 28, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: [400, 500, 600, 700] },
+    { key: 'attr', name: 'Name / Role — Helvetica Neue Bold + Neue Haas Grotesk', font: 'Mixed (see card)', defaults: { fs: 11.5, lh: 1.14, ls: 0.002, fw: 500 }, fsRange: [8, 20, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.05, 0.05, 0.001], weights: null },
+    { key: 'label', name: 'Breadcrumb — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 13.7, lh: 1.20, ls: -0.005, fw: 400 }, fsRange: [8, 24, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
+    { key: 'playicon', name: 'Play Button Icon Height (text is 0.55× this; icon width is its own slider above)', font: 'Helvetica Neue (system)', defaults: { fs: 20, lh: 1, ls: 0, fw: 700 }, fsRange: [8, 40, 0.1], lhRange: [1, 1, 0.01], lsRange: [0, 0, 0.001], weights: null },
   ], document.createElement('div'), stageMobile);
 
   // ---------------------------------------------------------------------

@@ -22,6 +22,7 @@ import { ImpactMobileSlide } from "@/components/proposal/slides-mobile/ImpactMob
 import { ScopeDeliverablesMobileSlide } from "@/components/proposal/slides-mobile/ScopeDeliverablesMobileSlide";
 import { ProjectTimelineMobileSlide } from "@/components/proposal/slides-mobile/ProjectTimelineMobileSlide";
 import { ExecutiveSummaryMobileSlide } from "@/components/proposal/slides-mobile/ExecutiveSummaryMobileSlide";
+import { ClientTestimonialsMobileSlide } from "@/components/proposal/slides-mobile/ClientTestimonialsMobileSlide";
 import { TermsAndConditionsMobileSlide } from "@/components/proposal/slides-mobile/TermsAndConditionsMobileSlide";
 import { ContractAgreementMobileSlide } from "@/components/proposal/slides-mobile/ContractAgreementMobileSlide";
 
@@ -81,10 +82,10 @@ export default async function ProposalPage({
         />
       </div>
 
-      {/* Mobile — in progress; Cover, TOC, Problem, Solution, Impact, Scope
-          and Deliverables, Project Timeline, Executive Summary, Terms and
-          Conditions, and Contract Agreement exist so far — Client
-          Testimonials is the only slide left, see AGENTS.md */}
+      {/* Mobile — all slides built; Cover, TOC, Problem, Solution, Impact,
+          Scope and Deliverables, Project Timeline, Executive Summary,
+          Client Testimonials, Terms and Conditions, and Contract
+          Agreement, see AGENTS.md */}
       <div className="md:hidden">
         <MobileSlideDeck
           sections={[
@@ -104,6 +105,10 @@ export default async function ProposalPage({
             {
               theme: "light",
               content: <ExecutiveSummaryMobileSlide proposal={proposal} />,
+            },
+            {
+              theme: "dark",
+              content: <ClientTestimonialsMobileSlide proposal={proposal} />,
             },
             {
               theme: "light",
