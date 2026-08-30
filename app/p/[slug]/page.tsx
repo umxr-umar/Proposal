@@ -20,6 +20,7 @@ import { ProblemMobileSlide } from "@/components/proposal/slides-mobile/ProblemM
 import { SolutionMobileSlide } from "@/components/proposal/slides-mobile/SolutionMobileSlide";
 import { ImpactMobileSlide } from "@/components/proposal/slides-mobile/ImpactMobileSlide";
 import { ScopeDeliverablesMobileSlide } from "@/components/proposal/slides-mobile/ScopeDeliverablesMobileSlide";
+import { ProjectTimelineMobileSlide } from "@/components/proposal/slides-mobile/ProjectTimelineMobileSlide";
 import { ExecutiveSummaryMobileSlide } from "@/components/proposal/slides-mobile/ExecutiveSummaryMobileSlide";
 
 // Proposals live in Notion. Re-fetch at most once per 60s so edits (or a
@@ -79,8 +80,8 @@ export default async function ProposalPage({
       </div>
 
       {/* Mobile — in progress; Cover, TOC, Problem, Solution, Impact, Scope
-          and Deliverables, and Executive Summary exist so far, see
-          AGENTS.md */}
+          and Deliverables, Project Timeline, and Executive Summary exist so
+          far, see AGENTS.md */}
       <div className="md:hidden">
         <MobileSlideDeck
           sections={[
@@ -92,6 +93,10 @@ export default async function ProposalPage({
             {
               theme: "light",
               content: <ScopeDeliverablesMobileSlide proposal={proposal} />,
+            },
+            {
+              theme: "light",
+              content: <ProjectTimelineMobileSlide proposal={proposal} />,
             },
             {
               theme: "light",
