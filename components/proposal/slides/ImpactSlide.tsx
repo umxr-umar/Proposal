@@ -4,6 +4,8 @@ import type { Proposal } from "@/lib/types";
 import { OverviewTextSlide } from "./OverviewTextSlide";
 import { pad, useSlideDeck } from "./SlideDeck";
 import { fx, ffont } from "@/lib/fluid";
+import type { ContentAlign } from "@/lib/contentAlign";
+import live from "@/lib/live-values/impact.json";
 
 /**
  * "Impact" — third and last of three sub-slides under "01. Project
@@ -33,6 +35,8 @@ export function ImpactSlide({ proposal }: { proposal: Proposal }) {
       bodyWidth={740}
       bodyGap={199}
       paragraphs={paragraphs}
+      align={live.layout.align as ContentAlign}
+      topPx={live.layout["body-y"]}
       footer={
         <button
           type="button"

@@ -1,0 +1,46 @@
+{
+  "layout": {
+    "header-x": 48,
+    "header-y": 48,
+    "header-w": 1824,
+    "header-lw": 760,
+    "cols-x": 48,
+    "cols-bottom": 60,
+    "cols-gap": 133,
+    "col-w1": 764,
+    "col-w2": 668,
+    "heading-gap": 37,
+    "section-gap": 21,
+    "page-x": 1855,
+    "page-y": 998,
+    "logo-h": 20.6,
+    "top": 150,
+    "align": "center"
+  },
+  "typography": {
+    "colheading": {
+      "fs": 31.7,
+      "lh": 1.44,
+      "ls": -0.015,
+      "fw": 700
+    },
+    "numheading": {
+      "fs": 25.1,
+      "lh": 1.33,
+      "ls": -0.019,
+      "fw": 700
+    },
+    "body": {
+      "fs": 19.9,
+      "lh": 1.53,
+      "ls": -0.01,
+      "fw": 500
+    },
+    "label": {
+      "fs": 26.5,
+      "lh": 1.35,
+      "ls": -0.03,
+      "fw": 500
+    }
+  }
+}

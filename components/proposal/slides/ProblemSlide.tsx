@@ -1,5 +1,7 @@
 import type { Proposal } from "@/lib/types";
 import { OverviewTextSlide } from "./OverviewTextSlide";
+import type { ContentAlign } from "@/lib/contentAlign";
+import live from "@/lib/live-values/problem.json";
 
 /**
  * "Problem" — first of three sub-slides under "01. Project Overview"
@@ -25,6 +27,8 @@ export function ProblemSlide({ proposal }: { proposal: Proposal }) {
       bodyWidth={710}
       bodyGap={174}
       paragraphs={paragraphs}
+      align={live.layout.align as ContentAlign}
+      topPx={live.layout["body-y"]}
     />
   );
 }

@@ -2320,19 +2320,79 @@
   // output box — mirroring how buildTypographyPanels already has its own
   // copy button, so a slide's full set of numbers (layout AND typography)
   // can be copied and handed over, not just typography.
-  function buildLayoutSliders(container, prefix, layoutFields, onChange, layoutState, layoutRefs, stageEl = stage) {
+  // Live-save support — POSTs the current values straight to the dev
+  // server, which writes them into lib/live-values/<slide>.json. The slide
+  // components import that JSON directly, so a save + a tab refresh is the
+  // whole loop now — no copy, no pasting values in for Claude to apply.
+  // Dev-server only (the API route 403s in production).
+  function slideIdFromPanel(container) {
+    return container.id.replace(/^panel-/, '');
+  }
+
+  // Synchronous on purpose: this is a personal local dev tool, not
+  // production code, and every panel needs its saved values BEFORE its
+  // sliders are built (their initial DOM value has to already be right,
+  // not patched in after the fact) — restructuring every builder function
+  // to async just to avoid one deprecated sync XHR isn't worth it here.
+  // Returns {layout:{}, typography:{}} (all-defaults) if nothing was ever
+  // saved for this slide, or if the dev server isn't reachable yet.
+  function loadSaved(slide) {
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', `/api/live-config?slide=${encodeURIComponent(slide)}`, false);
+      xhr.send(null);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const data = JSON.parse(xhr.responseText);
+        return { layout: data.layout || {}, typography: data.typography || {} };
+      }
+    } catch (e) {}
+    return { layout: {}, typography: {} };
+  }
+
+  async function saveLive(slide, payload) {
+    try {
+      const res = await fetch('/api/live-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slide, ...payload }),
+      });
+      return res.ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function flashSaved(btn, ok) {
+    const original = btn.textContent;
+    btn.textContent = ok ? 'Saved live ✓' : 'Save failed — is `npm run dev` running?';
+    setTimeout(() => (btn.textContent = original), ok ? 1200 : 2500);
+  }
+
+  // `saved` (from loadSaved(slide).layout) overrides each field's hardcoded
+  // `default` with the real last-saved value, keyed the same way the save
+  // button strips it (outer panel prefix removed, e.g. "pad-top" for a
+  // field with key "top" under prefix "c-pad"). Without this, every field
+  // NOT currently being moved would still report its stale hardcoded
+  // default to the next "Save layout live" click and silently overwrite
+  // whatever was really saved there before — this is the exact bug that
+  // wiped Cover's real padding-bottom the first time Vertical Position
+  // was saved.
+  function buildLayoutSliders(container, prefix, layoutFields, onChange, layoutState, layoutRefs, stageEl = stage, saved = {}) {
     const wrap = document.createElement('div');
     wrap.innerHTML = '<p class="section-label">Layout</p>';
+    const subPrefix = prefix.includes('-') ? prefix.split('-').slice(1).join('-') : '';
     layoutFields.forEach((f) => {
+      const savedKey = subPrefix ? `${subPrefix}-${f.key}` : f.key;
+      const initial = Object.prototype.hasOwnProperty.call(saved, savedKey) ? saved[savedKey] : f.default;
       const group = document.createElement('div');
       group.className = 'slider-group';
       group.innerHTML = `
-        <label>${f.label} <span class="val" id="val-${prefix}-${f.key}">${f.default}${f.unit || 'px'}</span></label>
-        <input type="range" id="in-${prefix}-${f.key}" min="${f.min}" max="${f.max}" step="${f.step || 1}" value="${f.default}" />
+        <label>${f.label} <span class="val" id="val-${prefix}-${f.key}">${initial}${f.unit || 'px'}</span></label>
+        <input type="range" id="in-${prefix}-${f.key}" min="${f.min}" max="${f.max}" step="${f.step || 1}" value="${initial}" />
       `;
       wrap.appendChild(group);
       if (layoutState) {
-        layoutState[`${prefix}-${f.key}`] = { label: f.label, value: f.default, unit: f.unit ?? 'px' };
+        layoutState[`${prefix}-${f.key}`] = { label: f.label, value: initial, unit: f.unit ?? 'px' };
       }
       const input = group.querySelector('input');
       input.addEventListener('input', () => {
@@ -2343,7 +2403,7 @@
         if (layoutRefs) layoutRefs.refresh();
         onChange();
       });
-      stageEl.style.setProperty(`--${prefix}-${f.key}`, f.default + (f.unit === '' ? '' : 'px'));
+      stageEl.style.setProperty(`--${prefix}-${f.key}`, initial + (f.unit === '' ? '' : 'px'));
     });
     const resetBtn = document.createElement('button');
     resetBtn.className = 'action reset';
@@ -2399,19 +2459,34 @@
     });
     container.appendChild(copyBtn);
 
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'action';
+    saveBtn.textContent = 'Save layout live';
+    saveBtn.addEventListener('click', async () => {
+      const prefix = Object.keys(layoutState)[0]?.split('-')[0];
+      const layout = {};
+      Object.entries(layoutState).forEach(([key, v]) => {
+        const stripped = prefix && key.startsWith(prefix + '-') ? key.slice(prefix.length + 1) : key;
+        layout[stripped] = v.value;
+      });
+      const ok = await saveLive(slideIdFromPanel(container), { layout });
+      flashSaved(saveBtn, ok);
+    });
+    container.appendChild(saveBtn);
+
     const hr = document.createElement('hr');
     hr.className = 'divider';
     container.appendChild(hr);
   }
 
-  function buildTypographyPanels(container, prefix, elements, outputBox, stageEl = stage) {
+  function buildTypographyPanels(container, prefix, elements, outputBox, stageEl = stage, saved = {}) {
     const title = document.createElement('p');
     title.className = 'section-label';
     title.textContent = 'Typography — per element';
     container.appendChild(title);
 
     const state = {};
-    elements.forEach((el) => { state[el.key] = { ...el.defaults }; });
+    elements.forEach((el) => { state[el.key] = { ...el.defaults, ...(saved[el.key] || {}) }; });
 
     function applyElement(key) {
       const s = state[key];
@@ -2431,25 +2506,26 @@
     }
 
     elements.forEach((el) => {
+      const init = state[el.key];
       const panel = document.createElement('div');
       panel.className = 'element-panel';
       const weightControl = el.weights
         ? `<div class="weight-picker" id="wp-${prefix}-${el.key}"></div>`
-        : `<div class="weight-fixed">Only ${el.defaults.fw} (Roman) is loaded — nothing else to pick.</div>`;
+        : `<div class="weight-fixed">Only ${init.fw} (Roman) is loaded — nothing else to pick.</div>`;
       panel.innerHTML = `
         <p class="el-name">${el.name}</p>
         <p class="el-font">${el.font}</p>
         <div class="slider-group">
-          <label>Font Size <span class="val" id="val-${prefix}-${el.key}-fs">${el.defaults.fs}px</span></label>
-          <input type="range" id="in-${prefix}-${el.key}-fs" min="${el.fsRange[0]}" max="${el.fsRange[1]}" step="${el.fsRange[2]}" value="${el.defaults.fs}" />
+          <label>Font Size <span class="val" id="val-${prefix}-${el.key}-fs">${init.fs}px</span></label>
+          <input type="range" id="in-${prefix}-${el.key}-fs" min="${el.fsRange[0]}" max="${el.fsRange[1]}" step="${el.fsRange[2]}" value="${init.fs}" />
         </div>
         <div class="slider-group">
-          <label>Line Height <span class="val" id="val-${prefix}-${el.key}-lh">${el.defaults.lh}</span></label>
-          <input type="range" id="in-${prefix}-${el.key}-lh" min="${el.lhRange[0]}" max="${el.lhRange[1]}" step="${el.lhRange[2]}" value="${el.defaults.lh}" />
+          <label>Line Height <span class="val" id="val-${prefix}-${el.key}-lh">${init.lh}</span></label>
+          <input type="range" id="in-${prefix}-${el.key}-lh" min="${el.lhRange[0]}" max="${el.lhRange[1]}" step="${el.lhRange[2]}" value="${init.lh}" />
         </div>
         <div class="slider-group">
-          <label>Letter Spacing <span class="val" id="val-${prefix}-${el.key}-ls">${fmtLs(el.defaults.ls)}</span></label>
-          <input type="range" id="in-${prefix}-${el.key}-ls" min="${el.lsRange[0]}" max="${el.lsRange[1]}" step="${el.lsRange[2]}" value="${el.defaults.ls}" />
+          <label>Letter Spacing <span class="val" id="val-${prefix}-${el.key}-ls">${fmtLs(init.ls)}</span></label>
+          <input type="range" id="in-${prefix}-${el.key}-ls" min="${el.lsRange[0]}" max="${el.lsRange[1]}" step="${el.lsRange[2]}" value="${init.ls}" />
         </div>
         ${weightControl}
       `;
@@ -2461,7 +2537,7 @@
           const btn = document.createElement('button');
           btn.type = 'button';
           btn.textContent = w;
-          if (w === el.defaults.fw) btn.classList.add('active');
+          if (w === init.fw) btn.classList.add('active');
           btn.addEventListener('click', () => {
             state[el.key].fw = w;
             wp.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
@@ -2501,6 +2577,15 @@
     });
     container.appendChild(copyBtn);
 
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'action';
+    saveBtn.textContent = 'Save typography live';
+    saveBtn.addEventListener('click', async () => {
+      const ok = await saveLive(slideIdFromPanel(container), { typography: state });
+      flashSaved(saveBtn, ok);
+    });
+    container.appendChild(saveBtn);
+
     const resetBtn = document.createElement('button');
     resetBtn.className = 'action reset';
     resetBtn.textContent = 'Reset typography';
@@ -2526,28 +2611,139 @@
     updateOutput();
   }
 
+  // Top/Center/Bottom control for a slide's main absolutely-positioned
+  // content block — feeds into the same layoutState (and so the same
+  // "Save layout live" button) as everything else on the panel, under key
+  // `${prefix}-align`. `stageSelector` is the CSS selector (scoped to
+  // `stage`, e.g. '#stage-scope .sd-cols') for the actual DOM element to
+  // move, so this control gives real, immediate visual feedback in the
+  // tool itself instead of only taking effect after a save + real-page
+  // refresh. "Bottom" always clears the inline override so that mode
+  // stays pixel-exact to the slide's original CSS-authored position;
+  // "Top"/"Center" are an approximate stand-in (a fixed reasonable offset
+  // / true center) since the tool's stage wasn't built with a precise
+  // top/center formula for every slide — the real page (via
+  // lib/contentAlign.ts) is still the exact source of truth for those.
+  function buildAlignToggle(container, prefix, layoutState, onChange, defaultValue = 'bottom', stageSelector = null, layoutRefs = null, topVar = null) {
+    const wrap = document.createElement('div');
+    wrap.innerHTML = '<p class="section-label">Vertical Position</p>';
+    const group = document.createElement('div');
+    group.className = 'align-toggle';
+    group.style.display = 'flex';
+    group.style.gap = '8px';
+    layoutState[`${prefix}-align`] = { label: 'Vertical Position', value: defaultValue, unit: '' };
+
+    function applyVisual(val) {
+      if (!stageSelector) return;
+      document.querySelectorAll(stageSelector).forEach((el) => {
+        if (val === 'top') {
+          el.style.top = topVar ? `calc(var(--${topVar}) * var(--scale))` : 'calc(150px * var(--scale))';
+          el.style.bottom = 'auto';
+          el.style.transform = 'none';
+        } else if (val === 'center') {
+          el.style.top = '50%';
+          el.style.bottom = 'auto';
+          el.style.transform = 'translateY(-50%)';
+        } else {
+          el.style.top = '';
+          el.style.bottom = '';
+          el.style.transform = '';
+        }
+      });
+    }
+
+    [['top', 'Top'], ['center', 'Center'], ['bottom', 'Bottom']].forEach(([val, label]) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = label;
+      btn.className = 'action' + (val === defaultValue ? ' active' : '');
+      btn.addEventListener('click', () => {
+        layoutState[`${prefix}-align`].value = val;
+        group.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyVisual(val);
+        if (layoutRefs) layoutRefs.refresh();
+        onChange();
+      });
+      group.appendChild(btn);
+    });
+    applyVisual(defaultValue);
+    wrap.appendChild(group);
+    container.appendChild(wrap);
+    const hr = document.createElement('hr');
+    hr.className = 'divider';
+    container.appendChild(hr);
+  }
+
+  // Top/Center/Bottom for Cover specifically — Cover's title and fields
+  // are two separate pinned pieces (justify-content: space-between on the
+  // whole stage), not one absolutely-positioned block like every other
+  // slide, so this toggles the stage's own justify-content instead of
+  // moving a single element. "Bottom" = today's original split-pin design
+  // (title glued to the very top, fields to the very bottom); "Top"/
+  // "Center" pack title+fields together as one group and park that group
+  // at the top or true center.
+  function buildCoverAlignToggle(container, layoutState, onChange, defaultValue = 'bottom', layoutRefs = null) {
+    const wrap = document.createElement('div');
+    wrap.innerHTML = '<p class="section-label">Vertical Position</p>';
+    const group = document.createElement('div');
+    group.style.display = 'flex';
+    group.style.gap = '8px';
+    layoutState['c-align'] = { label: 'Vertical Position', value: defaultValue, unit: '' };
+
+    function applyVisual(val) {
+      const stage = document.getElementById('stage-cover');
+      if (!stage) return;
+      stage.style.justifyContent = val === 'top' ? 'flex-start' : val === 'center' ? 'center' : 'space-between';
+    }
+
+    [['top', 'Top'], ['center', 'Center'], ['bottom', 'Bottom']].forEach(([val, label]) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = label;
+      btn.className = 'action' + (val === defaultValue ? ' active' : '');
+      btn.addEventListener('click', () => {
+        layoutState['c-align'].value = val;
+        group.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyVisual(val);
+        if (layoutRefs) layoutRefs.refresh();
+        onChange();
+      });
+      group.appendChild(btn);
+    });
+    applyVisual(defaultValue);
+    wrap.appendChild(group);
+    container.appendChild(wrap);
+    const hr = document.createElement('hr');
+    hr.className = 'divider';
+    container.appendChild(hr);
+  }
+
   // ---------------------------------------------------------------------
   // Cover slide module
   // ---------------------------------------------------------------------
   const coverPanel = document.getElementById('panel-cover');
   const cLayoutState = {};
   const cLayoutRefs = {};
+  const coverSaved = loadSaved('cover');
   buildLayoutSliders(coverPanel, 'c-pad', [
     { key: 'top', label: 'Padding Top', min: 0, max: 150, default: 21 },
     { key: 'bottom', label: 'Padding Bottom', min: 0, max: 150, default: 51 },
     { key: 'left', label: 'Padding Left', min: 0, max: 150, default: 47 },
     { key: 'right', label: 'Padding Right', min: 0, max: 150, default: 24 },
-  ], updateScale, cLayoutState, cLayoutRefs);
+  ], updateScale, cLayoutState, cLayoutRefs, stage, coverSaved.layout);
   buildLayoutSliders(coverPanel, 'c-logo', [
     { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 21.7 },
-  ], updateScale, cLayoutState, cLayoutRefs);
+  ], updateScale, cLayoutState, cLayoutRefs, stage, coverSaved.layout);
+  buildCoverAlignToggle(coverPanel, cLayoutState, updateScale, coverSaved.layout.align ?? 'bottom', cLayoutRefs);
   buildLayoutOutputBox(coverPanel, cLayoutState, cLayoutRefs);
   buildTypographyPanels(coverPanel, 'c', [
     { key: 'title', name: 'Title', font: 'Inter', defaults: { fs: 196.4, lh: 0.97, ls: -0.060, fw: 500 }, fsRange: [100, 260, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600] },
     { key: 'subtitle', name: 'Subtitle', font: 'Helvetica Neue (system)', defaults: { fs: 74.6, lh: 1.17, ls: -0.060, fw: 600 }, fsRange: [30, 120, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
     { key: 'label', name: 'Client Label ("CLIENT")', font: 'Neue Haas Grotesk Roman', defaults: { fs: 19.9, lh: 1.07, ls: 0.135, fw: 400 }, fsRange: [10, 40, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.05, 0.35, 0.001], weights: null },
     { key: 'value', name: 'Value Text (names, emails)', font: 'Neue Haas Grotesk Roman', defaults: { fs: 27.4, lh: 1.32, ls: -0.030, fw: 400 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
-  ], document.createElement('div'));
+  ], document.createElement('div'), stage, coverSaved.typography);
 
   // ---------------------------------------------------------------------
   // Mobile Cover slide module — mirrors components/proposal/slides-mobile/
@@ -2904,33 +3100,38 @@
   const tocPanel = document.getElementById('panel-toc');
   const tLayoutState = {};
   const tLayoutRefs = {};
+  const tocSaved = loadSaved('toc');
   buildLayoutSliders(tocPanel, 't-header', [
     { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
     { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
     { key: 'gap', label: 'Logo ↔ Label Gap', min: 0, max: 300, default: 174 },
-  ], updateScale, tLayoutState, tLayoutRefs);
+  ], updateScale, tLayoutState, tLayoutRefs, stage, tocSaved.layout);
   buildLayoutSliders(tocPanel, 't-list', [
     { key: 'x', label: 'List X', min: 0, max: 300, default: 56 },
     { key: 'y', label: 'List Y', min: 200, max: 900, default: 420 },
     { key: 'gap', label: 'Row Gap (vertical)', min: 0, max: 60, default: 12 },
-  ], updateScale, tLayoutState, tLayoutRefs);
+  ], updateScale, tLayoutState, tLayoutRefs, stage, tocSaved.layout);
   buildLayoutSliders(tocPanel, 't-row', [
     { key: 'gap', label: 'Number ↔ Title Gap', min: 0, max: 400, default: 199 },
-  ], updateScale, tLayoutState, tLayoutRefs);
+  ], updateScale, tLayoutState, tLayoutRefs, stage, tocSaved.layout);
   buildLayoutSliders(tocPanel, 't-page', [
     { key: 'x', label: 'Page Number X', min: 1400, max: 1900, default: 1855 },
     { key: 'y', label: 'Page Number Y', min: 800, max: 1060, default: 998 },
-  ], updateScale, tLayoutState, tLayoutRefs);
+  ], updateScale, tLayoutState, tLayoutRefs, stage, tocSaved.layout);
   buildLayoutSliders(tocPanel, 't-logo', [
     { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
-  ], updateScale, tLayoutState, tLayoutRefs);
+  ], updateScale, tLayoutState, tLayoutRefs, stage, tocSaved.layout);
+  buildLayoutSliders(tocPanel, 't', [
+    { key: 'top', label: 'Top Position (Vertical Position = Top)', min: 0, max: 900, default: 150 },
+  ], updateScale, tLayoutState, tLayoutRefs, stage, tocSaved.layout);
+  buildAlignToggle(tocPanel, 't', tLayoutState, updateScale, tocSaved.layout.align ?? 'bottom', '#stage-toc .t-list, #stage-toc .t-page', tLayoutRefs, 't-top');
   buildLayoutOutputBox(tocPanel, tLayoutState, tLayoutRefs);
   buildTypographyPanels(tocPanel, 't', [
     { key: 'number', name: 'Row Number ("/01.")', font: 'Instrument Serif', defaults: { fs: 72, lh: 0.97, ls: -0.025, fw: 400 }, fsRange: [30, 120, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: null },
     { key: 'title', name: 'Section Title', font: 'Neue Haas Grotesk Roman', defaults: { fs: 75.8, lh: 1.04, ls: 0.003, fw: 400 }, fsRange: [30, 120, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: null },
     { key: 'label', name: 'Header / Year / Page Label', font: 'Neue Haas Grotesk Roman', defaults: { fs: 30.3, lh: 1.31, ls: -0.006, fw: 400 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.6, 0.01], lsRange: [-0.08, 0.1, 0.001], weights: null },
-  ], document.createElement('div'));
+  ], document.createElement('div'), stage, tocSaved.typography);
 
   // ---------------------------------------------------------------------
   // Mobile TOC slide module — mirrors components/proposal/slides-mobile/
@@ -2970,36 +3171,38 @@
   const problemPanel = document.getElementById('panel-problem');
   const pLayoutState = {};
   const pLayoutRefs = {};
+  const problemSaved = loadSaved('problem');
   buildLayoutSliders(problemPanel, 'p-header', [
     { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
     { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
     { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 900, default: 545 },
-  ], updateScale, pLayoutState, pLayoutRefs);
+  ], updateScale, pLayoutState, pLayoutRefs, stage, problemSaved.layout);
   buildLayoutSliders(problemPanel, 'p-body', [
     { key: 'x', label: 'Body X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Body Y', min: 200, max: 900, default: 500 },
     { key: 'gap', label: 'Heading ↔ Text Gap', min: 0, max: 300, default: 174 },
-  ], updateScale, pLayoutState, pLayoutRefs);
+  ], updateScale, pLayoutState, pLayoutRefs, stage, problemSaved.layout);
   buildLayoutSliders(problemPanel, 'p-text', [
     { key: 'w', label: 'Body Text Width', min: 400, max: 1200, default: 710 },
-  ], updateScale, pLayoutState, pLayoutRefs);
+  ], updateScale, pLayoutState, pLayoutRefs, stage, problemSaved.layout);
   buildLayoutSliders(problemPanel, 'p-para', [
     { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 36 },
-  ], updateScale, pLayoutState, pLayoutRefs);
+  ], updateScale, pLayoutState, pLayoutRefs, stage, problemSaved.layout);
   buildLayoutSliders(problemPanel, 'p-page', [
     { key: 'x', label: 'Page Number X', min: 1400, max: 1900, default: 1855 },
     { key: 'y', label: 'Page Number Y', min: 800, max: 1060, default: 998 },
-  ], updateScale, pLayoutState, pLayoutRefs);
+  ], updateScale, pLayoutState, pLayoutRefs, stage, problemSaved.layout);
   buildLayoutSliders(problemPanel, 'p-logo', [
     { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
-  ], updateScale, pLayoutState, pLayoutRefs);
+  ], updateScale, pLayoutState, pLayoutRefs, stage, problemSaved.layout);
+  buildAlignToggle(problemPanel, 'p', pLayoutState, updateScale, problemSaved.layout.align ?? 'bottom', '#stage-problem .p-body', pLayoutRefs, 'p-body-y');
   buildLayoutOutputBox(problemPanel, pLayoutState, pLayoutRefs);
   buildTypographyPanels(problemPanel, 'p', [
     { key: 'heading', name: 'Heading ("Problem")', font: 'Inter', defaults: { fs: 27, lh: 1.8, ls: -0.03, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
     { key: 'body', name: 'Body Text', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
     { key: 'label', name: 'Breadcrumb / Year / Page', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
-  ], document.createElement('div'));
+  ], document.createElement('div'), stage, problemSaved.typography);
 
   // ---------------------------------------------------------------------
   // Solution slide module (second of three Project Overview sub-slides)
@@ -3009,36 +3212,38 @@
   const solutionPanel = document.getElementById('panel-solution');
   const soLayoutState = {};
   const soLayoutRefs = {};
+  const solutionSaved = loadSaved('solution');
   buildLayoutSliders(solutionPanel, 'so-header', [
     { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
     { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
     { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 900, default: 545 },
-  ], updateScale, soLayoutState, soLayoutRefs);
+  ], updateScale, soLayoutState, soLayoutRefs, stage, solutionSaved.layout);
   buildLayoutSliders(solutionPanel, 'so-body', [
     { key: 'x', label: 'Body X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Body Y', min: 200, max: 900, default: 500 },
     { key: 'gap', label: 'Heading ↔ Text Gap', min: 0, max: 300, default: 174 },
-  ], updateScale, soLayoutState, soLayoutRefs);
+  ], updateScale, soLayoutState, soLayoutRefs, stage, solutionSaved.layout);
   buildLayoutSliders(solutionPanel, 'so-text', [
     { key: 'w', label: 'Body Text Width', min: 400, max: 1200, default: 677 },
-  ], updateScale, soLayoutState, soLayoutRefs);
+  ], updateScale, soLayoutState, soLayoutRefs, stage, solutionSaved.layout);
   buildLayoutSliders(solutionPanel, 'so-para', [
     { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 36 },
-  ], updateScale, soLayoutState, soLayoutRefs);
+  ], updateScale, soLayoutState, soLayoutRefs, stage, solutionSaved.layout);
   buildLayoutSliders(solutionPanel, 'so-page', [
     { key: 'x', label: 'Page Number X', min: 1400, max: 1900, default: 1855 },
     { key: 'y', label: 'Page Number Y', min: 800, max: 1060, default: 998 },
-  ], updateScale, soLayoutState, soLayoutRefs);
+  ], updateScale, soLayoutState, soLayoutRefs, stage, solutionSaved.layout);
   buildLayoutSliders(solutionPanel, 'so-logo', [
     { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
-  ], updateScale, soLayoutState, soLayoutRefs);
+  ], updateScale, soLayoutState, soLayoutRefs, stage, solutionSaved.layout);
+  buildAlignToggle(solutionPanel, 'so', soLayoutState, updateScale, solutionSaved.layout.align ?? 'bottom', '#stage-solution .so-body', soLayoutRefs, 'so-body-y');
   buildLayoutOutputBox(solutionPanel, soLayoutState, soLayoutRefs);
   buildTypographyPanels(solutionPanel, 'so', [
     { key: 'heading', name: 'Heading ("Solution")', font: 'Inter', defaults: { fs: 27, lh: 1.8, ls: -0.03, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
     { key: 'body', name: 'Body Text', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
     { key: 'label', name: 'Breadcrumb / Year / Page', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
-  ], document.createElement('div'));
+  ], document.createElement('div'), stage, solutionSaved.typography);
 
   // ---------------------------------------------------------------------
   // Impact slide module (third of three Project Overview sub-slides —
@@ -3049,38 +3254,40 @@
   const impactPanel = document.getElementById('panel-impact');
   const imLayoutState = {};
   const imLayoutRefs = {};
+  const impactSaved = loadSaved('impact');
   buildLayoutSliders(impactPanel, 'im-header', [
     { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
     { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
     { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 900, default: 545 },
-  ], updateScale, imLayoutState, imLayoutRefs);
+  ], updateScale, imLayoutState, imLayoutRefs, stage, impactSaved.layout);
   buildLayoutSliders(impactPanel, 'im-body', [
     { key: 'x', label: 'Body X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Body Y', min: 200, max: 900, default: 500 },
     { key: 'gap', label: 'Heading ↔ Text Gap', min: 0, max: 300, default: 199 },
-  ], updateScale, imLayoutState, imLayoutRefs);
+  ], updateScale, imLayoutState, imLayoutRefs, stage, impactSaved.layout);
   buildLayoutSliders(impactPanel, 'im-text', [
     { key: 'w', label: 'Body Text Width', min: 400, max: 1200, default: 740 },
-  ], updateScale, imLayoutState, imLayoutRefs);
+  ], updateScale, imLayoutState, imLayoutRefs, stage, impactSaved.layout);
   buildLayoutSliders(impactPanel, 'im-para', [
     { key: 'gap', label: 'Paragraph Gap', min: 0, max: 80, default: 36 },
-  ], updateScale, imLayoutState, imLayoutRefs);
+  ], updateScale, imLayoutState, imLayoutRefs, stage, impactSaved.layout);
   buildLayoutSliders(impactPanel, 'im-footer', [
     { key: 'x', label: 'Footer Link X', min: 1000, max: 1900, default: 1413 },
-  ], updateScale, imLayoutState, imLayoutRefs);
+  ], updateScale, imLayoutState, imLayoutRefs, stage, impactSaved.layout);
   buildLayoutSliders(impactPanel, 'im-page', [
     { key: 'y', label: 'Footer Link Y', min: 800, max: 1060, default: 998 },
-  ], updateScale, imLayoutState, imLayoutRefs);
+  ], updateScale, imLayoutState, imLayoutRefs, stage, impactSaved.layout);
   buildLayoutSliders(impactPanel, 'im-logo', [
     { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
-  ], updateScale, imLayoutState, imLayoutRefs);
+  ], updateScale, imLayoutState, imLayoutRefs, stage, impactSaved.layout);
+  buildAlignToggle(impactPanel, 'im', imLayoutState, updateScale, impactSaved.layout.align ?? 'bottom', '#stage-impact .im-body', imLayoutRefs, 'im-body-y');
   buildLayoutOutputBox(impactPanel, imLayoutState, imLayoutRefs);
   buildTypographyPanels(impactPanel, 'im', [
     { key: 'heading', name: 'Heading ("Impact")', font: 'Inter', defaults: { fs: 27, lh: 1.8, ls: -0.03, fw: 700 }, fsRange: [16, 60, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
     { key: 'body', name: 'Body Text', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
     { key: 'label', name: 'Breadcrumb / Year / Footer Link', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
-  ], document.createElement('div'));
+  ], document.createElement('div'), stage, impactSaved.typography);
 
   // ---------------------------------------------------------------------
   // Scope and Deliverables slide module (numbered sections + bullets) —
@@ -3093,41 +3300,46 @@
   const scopePanel = document.getElementById('panel-scope');
   const sdLayoutState = {};
   const sdLayoutRefs = {};
+  const scopeSaved = loadSaved('scope');
   buildLayoutSliders(scopePanel, 'sd-header', [
     { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
     { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
     { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 1000, default: 760 },
-  ], updateScale, sdLayoutState, sdLayoutRefs);
+  ], updateScale, sdLayoutState, sdLayoutRefs, stage, scopeSaved.layout);
   buildLayoutSliders(scopePanel, 'sd-cols', [
     { key: 'x', label: 'Columns X', min: 0, max: 200, default: 48 },
-    { key: 'bottom', label: 'Columns Bottom (grows upward, like Problem/Solution/Impact)', min: 20, max: 300, default: 60 },
+    { key: 'bottom', label: 'Columns Bottom (unused — Vertical Position replaced this)', min: 20, max: 300, default: 60 },
     { key: 'gap', label: 'Column Gap (incl. divider)', min: 0, max: 300, default: 133 },
-  ], updateScale, sdLayoutState, sdLayoutRefs);
+  ], updateScale, sdLayoutState, sdLayoutRefs, stage, scopeSaved.layout);
   buildLayoutSliders(scopePanel, 'sd-col', [
     { key: 'w1', label: 'Design Column Width', min: 400, max: 1100, default: 826 },
     { key: 'w2', label: 'Development Column Width', min: 400, max: 1100, default: 731 },
-  ], updateScale, sdLayoutState, sdLayoutRefs);
+  ], updateScale, sdLayoutState, sdLayoutRefs, stage, scopeSaved.layout);
   buildLayoutSliders(scopePanel, 'sd-heading', [
     { key: 'gap', label: 'Column Heading ↔ Sections Gap', min: 0, max: 120, default: 24 },
-  ], updateScale, sdLayoutState, sdLayoutRefs);
+  ], updateScale, sdLayoutState, sdLayoutRefs, stage, scopeSaved.layout);
   buildLayoutSliders(scopePanel, 'sd-section', [
     { key: 'gap', label: 'Gap Between Numbered Sections', min: 0, max: 80, default: 14 },
-  ], updateScale, sdLayoutState, sdLayoutRefs);
+  ], updateScale, sdLayoutState, sdLayoutRefs, stage, scopeSaved.layout);
   buildLayoutSliders(scopePanel, 'sd-page', [
     { key: 'x', label: 'Page Number X', min: 1400, max: 1900, default: 1855 },
     { key: 'y', label: 'Page Number Y', min: 800, max: 1060, default: 998 },
-  ], updateScale, sdLayoutState, sdLayoutRefs);
+  ], updateScale, sdLayoutState, sdLayoutRefs, stage, scopeSaved.layout);
   buildLayoutSliders(scopePanel, 'sd-logo', [
     { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
-  ], updateScale, sdLayoutState, sdLayoutRefs);
+  ], updateScale, sdLayoutState, sdLayoutRefs, stage, scopeSaved.layout);
+  buildLayoutSliders(scopePanel, 'sd', [
+    { key: 'top', label: 'Top Position (Vertical Position = Top)', min: 0, max: 900, default: 150 },
+  ], updateScale, sdLayoutState, sdLayoutRefs, stage, scopeSaved.layout);
+  buildAlignToggle(scopePanel, 'sd', sdLayoutState, updateScale, scopeSaved.layout.align ?? 'bottom', '#stage-scope .sd-cols', sdLayoutRefs, 'sd-top');
   buildLayoutOutputBox(scopePanel, sdLayoutState, sdLayoutRefs);
   buildTypographyPanels(scopePanel, 'sd', [
     { key: 'colheading', name: 'Column Heading ("Website Design (2 Revisions)") — Helvetica Neue Bold', font: 'Helvetica Neue (system)', defaults: { fs: 31.8, lh: 1.66, ls: -0.015, fw: 700 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
     { key: 'numheading', name: 'Numbered Section Heading ("1. Framer Development") — Helvetica Neue Bold', font: 'Helvetica Neue (system)', defaults: { fs: 24.9, lh: 1.24, ls: -0.019, fw: 700 }, fsRange: [12, 40, 0.1], lhRange: [0.8, 1.9, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: [400, 500, 600, 700] },
     { key: 'body', name: 'Bullet Body Text — Neue Haas Grotesk (bold inline labels stay Helvetica Neue Bold)', font: 'Neue Haas Grotesk Roman', defaults: { fs: 19.9, lh: 1.53, ls: -0.010, fw: 500 }, fsRange: [11, 32, 0.1], lhRange: [0.8, 1.9, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: null },
     { key: 'label', name: 'Breadcrumb / Year / Page — Inter', font: 'Inter', defaults: { fs: 27.3, lh: 1.35, ls: -0.030, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
-  ], document.createElement('div'));
+  ], document.createElement('div'), stage, scopeSaved.typography);
 
   // ---------------------------------------------------------------------
   // Project Timeline slide module (paragraph + stage/duration table) —
@@ -3140,34 +3352,39 @@
   const timelinePanel = document.getElementById('panel-timeline');
   const ptLayoutState = {};
   const ptLayoutRefs = {};
+  const timelineSaved = loadSaved('timeline');
   buildLayoutSliders(timelinePanel, 'pt-header', [
     { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Header Y', min: 0, max: 200, default: 48 },
     { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1824 },
     { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 1000, default: 700 },
-  ], updateScale, ptLayoutState, ptLayoutRefs);
+  ], updateScale, ptLayoutState, ptLayoutRefs, stage, timelineSaved.layout);
   buildLayoutSliders(timelinePanel, 'pt-content', [
     { key: 'x', label: 'Intro X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Intro Y (top-anchored, under header)', min: 20, max: 400, default: 90 },
     { key: 'w', label: 'Content Width (intro + table)', min: 400, max: 1200, default: 760 },
-  ], updateScale, ptLayoutState, ptLayoutRefs);
+  ], updateScale, ptLayoutState, ptLayoutRefs, stage, timelineSaved.layout);
   buildLayoutSliders(timelinePanel, 'pt-table', [
-    { key: 'bottom', label: 'Table Bottom (bottom-anchored, grows upward — independent of the intro above)', min: 20, max: 300, default: 60 },
-  ], updateScale, ptLayoutState, ptLayoutRefs);
+    { key: 'bottom', label: 'Table Bottom (unused — Vertical Position replaced this)', min: 20, max: 300, default: 60 },
+  ], updateScale, ptLayoutState, ptLayoutRefs, stage, timelineSaved.layout);
   buildLayoutSliders(timelinePanel, 'pt-footer', [
     { key: 'right', label: 'Footer Link — Distance From Right Edge', min: 20, max: 400, default: 65 },
-    { key: 'bottom', label: 'Footer Link — Distance From Bottom', min: 20, max: 300, default: 60 },
-  ], updateScale, ptLayoutState, ptLayoutRefs);
+    { key: 'bottom', label: 'Footer Link — Distance From Bottom (unused — Vertical Position replaced this)', min: 20, max: 300, default: 60 },
+  ], updateScale, ptLayoutState, ptLayoutRefs, stage, timelineSaved.layout);
   buildLayoutSliders(timelinePanel, 'pt-logo', [
     { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
-  ], updateScale, ptLayoutState, ptLayoutRefs);
+  ], updateScale, ptLayoutState, ptLayoutRefs, stage, timelineSaved.layout);
+  buildLayoutSliders(timelinePanel, 'pt', [
+    { key: 'top', label: 'Top Position (Vertical Position = Top)', min: 0, max: 900, default: 150 },
+  ], updateScale, ptLayoutState, ptLayoutRefs, stage, timelineSaved.layout);
+  buildAlignToggle(timelinePanel, 'pt', ptLayoutState, updateScale, timelineSaved.layout.align ?? 'bottom', '#stage-timeline .pt-table, #stage-timeline .pt-footer-link', ptLayoutRefs, 'pt-top');
   buildLayoutOutputBox(timelinePanel, ptLayoutState, ptLayoutRefs);
   buildTypographyPanels(timelinePanel, 'pt', [
     { key: 'body', name: 'Paragraph / Table Rows — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 27.4, lh: 1.93, ls: -0.009, fw: 500 }, fsRange: [11, 40, 0.1], lhRange: [0.8, 2.2, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: null },
     { key: 'bold', name: 'Bold Text ("Project start date:", Total row) — Helvetica Neue Bold', font: 'Helvetica Neue (system)', defaults: { fs: 31.7, lh: 1.90, ls: -0.007, fw: 700 }, fsRange: [11, 44, 0.1], lhRange: [0.8, 2.2, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: [400, 500, 600, 700] },
     { key: 'tablabel', name: 'Table Header Label ("Stage" / "Timeline") — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 22.1, lh: 1.80, ls: 0.125, fw: 500 }, fsRange: [8, 32, 0.1], lhRange: [0.8, 2.0, 0.01], lsRange: [-0.05, 0.3, 0.001], weights: null },
     { key: 'label', name: 'Breadcrumb / Year / Footer Link — Inter', font: 'Inter', defaults: { fs: 27, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
-  ], document.createElement('div'));
+  ], document.createElement('div'), stage, timelineSaved.typography);
 
   // ---------------------------------------------------------------------
   // Executive Summary slide module (payment structure + breakdown table) —
@@ -3180,40 +3397,45 @@
   const execsummaryPanel = document.getElementById('panel-execsummary');
   const esLayoutState = {};
   const esLayoutRefs = {};
+  const execsummarySaved = loadSaved('execsummary');
   buildLayoutSliders(execsummaryPanel, 'es-header', [
     { key: 'x', label: 'Header X', min: 0, max: 200, default: 48 },
     { key: 'y', label: 'Header Y', min: 0, max: 200, default: 32 },
     { key: 'w', label: 'Header Width', min: 800, max: 1920, default: 1795 },
     { key: 'lw', label: 'Header Left-Group Width', min: 300, max: 1000, default: 700 },
-  ], updateScale, esLayoutState, esLayoutRefs);
+  ], updateScale, esLayoutState, esLayoutRefs, stage, execsummarySaved.layout);
   buildLayoutSliders(execsummaryPanel, 'es-intro', [
     { key: 'x', label: 'Intro X', min: 0, max: 200, default: 57 },
     { key: 'y', label: 'Intro Y (top-anchored, under header)', min: 20, max: 400, default: 178 },
     { key: 'gap', label: 'Label ↔ Body Gap', min: 0, max: 300, default: 61 },
-  ], updateScale, esLayoutState, esLayoutRefs);
+  ], updateScale, esLayoutState, esLayoutRefs, stage, execsummarySaved.layout);
   buildLayoutSliders(execsummaryPanel, 'es-label', [
     { key: 'w', label: 'Label Width ("Payment Structure")', min: 80, max: 400, default: 168 },
-  ], updateScale, esLayoutState, esLayoutRefs);
+  ], updateScale, esLayoutState, esLayoutRefs, stage, execsummarySaved.layout);
   buildLayoutSliders(execsummaryPanel, 'es-content', [
     { key: 'w', label: 'Content Width (body + table)', min: 400, max: 1200, default: 1108 },
-  ], updateScale, esLayoutState, esLayoutRefs);
+  ], updateScale, esLayoutState, esLayoutRefs, stage, execsummarySaved.layout);
   buildLayoutSliders(execsummaryPanel, 'es-table', [
-    { key: 'bottom', label: 'Table Bottom (bottom-anchored, grows upward — independent of the intro above)', min: 20, max: 300, default: 74 },
-  ], updateScale, esLayoutState, esLayoutRefs);
+    { key: 'bottom', label: 'Table Bottom (unused — Vertical Position replaced this)', min: 20, max: 300, default: 74 },
+  ], updateScale, esLayoutState, esLayoutRefs, stage, execsummarySaved.layout);
   buildLayoutSliders(execsummaryPanel, 'es-footer', [
     { key: 'right', label: 'Footer Link — Distance From Right Edge', min: 20, max: 400, default: 65 },
-    { key: 'bottom', label: 'Footer Link — Distance From Bottom', min: 20, max: 300, default: 60 },
-  ], updateScale, esLayoutState, esLayoutRefs);
+    { key: 'bottom', label: 'Footer Link — Distance From Bottom (unused — Vertical Position replaced this)', min: 20, max: 300, default: 60 },
+  ], updateScale, esLayoutState, esLayoutRefs, stage, execsummarySaved.layout);
   buildLayoutSliders(execsummaryPanel, 'es-logo', [
     { key: 'h', label: 'BI-FLUX Logo Height', min: 6, max: 60, step: 0.1, default: 20.6 },
-  ], updateScale, esLayoutState, esLayoutRefs);
+  ], updateScale, esLayoutState, esLayoutRefs, stage, execsummarySaved.layout);
+  buildLayoutSliders(execsummaryPanel, 'es', [
+    { key: 'top', label: 'Top Position (Vertical Position = Top)', min: 0, max: 900, default: 150 },
+  ], updateScale, esLayoutState, esLayoutRefs, stage, execsummarySaved.layout);
+  buildAlignToggle(execsummaryPanel, 'es', esLayoutState, updateScale, execsummarySaved.layout.align ?? 'bottom', '#stage-execsummary .es-table, #stage-execsummary .es-footer-link', esLayoutRefs, 'es-top');
   buildLayoutOutputBox(execsummaryPanel, esLayoutState, esLayoutRefs);
   buildTypographyPanels(execsummaryPanel, 'es', [
     { key: 'body', name: 'Body Text (paragraph, list, breakdown rows) — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 26.1, lh: 1.87, ls: -0.013, fw: 500 }, fsRange: [11, 40, 0.1], lhRange: [0.8, 2.2, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: null },
     { key: 'bold', name: 'Bold Text ("Payment Structure", dollar values, "TOTAL") — Helvetica Neue Bold', font: 'Helvetica Neue (system)', defaults: { fs: 29.4, lh: 1.20, ls: 0.016, fw: 700 }, fsRange: [11, 44, 0.1], lhRange: [0.8, 2.2, 0.01], lsRange: [-0.1, 0.05, 0.001], weights: [400, 500, 600, 700] },
     { key: 'label', name: 'Breadcrumb / Year / Footer Link — Inter', font: 'Inter', defaults: { fs: 29.4, lh: 1.35, ls: -0.03, fw: 500 }, fsRange: [14, 48, 0.1], lhRange: [0.8, 1.8, 0.01], lsRange: [-0.12, 0.02, 0.001], weights: [400, 500, 600, 700] },
     { key: 'note', name: 'Domain Fees Note (bottom right) — Neue Haas Grotesk', font: 'Neue Haas Grotesk Roman', defaults: { fs: 16.2, lh: 1.5, ls: -0.005, fw: 500 }, fsRange: [10, 24, 0.1], lhRange: [0.8, 1.9, 0.01], lsRange: [-0.05, 0.1, 0.001], weights: null },
-  ], document.createElement('div'));
+  ], document.createElement('div'), stage, execsummarySaved.typography);
 
   // ---------------------------------------------------------------------
   // Client Testimonials slide module (dark theme, three cards) — built

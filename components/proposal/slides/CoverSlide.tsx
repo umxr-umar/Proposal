@@ -4,6 +4,13 @@ import type { Proposal } from "@/lib/types";
 import { BifluxLogo } from "./BifluxLogo";
 import { useSlideDeck } from "./SlideDeck";
 import { fx, fy, ffont } from "@/lib/fluid";
+import live from "@/lib/live-values/cover.json";
+
+// Values below tagged "live" come from lib/live-values/cover.json, tuned
+// via public/padding-tool.html's "Save layout/typography live" buttons —
+// edit there and refresh this tab, no manual copy-paste. Everything else
+// (gaps, widths, positions not exposed as sliders in the tool) stays a
+// plain literal here.
 
 /**
  * Version 1 of the Cover slide. Values pulled from Paper's "Cover" frame at
@@ -56,24 +63,35 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
   // The studio's actual brand font, self-hosted (Roman/400 weight only).
   const neueHaas = "var(--font-neue-haas), system-ui, sans-serif";
 
+  // "bottom" (default) = original design: title glued to the very top,
+  // subtitle+fields glued to the very bottom, via justify-content:
+  // space-between with no explicit gap. "top"/"center" pack the two
+  // groups together instead — space-between no longer applies, so they
+  // need a real gap between them or they'd touch.
+  const align = (live.layout["align"] ?? "bottom") as "top" | "center" | "bottom";
+  const justifyContent =
+    align === "top" ? "flex-start" : align === "center" ? "center" : "space-between";
+
   return (
     <div
-      className="flex h-full w-full flex-col justify-between bg-[#000000] text-[#DDDDD5]"
+      className="flex h-full w-full flex-col bg-[#000000] text-[#DDDDD5]"
       style={{
-        paddingTop: fy(21),
-        paddingBottom: `calc(${fy(51)} + ${navSafeBottom}px)`,
-        paddingLeft: fx(47),
-        paddingRight: fx(24),
+        paddingTop: fy(live.layout["pad-top"]),
+        paddingBottom: `calc(${fy(live.layout["pad-bottom"])} + ${navSafeBottom}px)`,
+        paddingLeft: fx(live.layout["pad-left"]),
+        paddingRight: fx(live.layout["pad-right"]),
+        justifyContent,
+        gap: align === "bottom" ? undefined : fy(60),
       }}
     >
       <h1
         className="uppercase"
         style={{
           fontFamily: inter,
-          fontWeight: 500,
-          fontSize: ffont(196.4, { min: 56 }),
-          lineHeight: "97%",
-          letterSpacing: "-0.060em",
+          fontWeight: live.typography.title.fw,
+          fontSize: ffont(live.typography.title.fs, { min: 56 }),
+          lineHeight: `${live.typography.title.lh * 100}%`,
+          letterSpacing: `${live.typography.title.ls}em`,
         }}
       >
         Project Proposal
@@ -85,10 +103,10 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
             marginLeft: fx(8),
             width: fx(727),
             fontFamily: helveticaNeue,
-            fontWeight: 600,
-            fontSize: ffont(74.6),
-            lineHeight: "117%",
-            letterSpacing: "-0.060em",
+            fontWeight: live.typography.subtitle.fw,
+            fontSize: ffont(live.typography.subtitle.fs),
+            lineHeight: `${live.typography.subtitle.lh * 100}%`,
+            letterSpacing: `${live.typography.subtitle.ls}em`,
             textTransform: "capitalize",
           }}
         >
@@ -101,16 +119,16 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
           style={{ marginTop: fy(71), gap: fx(105) }}
         >
           <div className="flex flex-col" style={{ gap: fy(27) }}>
-            <BifluxLogo height={ffont(21.7)} />
+            <BifluxLogo height={ffont(live.layout["logo-h"])} />
             <div
               className="flex flex-col"
               style={{
                 gap: fy(4),
                 fontFamily: neueHaas,
-                fontWeight: 400,
-                fontSize: ffont(27.4),
-                lineHeight: "132%",
-                letterSpacing: "-0.030em",
+                fontWeight: live.typography.value.fw,
+                fontSize: ffont(live.typography.value.fs),
+                lineHeight: `${live.typography.value.lh * 100}%`,
+                letterSpacing: `${live.typography.value.ls}em`,
               }}
             >
               <div>{proposal.freelancerName ?? "Umar"}</div>
@@ -123,10 +141,10 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
               className="uppercase"
               style={{
                 fontFamily: neueHaas,
-                fontWeight: 400,
-                fontSize: ffont(19.9),
-                lineHeight: "107%",
-                letterSpacing: "0.135em",
+                fontWeight: live.typography.label.fw,
+                fontSize: ffont(live.typography.label.fs),
+                lineHeight: `${live.typography.label.lh * 100}%`,
+                letterSpacing: `${live.typography.label.ls}em`,
               }}
             >
               Client
@@ -136,10 +154,10 @@ export function CoverSlide({ proposal }: { proposal: Proposal }) {
               style={{
                 gap: fy(4),
                 fontFamily: neueHaas,
-                fontWeight: 400,
-                fontSize: ffont(27.4),
-                lineHeight: "132%",
-                letterSpacing: "-0.030em",
+                fontWeight: live.typography.value.fw,
+                fontSize: ffont(live.typography.value.fs),
+                lineHeight: `${live.typography.value.lh * 100}%`,
+                letterSpacing: `${live.typography.value.ls}em`,
               }}
             >
               <div>{proposal.clientName}</div>

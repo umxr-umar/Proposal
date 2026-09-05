@@ -3,6 +3,8 @@
 import { BifluxLogo } from "./BifluxLogo";
 import { pad, useSlideDeck } from "./SlideDeck";
 import { fx, fy, ffont } from "@/lib/fluid";
+import { contentAlignStyle, type ContentAlign } from "@/lib/contentAlign";
+import live from "@/lib/live-values/toc.json";
 
 const SECTIONS = [
   "Project Overview",
@@ -89,7 +91,14 @@ export function TableOfContentsSlide() {
 
       <div
         className="absolute flex flex-col items-start"
-        style={{ left: fx(56), bottom: navSafeBottom, gap: fy(12) }}
+        style={{
+          left: fx(56),
+          gap: fy(12),
+          ...contentAlignStyle(live.layout.align as ContentAlign, {
+            topPx: live.layout["top"],
+            navSafeBottom,
+          }),
+        }}
       >
         {SECTIONS.map((title, i) => (
           <button
@@ -129,12 +138,15 @@ export function TableOfContentsSlide() {
         className="absolute"
         style={{
           left: fx(1855),
-          bottom: navSafeBottom,
           fontFamily: neueHaas,
           fontSize: ffont(30.3),
           color: "#938F8A",
           letterSpacing: "-0.006em",
           lineHeight: "131%",
+          ...contentAlignStyle(live.layout.align as ContentAlign, {
+            topPx: live.layout["top"],
+            navSafeBottom,
+          }),
         }}
       >
         {pad(index)}

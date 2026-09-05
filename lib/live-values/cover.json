@@ -1,0 +1,36 @@
+{
+  "layout": {
+    "pad-top": 21,
+    "pad-bottom": 7,
+    "pad-left": 47,
+    "pad-right": 24,
+    "logo-h": 21.7,
+    "align": "bottom"
+  },
+  "typography": {
+    "title": {
+      "fs": 196.4,
+      "lh": 0.97,
+      "ls": -0.06,
+      "fw": 600
+    },
+    "subtitle": {
+      "fs": 71,
+      "lh": 1.25,
+      "ls": -0.03,
+      "fw": 600
+    },
+    "label": {
+      "fs": 21.7,
+      "lh": 1.04,
+      "ls": 0.135,
+      "fw": 400
+    },
+    "value": {
+      "fs": 25,
+      "lh": 1.46,
+      "ls": -0.03,
+      "fw": 400
+    }
+  }
+}

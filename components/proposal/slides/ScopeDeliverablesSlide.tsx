@@ -4,6 +4,8 @@ import type { Proposal } from "@/lib/types";
 import { BifluxLogo } from "./BifluxLogo";
 import { pad, useSlideDeck } from "./SlideDeck";
 import { fx, fy, ffont } from "@/lib/fluid";
+import { contentAlignStyle, type ContentAlign } from "@/lib/contentAlign";
+import live from "@/lib/live-values/scope.json";
 
 /**
  * "Scope and Deliverables" — Design + Development columns. Each column is
@@ -137,7 +139,14 @@ export function ScopeDeliverablesSlide({ proposal }: { proposal: Proposal }) {
 
       <div
         className="absolute flex items-start"
-        style={{ left: fx(48), bottom: navSafeBottom, gap: fx(133) }}
+        style={{
+          left: fx(48),
+          gap: fx(133),
+          ...contentAlignStyle(live.layout.align as ContentAlign, {
+            topPx: live.layout["top"],
+            navSafeBottom,
+          }),
+        }}
       >
         <div style={{ width: fx(826) }}>
           <div

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { BifluxLogo } from "./BifluxLogo";
 import { pad, useSlideDeck } from "./SlideDeck";
 import { fx, fy, ffont } from "@/lib/fluid";
+import { contentAlignStyle, type ContentAlign } from "@/lib/contentAlign";
 
 /**
  * Shared layout for the "01. Project Overview" sub-slides (Problem,
@@ -18,9 +19,11 @@ import { fx, fy, ffont } from "@/lib/fluid";
  * other size, rather than scaling a fixed canvas as one rigid block — no
  * cropping, no letterbox bars, ever.
  *
- * Body and footer anchor with `bottom: navSafeBottom` (from SlideDeck's
- * context, a constant real px) so they always clear the fixed nav pill
- * regardless of viewport size.
+ * The body block's vertical position defaults to `bottom: navSafeBottom`
+ * (original design) but is switchable to top/center via `align` — tuned
+ * live per-slide (Problem/Solution/Impact each have their own live-values
+ * file) through padding-tool.html's "Vertical Position" control. The
+ * footer/page-number always stays bottom-anchored regardless of `align`.
  */
 export function OverviewTextSlide({
   label,
@@ -28,12 +31,16 @@ export function OverviewTextSlide({
   bodyGap,
   paragraphs,
   footer,
+  align = "bottom",
+  topPx = 150,
 }: {
   label: string;
   bodyWidth: number;
   bodyGap: number;
   paragraphs: ReactNode[];
   footer?: ReactNode;
+  align?: ContentAlign;
+  topPx?: number;
 }) {
   const { index, navSafeBottom } = useSlideDeck();
   const inter = "var(--font-inter), system-ui, sans-serif";
@@ -81,7 +88,11 @@ export function OverviewTextSlide({
 
       <div
         className="absolute flex items-start"
-        style={{ left: fx(48), bottom: navSafeBottom, gap: fx(bodyGap) }}
+        style={{
+          left: fx(48),
+          gap: fx(bodyGap),
+          ...contentAlignStyle(align, { topPx, navSafeBottom }),
+        }}
       >
         <div
           style={{

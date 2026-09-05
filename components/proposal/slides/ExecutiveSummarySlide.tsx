@@ -4,6 +4,8 @@ import type { Proposal } from "@/lib/types";
 import { BifluxLogo } from "./BifluxLogo";
 import { pad, useSlideDeck } from "./SlideDeck";
 import { fx, fy, ffont } from "@/lib/fluid";
+import { contentAlignStyle, type ContentAlign } from "@/lib/contentAlign";
+import live from "@/lib/live-values/execsummary.json";
 
 /**
  * "04. Executive Summary" — a "Payment Structure" label+body row (same
@@ -36,6 +38,10 @@ export function ExecutiveSummarySlide({ proposal }: { proposal: Proposal }) {
   const neueHaas = "var(--font-neue-haas), system-ui, sans-serif";
   const year = new Date().getFullYear();
   const contentWidth = 1108;
+  const alignStyle = contentAlignStyle(live.layout.align as ContentAlign, {
+    topPx: live.layout["top"],
+    navSafeBottom,
+  });
 
   const bodyStyle = {
     fontFamily: neueHaas,
@@ -127,7 +133,7 @@ export function ExecutiveSummarySlide({ proposal }: { proposal: Proposal }) {
 
       <div
         className="absolute"
-        style={{ left: fx(57), bottom: navSafeBottom, width: fx(contentWidth) }}
+        style={{ left: fx(57), width: fx(contentWidth), ...alignStyle }}
       >
         <div
           className="flex items-center justify-between"
@@ -204,12 +210,12 @@ export function ExecutiveSummarySlide({ proposal }: { proposal: Proposal }) {
         className="absolute cursor-pointer border-0 bg-transparent p-0 text-right transition-opacity hover:opacity-70"
         style={{
           right: fx(65),
-          bottom: navSafeBottom,
           fontFamily: inter,
           fontWeight: 400,
           fontSize: ffont(29.4),
           lineHeight: "135%",
           letterSpacing: "-0.03em",
+          ...alignStyle,
         }}
       >
         <span style={{ color: "#938F8A" }}>{pad(index)} / </span>

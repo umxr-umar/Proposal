@@ -4,6 +4,8 @@ import type { Proposal } from "@/lib/types";
 import { BifluxLogo } from "./BifluxLogo";
 import { pad, useSlideDeck } from "./SlideDeck";
 import { fx, fy, ffont } from "@/lib/fluid";
+import { contentAlignStyle, type ContentAlign } from "@/lib/contentAlign";
+import live from "@/lib/live-values/timeline.json";
 
 /**
  * "03. Project Timeline" — a short intro paragraph, an all-bold/uppercase
@@ -36,6 +38,10 @@ export function ProjectTimelineSlide({ proposal }: { proposal: Proposal }) {
   const neueHaas = "var(--font-neue-haas), system-ui, sans-serif";
   const year = new Date().getFullYear();
   const contentWidth = 1037;
+  const alignStyle = contentAlignStyle(live.layout.align as ContentAlign, {
+    topPx: live.layout["top"],
+    navSafeBottom,
+  });
 
   return (
     <div
@@ -119,7 +125,7 @@ export function ProjectTimelineSlide({ proposal }: { proposal: Proposal }) {
 
       <div
         className="absolute"
-        style={{ left: fx(55), bottom: navSafeBottom, width: fx(contentWidth) }}
+        style={{ left: fx(55), width: fx(contentWidth), ...alignStyle }}
       >
         <div
           className="flex items-center justify-between"
@@ -181,12 +187,12 @@ export function ProjectTimelineSlide({ proposal }: { proposal: Proposal }) {
         className="absolute cursor-pointer border-0 bg-transparent p-0 text-right transition-opacity hover:opacity-70"
         style={{
           right: fx(65),
-          bottom: navSafeBottom,
           fontFamily: inter,
           fontWeight: 400,
           fontSize: ffont(27),
           lineHeight: "135%",
           letterSpacing: "-0.03em",
+          ...alignStyle,
         }}
       >
         <span style={{ color: "#938F8A" }}>{pad(index)} / </span>
